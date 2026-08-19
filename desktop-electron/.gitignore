@@ -1,0 +1,24 @@
+# Standard Electron .gitignore (matches Electron Forge / electron-builder scaffolds)
+
+node_modules/
+
+# Build output
+dist/
+out/
+build/
+release/
+
+# Electron Forge / electron-builder
+.webpack/
+*.log
+
+# macOS
+.DS_Store
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Editor
+*.swp
