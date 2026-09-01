@@ -1,0 +1,25 @@
+name: careconnect
+description: >-
+  CareConnect mobile app (SWEN 661 Team 1) — a caregiving companion app with a
+  Left-Hand Mode accessibility focus, built from the team's Week 3 Figma design
+  system. Phone and tablet layouts, WCAG 2.2 AA tap targets, no drag-only
+  actions, and visible focus states.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

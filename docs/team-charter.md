@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | Dom Puller | domspencer01@outlook.com | LaoWai-Fi | TBD | TBD |
 | Upneet Bir | upneetbir@gmail.com | upneetsb | TBD | TBD |
-| Wiliss Tako | takowiliss@gmail.com | TBD | TBD | TBD |
+| Wiliss Tako | takowiliss@gmail.com | wilisstako | TBD | TBD |
 
 Team name: TBD
 
