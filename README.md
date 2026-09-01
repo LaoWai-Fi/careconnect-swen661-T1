@@ -28,7 +28,7 @@ careconnect-swen661-T1/
     └── team-charter.md   # team roles, workflow, communication plan
 ```
 
-`web/` is the only platform scaffolded so far — see [web/README.md](web/README.md) for its setup and full feature/architecture writeup. `mobile-flutter/`, `mobile-rn/`, and `desktop-electron/` are placeholders (each with its own README and `.gitignore`) to be built out in later weeks.
+`web/` and `mobile-flutter/` are scaffolded — see [web/README.md](web/README.md) and [mobile-flutter/README.md](mobile-flutter/README.md) for their setup and feature writeups. `mobile-rn/` and `desktop-electron/` are placeholders (each with its own README and `.gitignore`) to be built out in later weeks.
 
 ## Setup instructions
 
@@ -38,10 +38,11 @@ Each platform folder is self-contained with its own dependencies and `.gitignore
 git clone https://github.com/LaoWai-Fi/careconnect-swen661-T1.git
 cd careconnect-swen661-T1
 
-cd web && npm install && npm run dev        # web app — see web/README.md
+cd web && npm install && npm run dev              # web app — see web/README.md
+cd mobile-flutter && flutter create . --platforms=android,ios --project-name careconnect && flutter run   # mobile app — see mobile-flutter/README.md
 ```
 
-Flutter, React Native, and Electron setup commands will be added to their respective folders' READMEs once those apps are scaffolded.
+React Native and Electron setup commands will be added to their respective folders' READMEs once those apps are scaffolded.
 
 ## License
 
