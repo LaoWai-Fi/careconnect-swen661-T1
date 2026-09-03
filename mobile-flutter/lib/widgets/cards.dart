@@ -181,8 +181,8 @@ class _AlertCardState extends State<AlertCard> {
             ),
           ),
           SizedBox(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             child: IconButton(
               icon: const Icon(Icons.close, size: 18),
               tooltip: 'Dismiss alert',

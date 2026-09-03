@@ -6,8 +6,8 @@ import '../theme/tokens.dart';
 /// system's `TapButton`.
 ///
 /// Accessibility notes:
-/// - All sizes meet or exceed WCAG 2.5.8 Target Size – AA (sm 44 / md 52 /
-///   lg 60 dp minimum heights).
+/// - All sizes meet or exceed the ~48x48dp touch-target baseline (sm 48 /
+///   md 52 / lg 60 dp minimum heights).
 /// - A 3px focus outline (WCAG 2.4.7 Focus Visible – AA) is drawn via
 ///   [FocusableActionDetector] so it also shows for keyboard/dpad users.
 enum TapButtonVariant { primary, outline, ghost, destructive, secondary }

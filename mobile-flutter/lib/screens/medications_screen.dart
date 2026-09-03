@@ -72,7 +72,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                   ),
                   const SizedBox(height: 20),
                   if (widget.state.medications.isEmpty)
-                    _EmptyState(
+                    const _EmptyState(
                       icon: Icons.medication_outlined,
                       title: 'No medications yet',
                       body: 'Tap "Add" to add Margaret\'s first prescription.',
@@ -222,8 +222,8 @@ class _MedCard extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 44,
-                height: 44,
+                width: 48,
+                height: 48,
                 child: IconButton(
                   icon: Icon(
                     med.taken ? Icons.check_circle : Icons.radio_button_unchecked,
@@ -368,8 +368,8 @@ class _MedFormSheetState extends State<_MedFormSheet> {
                               ),
                             ),
                             SizedBox(
-                              width: 44,
-                              height: 44,
+                              width: 48,
+                              height: 48,
                               child: IconButton(icon: const Icon(Icons.close), tooltip: 'Close', onPressed: widget.onCancel),
                             ),
                           ],

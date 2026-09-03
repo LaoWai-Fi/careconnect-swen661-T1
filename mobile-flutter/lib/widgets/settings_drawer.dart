@@ -125,6 +125,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             onPressed: () {
               Navigator.of(context).pop();
               state.signOut();
+              Navigator.of(context).pushNamedAndRemoveUntil('/landing', (route) => false);
             },
           ),
         ],

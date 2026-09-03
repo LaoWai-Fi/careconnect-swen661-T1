@@ -95,7 +95,7 @@ class _LandingScreenState extends State<LandingScreen> {
                         variant: TapButtonVariant.secondary,
                         size: TapButtonSize.lg,
                         fullWidth: true,
-                        onPressed: () => widget.state.navigate(CCPage.signup),
+                        onPressed: () => Navigator.of(context).pushNamed('/signup'),
                       ),
                       const SizedBox(height: 12),
                       TapButton(
@@ -103,7 +103,7 @@ class _LandingScreenState extends State<LandingScreen> {
                         variant: TapButtonVariant.ghost,
                         size: TapButtonSize.lg,
                         fullWidth: true,
-                        onPressed: () => widget.state.navigate(CCPage.signin),
+                        onPressed: () => Navigator.of(context).pushNamed('/signin'),
                       ),
                     ],
                   ),
@@ -157,7 +157,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     child: const Icon(Icons.smart_toy_outlined, size: 16, color: Colors.white),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
+                  const Expanded(
                     child: Text('CareConnect Assistant', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   ),
                   IconButton(
@@ -214,8 +214,8 @@ class _LandingScreenState extends State<LandingScreen> {
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 44,
-                    height: 44,
+                    width: 48,
+                    height: 48,
                     child: IconButton.filled(
                       icon: const Icon(Icons.send, size: 18),
                       tooltip: 'Send message',

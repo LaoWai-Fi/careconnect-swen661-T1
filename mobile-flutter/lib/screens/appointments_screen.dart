@@ -314,8 +314,8 @@ class _ApptFormSheetState extends State<_ApptFormSheet> {
                               ),
                             ),
                             SizedBox(
-                              width: 44,
-                              height: 44,
+                              width: 48,
+                              height: 48,
                               child: IconButton(icon: const Icon(Icons.close), tooltip: 'Close', onPressed: widget.onCancel),
                             ),
                           ],

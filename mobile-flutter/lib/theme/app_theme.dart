@@ -45,6 +45,7 @@ abstract final class CCTheme {
         onError: Colors.white,
         surface: card,
         onSurface: foreground,
+        onSurfaceVariant: mutedForeground,
         surfaceContainerHighest: muted,
         outline: border,
       ),

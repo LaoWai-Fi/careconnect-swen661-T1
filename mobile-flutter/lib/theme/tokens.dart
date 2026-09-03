@@ -79,12 +79,13 @@ abstract final class CCTokens {
   static const double radius = 12.0;
   static final BorderRadius borderRadius = BorderRadius.circular(radius);
 
-  // ── Tap target sizes (WCAG 2.5.8 Target Size – AA) ─────────────────────
+  // ── Tap target sizes (WCAG 2.5.8 Target Size – AA, and the Week 4
+  // ~48x48dp baseline) ─────────────────────────────────────────────────
   /// Minimum interactive size anywhere in the app.
-  static const double minTarget = 44.0;
+  static const double minTarget = 48.0;
 
-  /// TapButton size scale: sm 44, md 52, lg 60 — matches the Figma spec.
-  static const double buttonSm = 44.0;
+  /// TapButton size scale: sm 48, md 52, lg 60.
+  static const double buttonSm = 48.0;
   static const double buttonMd = 52.0;
   static const double buttonLg = 60.0;
 

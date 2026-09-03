@@ -1,17 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Which screen is showing. Mirrors the Figma Make `Page` type.
-enum CCPage {
-  landing,
-  signin,
-  signup,
-  role,
-  dashboard,
-  medications,
-  appointments,
-  activity,
-}
-
 /// One-Handed Mode: off / left / right. The team's assigned accessibility
 /// constraint is the `left` mode — it anchors navigation and key actions to
 /// the left edge for left-thumb reach.
@@ -92,25 +80,48 @@ class DashboardWidget {
   int order;
 }
 
+/// A message in the caregiver's inbox — ported from the Figma Make `Message`
+/// type (cc/bcc/attachments were dropped for the Flutter port; everything
+/// that drives the read/unread + navigation behavior is kept).
+class Message {
+  Message({
+    required this.id,
+    required this.from,
+    required this.to,
+    required this.subject,
+    required this.body,
+    required this.timestamp,
+    this.read = false,
+    this.archived = false,
+  });
+
+  final String id;
+  final String from;
+  final String to;
+  final String subject;
+  final String body;
+  final String timestamp;
+  bool read;
+  bool archived;
+}
+
 /// Root app state — mirrors the Figma Make `AppState` type so the Flutter
 /// build behaves identically to the design prototype.
+///
+/// Navigation is NOT tracked here: which screen is showing is owned by the
+/// Flutter `Navigator` (named routes, see `main.dart`), not by a page field
+/// on this class. This class only holds app data and business logic.
 class AppState with ChangeNotifier {
-  CCPage page = CCPage.landing;
   HandMode handMode = HandMode.off;
   String userName = '';
-  String? role; // 'caregiver' | 'recipient'
   List<Medication> medications = [];
   List<Appointment> appointments = [];
   List<ActivityEntry> activity = [];
   List<DashboardWidget> dashboardWidgets = [];
+  List<Message> messages = [];
   FontScale fontSize = FontScale.normal;
   bool checkedIn = false;
   ThemeModeSetting theme = ThemeModeSetting.system;
-
-  void navigate(CCPage p) {
-    page = p;
-    notifyListeners();
-  }
 
   void setHandMode(HandMode m) {
     handMode = m;
@@ -127,24 +138,17 @@ class AppState with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Records the signed-in user's name. Does not change screens — the
+  /// calling screen navigates to '/dashboard' itself once this returns.
   void signIn(String name) {
     userName = name;
-    page = CCPage.role;
     notifyListeners();
   }
 
   void signOut() {
-    page = CCPage.landing;
     userName = '';
-    role = null;
     handMode = HandMode.off;
     checkedIn = false;
-    notifyListeners();
-  }
-
-  void chooseRole(String r) {
-    role = r;
-    page = CCPage.dashboard;
     notifyListeners();
   }
 
@@ -216,15 +220,61 @@ class AppState with ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Messages ──────────────────────────────────────────────────────────
+
+  void sendMessage({required String from, required String to, required String subject, required String body}) {
+    messages.insert(
+      0,
+      Message(id: _uid(), from: from, to: to, subject: subject, body: body, timestamp: _nowTimestamp(), read: true),
+    );
+    notifyListeners();
+  }
+
+  /// Marks a message read. Safe to call even if it's already read — used
+  /// when a message is opened, so it never flips a manually-set unread
+  /// state back on by accident.
+  void markMessageRead(String id) {
+    for (final m in messages) {
+      if (m.id == id && !m.read) m.read = true;
+    }
+    notifyListeners();
+  }
+
+  /// Flips read/unread. Used by the explicit toggle controls (the list-row
+  /// dot and the detail screen's "Mark as unread/read" button) so a message
+  /// can be pushed back to unread on purpose.
+  void toggleMessageRead(String id) {
+    for (final m in messages) {
+      if (m.id == id) m.read = !m.read;
+    }
+    notifyListeners();
+  }
+
+  void archiveMessage(String id) {
+    for (final m in messages) {
+      if (m.id == id) m.archived = true;
+    }
+    notifyListeners();
+  }
+
+  void deleteMessage(String id) {
+    messages.removeWhere((m) => m.id == id);
+    notifyListeners();
+  }
+
+  int get unreadMessageCount => messages.where((m) => !m.read && !m.archived).length;
+
   void _log(ActivityType type, String description) {
-    final now = DateTime.now();
-    final ts =
-        '${((now.hour % 12) == 0 ? 12 : now.hour % 12).toString()}:${now.minute.toString().padLeft(2, '0')} ${now.hour < 12 ? 'am' : 'pm'}';
     activity.insert(
       0,
-      ActivityEntry(id: _uid(), type: type, description: description, timestamp: ts),
+      ActivityEntry(id: _uid(), type: type, description: description, timestamp: _nowTimestamp()),
     );
   }
+}
+
+String _nowTimestamp() {
+  final now = DateTime.now();
+  return '${((now.hour % 12) == 0 ? 12 : now.hour % 12).toString()}:${now.minute.toString().padLeft(2, '0')} ${now.hour < 12 ? 'am' : 'pm'}';
 }
 
 int _counter = 0;

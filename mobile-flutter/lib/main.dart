@@ -7,9 +7,10 @@ import 'screens/auth_screens.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/landing_screen.dart';
 import 'screens/medications_screen.dart';
+import 'screens/message_detail_screen.dart';
+import 'screens/messages_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_shell.dart';
-import 'widgets/settings_drawer.dart';
 
 void main() {
   runApp(const CareConnectApp());
@@ -38,6 +39,7 @@ class _CareConnectAppState extends State<CareConnectApp> {
       DashboardWidget(id: 'alerts', label: 'Alerts', enabled: true, order: 1),
       DashboardWidget(id: 'medications', label: "Today's medications", enabled: true, order: 2),
       DashboardWidget(id: 'appointments', label: 'Next appointment', enabled: true, order: 3),
+      DashboardWidget(id: 'messages', label: 'Unread messages', enabled: true, order: 4),
     ];
     _state.medications = [
       Medication(
@@ -88,6 +90,36 @@ class _CareConnectAppState extends State<CareConnectApp> {
         notes: 'Routine yearly eye test. Your glasses prescription may be updated. No special preparation needed.',
       ),
     ];
+    _state.messages = [
+      Message(
+        id: 'msg1',
+        from: 'Dr. Sharma',
+        to: 'Maria Thompson',
+        subject: "Margaret's blood pressure results",
+        body:
+            "Hi Maria,\n\nI reviewed Margaret's blood pressure readings from this week. The numbers are slightly elevated but not concerning at this stage. Please ensure she takes her Amlodipine consistently at 8:30 am.\n\nI'll check again at her appointment on Thursday.\n\nBest regards,\nDr. Sharma",
+        timestamp: '9:15 am',
+      ),
+      Message(
+        id: 'msg2',
+        from: 'Emma Thompson',
+        to: 'Maria Thompson',
+        subject: 'Cover this afternoon?',
+        body:
+            "Hi,\n\nCould you cover Margaret's afternoon visit today? I have a clash with another appointment. She needs her 2 pm medications checked.\n\nThanks,\nEmma",
+        timestamp: 'Yesterday',
+      ),
+      Message(
+        id: 'msg3',
+        from: 'Vision Plus Opticians',
+        to: 'Maria Thompson',
+        subject: 'Appointment reminder',
+        body:
+            'This is a reminder that Margaret Thompson has an eye test booked for Friday 18 July at 11:00 am at Vision Plus Opticians, 22 High Street, Westfield. Please call us if you need to reschedule.',
+        timestamp: 'Mon',
+        read: true,
+      ),
+    ];
   }
 
   @override
@@ -118,35 +150,41 @@ class _CareConnectAppState extends State<CareConnectApp> {
           child: child!,
         );
       },
-      home: _buildPage(),
+      initialRoute: '/landing',
+      onGenerateRoute: _onGenerateRoute,
     );
   }
 
-  Widget _buildPage() {
-    switch (_state.page) {
-      case CCPage.landing:
-        return LandingScreen(state: _state);
-      case CCPage.signin:
-        return SignInScreen(state: _state);
-      case CCPage.signup:
-        return SignUpScreen(state: _state);
-      case CCPage.role:
-        return RoleChooserScreen(state: _state);
-      case CCPage.dashboard:
-      case CCPage.medications:
-      case CCPage.appointments:
-      case CCPage.activity:
-        return AppShell(
-          state: _state,
-          onOpenSettings: () => showSettingsSheet(context, _state),
-          child: switch (_state.page) {
-            CCPage.dashboard => DashboardScreen(state: _state),
-            CCPage.medications => MedicationsScreen(state: _state),
-            CCPage.appointments => AppointmentsScreen(state: _state),
-            CCPage.activity => ActivityScreen(state: _state),
-            _ => const SizedBox.shrink(),
-          },
-        );
-    }
+  /// Named-route navigation: every screen is reached through the Flutter
+  /// `Navigator` by route name (`pushNamed` / `pushReplacementNamed` /
+  /// `pushNamedAndRemoveUntil`), not a hand-rolled page-enum switch.
+  ///
+  /// The bottom-nav/sidebar tabs (dashboard/medications/appointments/
+  /// activity/messages) use `pushReplacementNamed` so the back stack
+  /// doesn't grow on every tab tap — the same pattern a native bottom-nav
+  /// uses. Selecting a specific item (e.g. a message) genuinely pushes a
+  /// detail screen with that item passed as route arguments, giving a real
+  /// back stack and data hand-off for that flow (see '/messages/detail').
+  Route<dynamic> _onGenerateRoute(RouteSettings settings) {
+    final Widget page = switch (settings.name) {
+      '/signin' => SignInScreen(state: _state),
+      '/signup' => SignUpScreen(state: _state),
+      '/dashboard' => AppShell(state: _state, activeTab: AppTab.dashboard, child: DashboardScreen(state: _state)),
+      '/medications' => AppShell(
+        state: _state,
+        activeTab: AppTab.medications,
+        child: MedicationsScreen(state: _state),
+      ),
+      '/appointments' => AppShell(
+        state: _state,
+        activeTab: AppTab.appointments,
+        child: AppointmentsScreen(state: _state),
+      ),
+      '/activity' => AppShell(state: _state, activeTab: AppTab.activity, child: ActivityScreen(state: _state)),
+      '/messages' => AppShell(state: _state, activeTab: AppTab.messages, child: MessagesScreen(state: _state)),
+      '/messages/detail' => MessageDetailScreen(state: _state, message: settings.arguments as Message),
+      _ => LandingScreen(state: _state),
+    };
+    return MaterialPageRoute<void>(builder: (_) => page, settings: settings);
   }
 }

@@ -39,6 +39,7 @@ class _SignInScreenState extends State<SignInScreen> {
     Future.delayed(const Duration(milliseconds: 700), () {
       if (!mounted) return;
       widget.state.signIn(_email.text.split('@').first.isEmpty ? 'Joyce' : _email.text.split('@').first);
+      Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
     });
   }
 
@@ -109,7 +110,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         const SizedBox(height: 18),
                         TextButton(
-                          onPressed: () => widget.state.navigate(CCPage.signup),
+                          onPressed: () => Navigator.of(context).pushReplacementNamed('/signup'),
                           child: Text.rich(
                             TextSpan(
                               text: "Don't have an account? ",
@@ -189,6 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Future.delayed(const Duration(milliseconds: 700), () {
       if (!mounted) return;
       widget.state.signIn(_name.text.trim());
+      Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
     });
   }
 
@@ -268,7 +270,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         const SizedBox(height: 18),
                         TextButton(
-                          onPressed: () => widget.state.navigate(CCPage.signin),
+                          onPressed: () => Navigator.of(context).pushReplacementNamed('/signin'),
                           child: Text.rich(
                             TextSpan(
                               text: 'Already have an account? ',
@@ -293,123 +295,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Role chooser — ported from the Figma `RoleChooserPage`.
-class RoleChooserScreen extends StatelessWidget {
-  const RoleChooserScreen({super.key, required this.state});
-
-  final AppState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      backgroundColor: scheme.surfaceContainerHighest,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _AuthHeader(),
-            Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 440),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Welcome, ${state.userName}!',
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: scheme.onSurface),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'How are you using CareConnect right now?',
-                          style: TextStyle(fontSize: 16, color: scheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 24),
-                        _RoleCard(
-                          icon: Icons.favorite_border,
-                          label: 'I am the Care Recipient',
-                          description: 'Track your own medications, appointments, and daily check-ins.',
-                          onTap: () => state.chooseRole('recipient'),
-                        ),
-                        const SizedBox(height: 16),
-                        _RoleCard(
-                          icon: Icons.shield_outlined,
-                          label: 'I am the Caregiver',
-                          description: 'Manage medications, appointments, and monitor care for someone you love.',
-                          onTap: () => state.chooseRole('caregiver'),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          "Your choice is remembered. You can switch at any time from inside the app.\nThis does not affect what information is stored — only which view you see first.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RoleCard extends StatelessWidget {
-  const _RoleCard({
-    required this.icon,
-    required this.label,
-    required this.description,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final String description;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Material(
-      color: scheme.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: scheme.primary, width: 2),
-          ),
-          child: Column(
-            children: [
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: scheme.primary.withValues(alpha: 0.13),
-                child: Icon(icon, size: 30, color: scheme.primary),
-              ),
-              const SizedBox(height: 12),
-              Text(label, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: scheme.onSurface)),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant),
-              ),
-            ],
-          ),
         ),
       ),
     );

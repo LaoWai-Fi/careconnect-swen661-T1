@@ -196,7 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   sub: 'taken today',
                   bg: isLight ? CCTokens.warningBgLight : CCTokens.warningBgDark,
                   borderColor: isLight ? CCTokens.warningBorderLight : CCTokens.warningBorderDark,
-                  onTap: () => state.navigate(CCPage.medications),
+                  onTap: () => Navigator.of(context).pushReplacementNamed('/medications'),
                 ),
                 StatCard(
                   icon: Icons.person_outline,
@@ -218,7 +218,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   sub: nextAppt?.dateTime ?? '—',
                   bg: isLight ? CCTokens.infoBgLight : CCTokens.infoBgDark,
                   borderColor: isLight ? CCTokens.infoBorderLight : CCTokens.infoBorderDark,
-                  onTap: () => state.navigate(CCPage.appointments),
+                  onTap: () => Navigator.of(context).pushReplacementNamed('/appointments'),
                 ),
               ],
             ),
@@ -262,7 +262,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   '${untaken.map((m) => '${m.name} ${m.dose}').join(', ')} — scheduled for ${untaken.first.time}.',
             ),
           if (!state.checkedIn)
-            AlertCard(
+            const AlertCard(
               icon: Icons.person_outline,
               title: 'No check-in yet',
               body: "Margaret hasn't checked in this morning. Tap the Check-in card above to record it.",
@@ -307,7 +307,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => state.navigate(CCPage.medications),
+                onPressed: () => Navigator.of(context).pushReplacementNamed('/medications'),
                 child: const Text('View all →'),
               ),
             ],
@@ -332,7 +332,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => state.navigate(CCPage.appointments),
+                onPressed: () => Navigator.of(context).pushReplacementNamed('/appointments'),
                 child: const Text('View all →'),
               ),
             ],
@@ -360,6 +360,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 24),
         ];
 
+      case 'messages':
+        final unread = state.messages.where((m) => !m.read && !m.archived).toList();
+        return [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Unread messages',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: scheme.onSurface),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pushReplacementNamed('/messages'),
+                child: const Text('View all →'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (unread.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: scheme.outline),
+              ),
+              child: Text(
+                'No new messages',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Flex(
+              direction: isWide ? Axis.horizontal : Axis.vertical,
+              children: _spread(isWide, [
+                for (final msg in unread.take(3))
+                  _MessageTile(
+                    message: msg,
+                    onTap: () {
+                      state.markMessageRead(msg.id);
+                      Navigator.of(context).pushNamed('/messages/detail', arguments: msg);
+                    },
+                  ),
+              ]),
+            ),
+          const SizedBox(height: 24),
+        ];
+
       default:
         return [const SizedBox.shrink()];
     }
@@ -377,7 +427,11 @@ class _MedTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    return Material(
+    return Semantics(
+      button: true,
+      label: '${med.name}, ${med.dose}, ${med.time}',
+      value: med.taken ? 'Taken' : 'Not yet taken',
+      child: Material(
       color: med.taken
           ? (isLight ? CCTokens.successBgLight : CCTokens.successBgDark)
           : scheme.surface,
@@ -431,6 +485,67 @@ class _MedTile extends StatelessWidget {
           ),
         ),
       ),
+      ),
+    );
+  }
+}
+
+/// Compact tappable message row on the dashboard.
+class _MessageTile extends StatelessWidget {
+  const _MessageTile({required this.message, required this.onTap});
+
+  final Message message;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: 'Unread message from ${message.from}: ${message.subject}',
+      child: Material(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 60),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: scheme.primary, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(color: scheme.primary, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        message.from,
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: scheme.onSurface),
+                      ),
+                      Text(
+                        message.subject,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(message.timestamp, style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant)),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -469,9 +584,12 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
     widget.state.reorderWidgets(_items);
   }
 
-  void _onReorder(int oldIndex, int newIndex) {
+  /// `onReorderItem` (replacing the deprecated `onReorder`, Flutter
+  /// 3.41+) already adjusts `newIndex` for the removed item at
+  /// `oldIndex` before calling this, so unlike the old `onReorder`
+  /// callback this must NOT also decrement newIndex itself.
+  void _onReorderItem(int oldIndex, int newIndex) {
     setState(() {
-      if (newIndex > oldIndex) newIndex -= 1;
       final moved = _items.removeAt(oldIndex);
       _items.insert(newIndex, moved);
     });
@@ -529,7 +647,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                           child: ReorderableListView.builder(
                             shrinkWrap: true,
                             buildDefaultDragHandles: false,
-                            onReorder: _onReorder,
+                            onReorderItem: _onReorderItem,
                             itemCount: _items.length,
                             proxyDecorator: (child, index, animation) => Material(
                               color: scheme.surfaceContainerHighest,
@@ -547,8 +665,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                     ReorderableDragStartListener(
                                       index: i,
                                       child: SizedBox(
-                                        width: 44,
-                                        height: 44,
+                                        width: 48,
+                                        height: 48,
                                         child: Icon(Icons.drag_indicator, color: scheme.onSurfaceVariant),
                                       ),
                                     ),
@@ -560,8 +678,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                     ),
                                     // Tap-based Move Up / Move Down (WCAG 2.5.7)
                                     SizedBox(
-                                      width: 44,
-                                      height: 44,
+                                      width: 48,
+                                      height: 48,
                                       child: IconButton(
                                         icon: const Icon(Icons.arrow_upward, size: 18),
                                         tooltip: 'Move ${w.label} up',
@@ -569,8 +687,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                       ),
                                     ),
                                     SizedBox(
-                                      width: 44,
-                                      height: 44,
+                                      width: 48,
+                                      height: 48,
                                       child: IconButton(
                                         icon: const Icon(Icons.arrow_downward, size: 18),
                                         tooltip: 'Move ${w.label} down',
@@ -614,7 +732,6 @@ class _WidgetToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Semantics(
       label: '$label — ${value ? 'visible' : 'hidden'}',
       toggled: value,

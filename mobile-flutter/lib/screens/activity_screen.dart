@@ -53,7 +53,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isLight = Theme.of(context).brightness == Brightness.light;
     final isWide = MediaQuery.sizeOf(context).width >= 768;
 
     final entries =

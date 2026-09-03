@@ -3,21 +3,41 @@ import 'package:flutter/material.dart';
 import '../models/app_state.dart';
 import '../theme/tokens.dart';
 import 'cards.dart';
+import 'settings_drawer.dart';
 import 'tap_button.dart';
 
-/// Navigation items — mirror the Figma design's NAV_ITEMS.
+/// The five top-level destinations, each backed by a named route.
+///
+/// Navigation is driven by the Flutter `Navigator` (see `main.dart`'s
+/// `_onGenerateRoute`), not by a field on `AppState` -- this enum only says
+/// which tab is *currently showing* so the nav bar/sidebar can highlight it
+/// and the header can label it.
+enum AppTab { dashboard, medications, appointments, activity, messages }
+
+extension AppTabRoute on AppTab {
+  String get route => switch (this) {
+    AppTab.dashboard => '/dashboard',
+    AppTab.medications => '/medications',
+    AppTab.appointments => '/appointments',
+    AppTab.activity => '/activity',
+    AppTab.messages => '/messages',
+  };
+}
+
+/// Navigation items -- mirror the Figma design's NAV_ITEMS.
 class _NavItem {
-  const _NavItem(this.page, this.label, this.icon);
-  final CCPage page;
+  const _NavItem(this.tab, this.label, this.icon);
+  final AppTab tab;
   final String label;
   final IconData icon;
 }
 
 const _navItems = [
-  _NavItem(CCPage.dashboard, 'Dashboard', Icons.dashboard_outlined),
-  _NavItem(CCPage.medications, 'Medications', Icons.medication_outlined),
-  _NavItem(CCPage.appointments, 'Appointments', Icons.event_outlined),
-  _NavItem(CCPage.activity, 'Activity', Icons.insights_outlined),
+  _NavItem(AppTab.dashboard, 'Dashboard', Icons.dashboard_outlined),
+  _NavItem(AppTab.medications, 'Medications', Icons.medication_outlined),
+  _NavItem(AppTab.appointments, 'Appointments', Icons.event_outlined),
+  _NavItem(AppTab.activity, 'Activity', Icons.insights_outlined),
+  _NavItem(AppTab.messages, 'Messages', Icons.mail_outline),
 ];
 
 /// The authenticated app shell: header, greeting bar, navigation (bottom bar
@@ -33,12 +53,12 @@ class AppShell extends StatelessWidget {
     super.key,
     required this.state,
     required this.child,
-    required this.onOpenSettings,
+    required this.activeTab,
   });
 
   final AppState state;
   final Widget child;
-  final VoidCallback onOpenSettings;
+  final AppTab activeTab;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +66,7 @@ class AppShell extends StatelessWidget {
     return isWide ? _buildWide(context) : _buildCompact(context);
   }
 
-  // ── Phone layout ────────────────────────────────────────────────────────
+  // -- Phone layout ----------------------------------------------------------
   Widget _buildCompact(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final handLeft = state.handMode == HandMode.left;
@@ -55,11 +75,11 @@ class AppShell extends StatelessWidget {
       backgroundColor: scheme.surfaceContainerHighest,
       body: Column(
         children: [
-          _Header(state: state, onOpenSettings: onOpenSettings),
+          _Header(state: state, activeTab: activeTab),
           Expanded(child: child),
         ],
       ),
-      // Bottom nav — anchored LEFT in Left-Hand Mode.
+      // Bottom nav -- anchored LEFT in Left-Hand Mode.
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: scheme.surface,
@@ -82,8 +102,9 @@ class AppShell extends StatelessWidget {
                 for (final item in _navItems)
                   _NavButton(
                     item: item,
-                    active: state.page == item.page,
-                    onTap: () => state.navigate(item.page),
+                    active: activeTab == item.tab,
+                    badgeCount: item.tab == AppTab.messages ? state.unreadMessageCount : 0,
+                    onTap: () => Navigator.of(context).pushReplacementNamed(item.tab.route),
                   ),
               ],
             ),
@@ -98,7 +119,7 @@ class AppShell extends StatelessWidget {
     );
   }
 
-  // ── Tablet layout ───────────────────────────────────────────────────────
+  // -- Tablet layout -----------------------------------------------------------
   Widget _buildWide(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final handRight = state.handMode == HandMode.right;
@@ -107,14 +128,14 @@ class AppShell extends StatelessWidget {
       backgroundColor: scheme.surfaceContainerHighest,
       body: Column(
         children: [
-          _Header(state: state, onOpenSettings: onOpenSettings),
+          _Header(state: state, activeTab: activeTab),
           Expanded(
             child: Row(
               children: [
                 // Sidebar sits on the LEFT by default; Right mode flips it.
-                if (!handRight) _Sidebar(state: state),
+                if (!handRight) _Sidebar(state: state, activeTab: activeTab),
                 Expanded(child: child),
-                if (handRight) _Sidebar(state: state),
+                if (handRight) _Sidebar(state: state, activeTab: activeTab),
               ],
             ),
           ),
@@ -128,13 +149,13 @@ class AppShell extends StatelessWidget {
   }
 }
 
-// ── Header + greeting bar ──────────────────────────────────────────────────
+// -- Header + greeting bar ----------------------------------------------------
 
 class _Header extends StatelessWidget {
-  const _Header({required this.state, required this.onOpenSettings});
+  const _Header({required this.state, required this.activeTab});
 
   final AppState state;
-  final VoidCallback onOpenSettings;
+  final AppTab activeTab;
 
   @override
   Widget build(BuildContext context) {
@@ -143,15 +164,14 @@ class _Header extends StatelessWidget {
     final hour = now.hour;
     final timeStr =
         '${(hour % 12) == 0 ? 12 : hour % 12}:${now.minute.toString().padLeft(2, '0')} ${hour < 12 ? 'am' : 'pm'}';
-    final dateStr = _weekday(now.weekday) +
-        ', ${now.day} ${_month(now.month)}';
+    final dateStr = '${_weekday(now.weekday)}, ${now.day} ${_month(now.month)}';
     final greeting = hour < 12
         ? 'Good morning'
         : hour < 17
         ? 'Good afternoon'
         : 'Good evening';
     final pageLabel = _navItems
-        .where((n) => n.page == state.page)
+        .where((n) => n.tab == activeTab)
         .map((n) => n.label)
         .followedBy(const [''])
         .first;
@@ -169,13 +189,16 @@ class _Header extends StatelessWidget {
                 _HeaderIconBtn(
                   icon: Icons.settings_outlined,
                   tooltip: 'Open settings',
-                  onTap: onOpenSettings,
+                  onTap: () => showSettingsSheet(context, state),
                 ),
                 const SizedBox(width: 8),
                 _HeaderIconBtn(
                   icon: Icons.logout,
                   tooltip: 'Sign out',
-                  onTap: state.signOut,
+                  onTap: () {
+                    state.signOut();
+                    Navigator.of(context).pushNamedAndRemoveUntil('/landing', (route) => false);
+                  },
                 ),
               ],
             ),
@@ -241,8 +264,8 @@ class _HeaderIconBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 44,
-      height: 44,
+      width: 48,
+      height: 48,
       child: IconButton(
         icon: Icon(icon, size: 22),
         tooltip: tooltip,
@@ -258,22 +281,24 @@ class _HeaderIconBtn extends StatelessWidget {
   }
 }
 
-// ── Navigation widgets ──────────────────────────────────────────────────────
+// -- Navigation widgets ---------------------------------------------------------
 
 class _NavButton extends StatelessWidget {
-  const _NavButton({required this.item, required this.active, required this.onTap});
+  const _NavButton({required this.item, required this.active, required this.onTap, this.badgeCount = 0});
 
   final _NavItem item;
   final bool active;
   final VoidCallback onTap;
+  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final label = badgeCount > 0 ? '${item.label}, $badgeCount unread' : item.label;
     return Semantics(
       selected: active,
       button: true,
-      label: item.label,
+      label: label,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -285,10 +310,21 @@ class _NavButton extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  item.icon,
-                  size: 22,
-                  color: active ? scheme.primary : scheme.onSurfaceVariant,
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      item.icon,
+                      size: 22,
+                      color: active ? scheme.primary : scheme.onSurfaceVariant,
+                    ),
+                    if (badgeCount > 0)
+                      Positioned(
+                        top: -4,
+                        right: -6,
+                        child: _NavBadge(count: badgeCount),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -309,9 +345,10 @@ class _NavButton extends StatelessWidget {
 }
 
 class _Sidebar extends StatelessWidget {
-  const _Sidebar({required this.state});
+  const _Sidebar({required this.state, required this.activeTab});
 
   final AppState state;
+  final AppTab activeTab;
 
   @override
   Widget build(BuildContext context) {
@@ -329,8 +366,9 @@ class _Sidebar extends StatelessWidget {
                   for (final item in _navItems)
                     _SideNavBtn(
                       item: item,
-                      active: state.page == item.page,
-                      onTap: () => state.navigate(item.page),
+                      active: activeTab == item.tab,
+                      badgeCount: item.tab == AppTab.messages ? state.unreadMessageCount : 0,
+                      onTap: () => Navigator.of(context).pushReplacementNamed(item.tab.route),
                     ),
                 ],
               ),
@@ -343,15 +381,17 @@ class _Sidebar extends StatelessWidget {
 }
 
 class _SideNavBtn extends StatelessWidget {
-  const _SideNavBtn({required this.item, required this.active, required this.onTap});
+  const _SideNavBtn({required this.item, required this.active, required this.onTap, this.badgeCount = 0});
 
   final _NavItem item;
   final bool active;
   final VoidCallback onTap;
+  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final label = badgeCount > 0 ? '${item.label}, $badgeCount unread' : item.label;
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
@@ -363,26 +403,44 @@ class _SideNavBtn extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: CCTokens.borderRadius,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 52),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(
-                  item.icon,
-                  size: 20,
-                  color: active ? scheme.primary : scheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  item.label,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: active ? FontWeight.w600 : FontWeight.w500,
-                    color: active ? scheme.primary : scheme.onSurfaceVariant,
+          child: Semantics(
+            selected: active,
+            button: true,
+            label: label,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 52),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(
+                        item.icon,
+                        size: 20,
+                        color: active ? scheme.primary : scheme.onSurfaceVariant,
+                      ),
+                      if (badgeCount > 0)
+                        Positioned(
+                          top: -4,
+                          right: -6,
+                          child: _NavBadge(count: badgeCount),
+                        ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      item.label,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: active ? FontWeight.w600 : FontWeight.w500,
+                        color: active ? scheme.primary : scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -391,7 +449,35 @@ class _SideNavBtn extends StatelessWidget {
   }
 }
 
-// ── SOS ─────────────────────────────────────────────────────────────────────
+/// Small red unread-count pill overlaid on a nav icon. Only ever rendered
+/// once per nav item (on the icon) -- the label text next to it never
+/// duplicates the count, so there's exactly one badge per unread state.
+class _NavBadge extends StatelessWidget {
+  const _NavBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+      decoration: BoxDecoration(
+        color: Colors.red.shade600,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white, width: 1),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        count > 9 ? '9+' : '$count',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700, height: 1),
+      ),
+    );
+  }
+}
+
+// -- SOS -------------------------------------------------------------------------
 
 class _SosFab extends StatelessWidget {
   const _SosFab();
@@ -430,7 +516,7 @@ class _SosFab extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.emergency, size: 48, color: Colors.white),
+                    const Icon(Icons.emergency, size: 48, color: Colors.white),
                     const SizedBox(height: 10),
                     const Text(
                       'Emergency',
