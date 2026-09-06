@@ -17,6 +17,18 @@ class MessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild on state changes (sending a message, archiving one from the
+    // detail screen and returning here, toggling read/unread) so the list
+    // stays correct even when this screen isn't being rebuilt by an
+    // ancestor listening to [state] -- see the same pattern in
+    // message_detail_screen.dart.
+    return ListenableBuilder(
+      listenable: state,
+      builder: (context, _) => _buildScreen(context),
+    );
+  }
+
+  Widget _buildScreen(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final active = state.messages.where((m) => !m.archived).toList();
 
@@ -29,6 +41,7 @@ class MessagesScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Text(
@@ -36,11 +49,38 @@ class MessagesScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: scheme.onSurface),
                     ),
                   ),
-                  TapButton(
-                    label: 'New Message',
-                    icon: Icons.mail_outline,
-                    size: TapButtonSize.sm,
-                    onPressed: () => showComposeSheet(context, state),
+                  // Stacked (New Message above, the archive entry point
+                  // below) rather than side by side -- two buttons sharing
+                  // this row with the title left too little room for
+                  // "Messages" and wrapped it onto two lines.
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      TapButton(
+                        label: 'New Message',
+                        icon: Icons.mail_outline,
+                        size: TapButtonSize.sm,
+                        onPressed: () => showComposeSheet(context, state),
+                      ),
+                      const SizedBox(height: 8),
+                      // Archiving a message (from the detail screen) hides
+                      // it from this inbox rather than deleting it -- this
+                      // is the entry point to see and, from there,
+                      // unarchive them. No count badge here -- unlike an
+                      // unread count, there's no way for a user to "clear"
+                      // how many messages are archived, so a persistent
+                      // number would just be a permanent, meaningless
+                      // notification.
+                      SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: IconButton(
+                          icon: const Icon(Icons.archive_outlined),
+                          tooltip: 'View archived messages',
+                          onPressed: () => Navigator.of(context).pushNamed('/messages/archived'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -72,7 +112,7 @@ class MessagesScreen extends StatelessWidget {
                 Column(
                   children: [
                     for (final msg in active) ...[
-                      _MessageRow(
+                      MessageRow(
                         message: msg,
                         onToggleRead: () => state.toggleMessageRead(msg.id),
                         onOpen: () {
@@ -92,8 +132,11 @@ class MessagesScreen extends StatelessWidget {
   }
 }
 
-class _MessageRow extends StatelessWidget {
-  const _MessageRow({required this.message, required this.onToggleRead, required this.onOpen});
+/// A single message row -- public (not file-private) so it can be reused
+/// by [ArchivedMessagesScreen], which lists the same kind of row for
+/// archived messages instead of active ones.
+class MessageRow extends StatelessWidget {
+  const MessageRow({super.key, required this.message, required this.onToggleRead, required this.onOpen});
 
   final Message message;
   final VoidCallback onToggleRead;
@@ -271,7 +314,7 @@ class _ComposeSheetState extends State<_ComposeSheet> {
     });
     if (_toError != null || _bodyError != null) return;
     widget.state.sendMessage(
-      from: 'Maria Thompson',
+      from: widget.state.userName,
       to: _to.text.trim(),
       subject: _subject.text.trim().isEmpty ? '(no subject)' : _subject.text.trim(),
       body: _body.text.trim(),

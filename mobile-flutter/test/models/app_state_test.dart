@@ -164,10 +164,74 @@ void main() {
       expect(state.medications, hasLength(1));
     });
 
+    test('signIn relabels demo data addressed to the placeholder "Maria Thompson" to whoever signs in', () {
+      // Seed data (as built in main.dart) is created before anyone has
+      // signed in, so it hardcodes a placeholder name for appointments
+      // assigned to "the app's user" and messages addressed to them. Once a
+      // real name is known, those records should follow the actual
+      // signed-in person instead of forever reading "Maria Thompson".
+      state.appointments = [
+        Appointment(id: 'a1', title: 'Checkup', dateTime: 't', location: 'l', notes: '', assignee: 'Maria Thompson'),
+        // Not everything is assigned to the app's user -- an assignee that
+        // was deliberately set to someone else must not be touched.
+        Appointment(id: 'a2', title: 'Eye test', dateTime: 't', location: 'l', notes: '', assignee: 'Emma Thompson'),
+      ];
+      state.messages = [
+        Message(id: 'm1', from: 'Dr. Sharma', to: 'Maria Thompson', subject: 's', body: 'b', timestamp: 't'),
+        // A message the user already sent to someone else keeps its real
+        // recipient.
+        Message(id: 'm2', from: 'Maria Thompson', to: 'Dr. Sharma', subject: 's', body: 'b', timestamp: 't'),
+      ];
+
+      state.signIn('Dom Puller');
+
+      expect(state.appointments.firstWhere((a) => a.id == 'a1').assignee, 'Dom Puller');
+      expect(state.appointments.firstWhere((a) => a.id == 'a2').assignee, 'Emma Thompson');
+      expect(state.messages.firstWhere((m) => m.id == 'm1').to, 'Dom Puller');
+      expect(state.messages.firstWhere((m) => m.id == 'm2').to, 'Dr. Sharma');
+    });
+
     test('toggleWidget flips a dashboard widget\'s enabled flag', () {
       state.dashboardWidgets = [DashboardWidget(id: 'w1', label: 'Widget', enabled: true)];
       state.toggleWidget('w1');
       expect(state.dashboardWidgets.first.enabled, isFalse);
+    });
+  });
+
+  group('AppState — clock-dependent timestamps (injected clock)', () {
+    // AppState takes an optional `now` clock so tests never depend on the
+    // wall clock (a test asserting real-time output would be flaky right
+    // around midnight/noon and impossible to write deterministically at
+    // all). Each case below pins a specific DateTime and checks the exact
+    // "h:mm am/pm" string that activity/message logging produces from it.
+    test('formats midnight as 12:00 am', () {
+      final state = AppState(now: () => DateTime(2026, 1, 1, 0, 0));
+      state.checkIn();
+      expect(state.activity.first.timestamp, '12:00 am');
+    });
+
+    test('formats noon as 12:00 pm', () {
+      final state = AppState(now: () => DateTime(2026, 1, 1, 12, 0));
+      state.checkIn();
+      expect(state.activity.first.timestamp, '12:00 pm');
+    });
+
+    test('formats an afternoon hour with minute padding', () {
+      final state = AppState(now: () => DateTime(2026, 1, 1, 13, 5));
+      state.checkIn();
+      expect(state.activity.first.timestamp, '1:05 pm');
+    });
+
+    test('formats a morning hour just before noon', () {
+      final state = AppState(now: () => DateTime(2026, 1, 1, 11, 59));
+      state.checkIn();
+      expect(state.activity.first.timestamp, '11:59 am');
+    });
+
+    test('sendMessage stamps the message with the injected clock too', () {
+      final state = AppState(now: () => DateTime(2026, 6, 1, 9, 15));
+      state.sendMessage(from: 'Maria Thompson', to: 'Dr. Sharma', subject: 'Hi', body: 'Body');
+      expect(state.messages.first.timestamp, '9:15 am');
     });
   });
 }

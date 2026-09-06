@@ -8,6 +8,7 @@ import 'package:careconnect/screens/activity_screen.dart';
 import 'package:careconnect/screens/messages_screen.dart';
 import 'package:careconnect/screens/message_detail_screen.dart';
 import 'package:careconnect/widgets/app_shell.dart';
+import 'package:careconnect/widgets/cards.dart' show CCLogo;
 
 /// A trimmed copy of main.dart's route table, wired only for the routes
 /// each test below actually exercises, so these tests can pump a full
@@ -93,6 +94,43 @@ void main() {
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
       expect(scaffold.floatingActionButtonLocation, FloatingActionButtonLocation.endFloat);
+    });
+
+    testWidgets('switching to Left in the settings sheet immediately updates the already-open shell', (tester) async {
+      // Regression test: AppShell is built inline inside an already-pushed
+      // route (see main.dart's _onGenerateRoute), so a state change made
+      // from a *different*, newly-pushed route (the settings sheet) needs
+      // AppShell to rebuild itself -- the root Provider watcher rebuilding
+      // main.dart does not reliably reach back down into it. Covers both
+      // the FAB and the header's settings/sign-out icons, which swap sides
+      // with the logo in Left-Hand Mode.
+      final state = _seededState();
+      await tester.pumpWidget(_testApp(state));
+      await tester.pumpAndSettle();
+
+      // Off by default: logo sits left of the settings icon, and the FAB
+      // anchors to the end (right).
+      final logoBefore = tester.getTopLeft(find.byType(CCLogo)).dx;
+      final settingsBefore = tester.getTopLeft(find.byTooltip('Open settings')).dx;
+      expect(logoBefore, lessThan(settingsBefore));
+      var scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
+      expect(scaffold.floatingActionButtonLocation, FloatingActionButtonLocation.endFloat);
+
+      await tester.tap(find.byTooltip('Open settings'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('👈 Left'));
+      await tester.pumpAndSettle();
+      await tester.tapAt(const Offset(20, 20)); // dismiss the settings sheet
+      await tester.pumpAndSettle();
+
+      expect(state.handMode, HandMode.left);
+      // Left mode: settings/sign-out move to the left edge, pushing the
+      // logo to the right.
+      final logoAfter = tester.getTopLeft(find.byType(CCLogo)).dx;
+      final settingsAfter = tester.getTopLeft(find.byTooltip('Open settings')).dx;
+      expect(settingsAfter, lessThan(logoAfter));
+      scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
+      expect(scaffold.floatingActionButtonLocation, FloatingActionButtonLocation.startFloat);
     });
   });
 

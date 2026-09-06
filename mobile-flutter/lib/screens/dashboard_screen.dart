@@ -34,6 +34,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild on state changes (the medication tile toggle, the Customize
+    // sheet, etc. call AppState methods with no paired local setState) so
+    // this screen stays correct even when it isn't being rebuilt by an
+    // ancestor listening to [state] -- see the same pattern in
+    // message_detail_screen.dart and messages_screen.dart. Without this,
+    // DashboardScreen reached via a named route (as it always is in the
+    // real app) doesn't reflect the change even though AppState did.
+    return ListenableBuilder(
+      listenable: widget.state,
+      builder: (context, _) => _buildScreen(context),
+    );
+  }
+
+  Widget _buildScreen(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
     final isWide = MediaQuery.sizeOf(context).width >= 768;
@@ -246,27 +260,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       case 'alerts':
         final untaken = meds.where((m) => !m.taken).toList();
-        final alerts = <AlertCard>[
+        // Each candidate carries the stable id AppState tracks dismissals
+        // under, so a dismissed alert (a) drops out of both this list and
+        // the count badge below together, and (b) stays dismissed if the
+        // user navigates away and back -- the dismissal lives on AppState,
+        // not on the card's own widget state.
+        final candidates = <({String id, AlertCard card})>[
           if (nextAppt != null && nextAppt.dateTime.toLowerCase().contains('today'))
-            AlertCard(
-              icon: Icons.event_outlined,
-              title: 'Appointment today',
-              body:
-                  '${nextAppt.title} at ${nextAppt.dateTime.split('—').length > 1 ? nextAppt.dateTime.split('—')[1].trim() : nextAppt.dateTime} — ${nextAppt.location.split('—').first.trim()}.',
+            (
+              id: AppState.alertAppointmentToday,
+              card: AlertCard(
+                icon: Icons.event_outlined,
+                title: 'Appointment today',
+                body:
+                    '${nextAppt.title} at ${nextAppt.dateTime.split('—').length > 1 ? nextAppt.dateTime.split('—')[1].trim() : nextAppt.dateTime} — ${nextAppt.location.split('—').first.trim()}.',
+                onDismiss: () => state.dismissAlert(AppState.alertAppointmentToday),
+              ),
             ),
           if (untaken.isNotEmpty)
-            AlertCard(
-              icon: Icons.medication_outlined,
-              title: '${untaken.length} medication${untaken.length > 1 ? 's' : ''} not yet taken',
-              body:
-                  '${untaken.map((m) => '${m.name} ${m.dose}').join(', ')} — scheduled for ${untaken.first.time}.',
+            (
+              id: AppState.alertMedsUntaken,
+              card: AlertCard(
+                icon: Icons.medication_outlined,
+                title: '${untaken.length} medication${untaken.length > 1 ? 's' : ''} not yet taken',
+                body:
+                    '${untaken.map((m) => '${m.name} ${m.dose}').join(', ')} — scheduled for ${untaken.first.time}.',
+                onDismiss: () => state.dismissAlert(AppState.alertMedsUntaken),
+              ),
             ),
           if (!state.checkedIn)
-            const AlertCard(
-              icon: Icons.person_outline,
-              title: 'No check-in yet',
-              body: "Margaret hasn't checked in this morning. Tap the Check-in card above to record it.",
+            (
+              id: AppState.alertNoCheckIn,
+              card: AlertCard(
+                icon: Icons.person_outline,
+                title: 'No check-in yet',
+                body: "Margaret hasn't checked in this morning. Tap the Check-in card above to record it.",
+                onDismiss: () => state.dismissAlert(AppState.alertNoCheckIn),
+              ),
             ),
+        ];
+        final alerts = [
+          for (final c in candidates)
+            if (!state.dismissedAlertIds.contains(c.id)) c.card,
         ];
         if (alerts.isEmpty) return [const SizedBox.shrink()];
         return [
@@ -339,22 +374,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: scheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: scheme.outline),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(nextAppt.title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: scheme.onSurface)),
-                const SizedBox(height: 4),
-                Text('🕐 ${nextAppt.dateTime}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
-                Text('📍 ${nextAppt.location}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
-                const SizedBox(height: 4),
-                Text(nextAppt.notes, style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
-              ],
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              // Tapping this widget's own next-appointment card opens the
+              // same detail screen the Appointments list's card opens --
+              // see appointments_screen.dart's _ApptCard for the identical
+              // pattern (arguments: nextAppt hands that specific
+              // appointment across, the same way messages do above).
+              onTap: () => Navigator.of(context).pushNamed('/appointments/detail', arguments: nextAppt),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(nextAppt.title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: scheme.onSurface)),
+                    const SizedBox(height: 4),
+                    Text('🕐 ${nextAppt.dateTime}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
+                    Text('📍 ${nextAppt.location}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
+                    const SizedBox(height: 4),
+                    Text(nextAppt.notes, style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
+                  ],
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -647,6 +693,19 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                           child: ReorderableListView.builder(
                             shrinkWrap: true,
                             buildDefaultDragHandles: false,
+                            // This sheet sits inside the Dashboard's own
+                            // Scaffold, so the SOS button (a fixed
+                            // FloatingActionButton, bottom-right normally,
+                            // bottom-left in Left-Hand Mode -- but always
+                            // sitting over the RIGHT-aligned Move
+                            // Up/Down/toggle controls of whichever row ends
+                            // up at the very bottom) floats on top of it,
+                            // not behind it. Reserving this much room below
+                            // the last item gives the list somewhere to
+                            // scroll to, so every row's controls can be
+                            // brought clear of the button instead of ending
+                            // up stuck underneath it.
+                            padding: const EdgeInsets.only(bottom: 96),
                             onReorderItem: _onReorderItem,
                             itemCount: _items.length,
                             proxyDecorator: (child, index, animation) => Material(
@@ -700,8 +759,17 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                       value: w.enabled,
                                       label: w.label,
                                       onChanged: (_) {
-                                        setState(() => w.enabled = !w.enabled);
+                                        // `w` is the same object referenced by
+                                        // `widget.state.dashboardWidgets`, so
+                                        // toggleWidget already flips it -- an
+                                        // extra local mutation here would flip
+                                        // it a second time and cancel out.
+                                        // The empty setState just forces this
+                                        // sheet's own build to re-run so the
+                                        // switch reflects the new value right
+                                        // away.
                                         widget.state.toggleWidget(w.id);
+                                        setState(() {});
                                       },
                                     ),
                                   ],

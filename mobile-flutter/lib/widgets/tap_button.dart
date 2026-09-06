@@ -23,6 +23,8 @@ class TapButton extends StatelessWidget {
     this.icon,
     this.fullWidth = false,
     this.autofocus = false,
+    this.foregroundColor,
+    this.borderColor,
   });
 
   final String label;
@@ -32,6 +34,19 @@ class TapButton extends StatelessWidget {
   final IconData? icon;
   final bool fullWidth;
   final bool autofocus;
+
+  /// Overrides the variant's default text/icon color. Needed for cases like
+  /// a `ghost` button sitting on a colored (non-surface) background, where
+  /// the variant's usual `scheme.primary` text would match the background
+  /// and disappear -- e.g. the landing screen's teal hero section.
+  final Color? foregroundColor;
+
+  /// Overrides the variant's default border. Passing this always draws a
+  /// visible 2px border (like the `outline` variant does), regardless of
+  /// [variant] -- needed for a `ghost` button that still needs a visible
+  /// outline against a colored background, e.g. the landing screen's
+  /// secondary CTA on its teal hero section.
+  final Color? borderColor;
 
   double get minHeight => switch (size) {
     TapButtonSize.sm => CCTokens.buttonSm,
@@ -77,6 +92,9 @@ class TapButton extends StatelessWidget {
         Colors.transparent,
       ),
     };
+    final resolvedFg = foregroundColor ?? fg;
+    final resolvedBorder = borderColor ?? border;
+    final borderWidth = (variant == TapButtonVariant.outline || borderColor != null) ? 2.0 : 0.0;
 
     final content = Row(
       mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
@@ -90,7 +108,7 @@ class TapButton extends StatelessWidget {
             style: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.w600,
-              color: fg,
+              color: resolvedFg,
             ),
           ),
         ),
@@ -117,7 +135,7 @@ class TapButton extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 borderRadius: CCTokens.borderRadius,
-                border: Border.all(color: border, width: variant == TapButtonVariant.outline ? 2 : 0),
+                border: Border.all(color: resolvedBorder, width: borderWidth),
               ),
               child: Center(child: content),
             ),

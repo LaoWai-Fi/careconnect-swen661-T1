@@ -130,23 +130,23 @@ class StatCard extends StatelessWidget {
 }
 
 /// Dismissible warning alert card (Dashboard "Alerts" section).
-class AlertCard extends StatefulWidget {
-  const AlertCard({super.key, required this.icon, required this.title, required this.body});
+/// Purely a display -- whether a given alert is currently dismissed lives
+/// in [AppState.dismissedAlertIds], not here, so that dismissing one (a)
+/// updates the Alerts section's count badge, which is computed from the
+/// same filtered list the dashboard builds these from, and (b) survives
+/// navigating away from and back to the Dashboard, unlike a widget-local
+/// dismiss flag that gets rebuilt fresh every time the route is pushed
+/// again.
+class AlertCard extends StatelessWidget {
+  const AlertCard({super.key, required this.icon, required this.title, required this.body, required this.onDismiss});
 
   final IconData icon;
   final String title;
   final String body;
-
-  @override
-  State<AlertCard> createState() => _AlertCardState();
-}
-
-class _AlertCardState extends State<AlertCard> {
-  bool dismissed = false;
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    if (dismissed) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
     return Container(
@@ -162,19 +162,19 @@ class _AlertCardState extends State<AlertCard> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(widget.icon, size: 20, color: scheme.onSurface),
+          Icon(icon, size: 20, color: scheme.onSurface),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.title,
+                  title,
                   style: TextStyle(fontWeight: FontWeight.w600, color: scheme.onSurface),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  widget.body,
+                  body,
                   style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant),
                 ),
               ],
@@ -186,7 +186,7 @@ class _AlertCardState extends State<AlertCard> {
             child: IconButton(
               icon: const Icon(Icons.close, size: 18),
               tooltip: 'Dismiss alert',
-              onPressed: () => setState(() => dismissed = true),
+              onPressed: onDismiss,
             ),
           ),
         ],

@@ -103,10 +103,19 @@ class MessageDetailScreen extends StatelessWidget {
                       SizedBox(
                         width: 200,
                         child: TapButton(
-                          label: 'Archive',
+                          // Reached from either the main inbox (not yet
+                          // archived) or the Archived messages screen
+                          // (already archived) -- offer the opposite
+                          // action of whichever screen sent us here, then
+                          // pop back to it so the list there is correct.
+                          label: message.archived ? 'Unarchive' : 'Archive',
                           variant: TapButtonVariant.secondary,
                           onPressed: () {
-                            state.archiveMessage(message.id);
+                            if (message.archived) {
+                              state.unarchiveMessage(message.id);
+                            } else {
+                              state.archiveMessage(message.id);
+                            }
                             Navigator.of(context).pop();
                           },
                         ),

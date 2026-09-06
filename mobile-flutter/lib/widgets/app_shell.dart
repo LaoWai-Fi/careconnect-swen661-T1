@@ -48,6 +48,8 @@ const _navItems = [
 /// - Bottom nav anchors to the LEFT edge so items fall in the left thumb zone.
 /// - The SOS button moves to the bottom-LEFT corner.
 /// - The sidebar renders on the LEFT side on tablets.
+/// - The header's settings/sign-out icons move to the LEFT edge (with the
+///   logo pushed to the right) instead of their default right-edge spot.
 class AppShell extends StatelessWidget {
   const AppShell({
     super.key,
@@ -62,6 +64,22 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild on state changes (hand mode, theme, unread count, etc.) so
+    // the shell stays correct even when it isn't being rebuilt by an
+    // ancestor listening to [state] -- see the same pattern in
+    // message_detail_screen.dart and the screens under lib/screens/.
+    // AppShell is built inline inside main.dart's _onGenerateRoute, as part
+    // of an already-pushed route, so it needs this just as much as those
+    // screens do: without it, e.g. picking a new One-Handed Mode from the
+    // settings sheet (a *different*, newly-pushed route) updated AppState
+    // but never made the shell underneath re-render with the new layout.
+    return ListenableBuilder(
+      listenable: state,
+      builder: (context, _) => _buildShell(context),
+    );
+  }
+
+  Widget _buildShell(BuildContext context) {
     final isWide = MediaQuery.sizeOf(context).width >= 768;
     return isWide ? _buildWide(context) : _buildCompact(context);
   }
@@ -75,7 +93,12 @@ class AppShell extends StatelessWidget {
       backgroundColor: scheme.surfaceContainerHighest,
       body: Column(
         children: [
-          _Header(state: state, activeTab: activeTab),
+          // Without this, the header (logo, settings, sign-out) renders
+          // starting at the very top of the screen and gets pushed under
+          // the status bar / notch on real devices, making those icons
+          // untappable. The bottom nav below already handles its own edge
+          // with SafeArea(top: false); this is the matching top edge.
+          SafeArea(bottom: false, child: _Header(state: state, activeTab: activeTab)),
           Expanded(child: child),
         ],
       ),
@@ -128,7 +151,7 @@ class AppShell extends StatelessWidget {
       backgroundColor: scheme.surfaceContainerHighest,
       body: Column(
         children: [
-          _Header(state: state, activeTab: activeTab),
+          SafeArea(bottom: false, child: _Header(state: state, activeTab: activeTab)),
           Expanded(
             child: Row(
               children: [
@@ -182,25 +205,34 @@ class _Header extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Row(
-              children: [
-                const CCLogo(size: 28),
-                const Spacer(),
-                _HeaderIconBtn(
-                  icon: Icons.settings_outlined,
-                  tooltip: 'Open settings',
-                  onTap: () => showSettingsSheet(context, state),
-                ),
-                const SizedBox(width: 8),
-                _HeaderIconBtn(
-                  icon: Icons.logout,
-                  tooltip: 'Sign out',
-                  onTap: () {
-                    state.signOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil('/landing', (route) => false);
-                  },
-                ),
-              ],
+            child: Builder(
+              builder: (context) {
+                const logo = CCLogo(size: 28);
+                final icons = [
+                  _HeaderIconBtn(
+                    icon: Icons.settings_outlined,
+                    tooltip: 'Open settings',
+                    onTap: () => showSettingsSheet(context, state),
+                  ),
+                  const SizedBox(width: 8),
+                  _HeaderIconBtn(
+                    icon: Icons.logout,
+                    tooltip: 'Sign out',
+                    onTap: () {
+                      state.signOut();
+                      Navigator.of(context).pushNamedAndRemoveUntil('/landing', (route) => false);
+                    },
+                  ),
+                ];
+                // Left-Hand Mode: settings/sign-out move to the left edge
+                // (the left thumb zone), with the logo pushed to the right.
+                // Off/Right keep the original layout (icons on the right).
+                return Row(
+                  children: state.handMode == HandMode.left
+                      ? [...icons, const Spacer(), logo]
+                      : [logo, const Spacer(), ...icons],
+                );
+              },
             ),
           ),
           Divider(height: 1, color: scheme.outline),
@@ -305,7 +337,15 @@ class _NavButton extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            constraints: const BoxConstraints(minWidth: 64, minHeight: 56),
+            // maxWidth caps how wide a single item can grow -- without it,
+            // a long label (e.g. "Appointments") at a larger text-size
+            // setting kept growing the item's intrinsic width with no
+            // limit, so the 5-item row eventually ran wider than the
+            // screen and the last item (Messages) got clipped off the
+            // right edge entirely. The label below still ellipsizes if it
+            // doesn't fit inside this cap, so it degrades gracefully
+            // instead of overflowing.
+            constraints: const BoxConstraints(minWidth: 64, maxWidth: 78, minHeight: 56),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -327,12 +367,18 @@ class _NavButton extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  item.label,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: active ? scheme.primary : scheme.onSurfaceVariant,
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    item.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: active ? scheme.primary : scheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -432,6 +478,8 @@ class _SideNavBtn extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: active ? FontWeight.w600 : FontWeight.w500,
