@@ -16,6 +16,8 @@ abstract final class CCTokens {
 
   static const Color primaryHoverLight = Color(0xFF155E6A);
   static const Color primaryActiveLight = Color(0xFF114F59);
+  static const Color primaryHoverDark = Color(0xFF5DD4E2);
+  static const Color primaryActiveDark = Color(0xFF3AB4C4);
 
   // ── Surfaces ────────────────────────────────────────────────────────────
   static const Color backgroundLight = Color(0xFFF0F4F7);
@@ -43,9 +45,17 @@ abstract final class CCTokens {
   // ── Semantic ────────────────────────────────────────────────────────────
   static const Color destructiveLight = Color(0xFFB91C1C); // 6.1:1 w/ white
   static const Color destructiveDark = Color(0xFFF87171);
+  static const Color destructiveHoverLight = Color(0xFF991B1B);
+  static const Color destructiveActiveLight = Color(0xFF7F1D1D);
+  static const Color destructiveHoverDark = Color(0xFFFCA5A5);
+  static const Color destructiveActiveDark = Color(0xFFFBBABA);
 
   static const Color secondaryLight = Color(0xFFA6512E);
   static const Color secondaryDark = Color(0xFFE08A5C);
+  static const Color secondaryHoverLight = Color(0xFF8F4427);
+  static const Color secondaryActiveLight = Color(0xFF7A3920);
+  static const Color secondaryHoverDark = Color(0xFFE89970);
+  static const Color secondaryActiveDark = Color(0xFFD47A4A);
 
   static const Color outlineHoverLight = Color(0xFFE8F4F6);
   static const Color outlineActiveLight = Color(0xFFCEE9EC);
