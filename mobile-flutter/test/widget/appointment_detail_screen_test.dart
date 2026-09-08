@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:careconnect/models/app_state.dart';
 import 'package:careconnect/screens/appointment_detail_screen.dart';
 import 'package:careconnect/screens/appointments_screen.dart';
+import 'package:careconnect/widgets/tap_button.dart';
 
 import '../support/test_app.dart';
 
@@ -76,12 +77,19 @@ void main() {
   });
 
   group('AppointmentDetailScreen — delete', () {
-    testWidgets('Delete removes the appointment immediately and returns to the list (no confirmation)', (tester) async {
+    testWidgets('Delete asks for confirmation, then removes the appointment and returns to the list', (tester) async {
       final state = AppState()
         ..appointments = [Appointment(id: 'a1', title: 'Eye test', dateTime: 'Fri', location: 'Vision Plus', notes: '')];
       await _openFirstAppointment(tester, state);
 
       await tester.tap(find.text('🗑 Delete'));
+      await tester.pumpAndSettle();
+
+      // Confirm dialog showing; nothing deleted yet.
+      expect(state.appointments, isNotEmpty);
+      expect(find.text('Delete appointment?'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(TapButton, 'Delete'));
       await tester.pumpAndSettle();
 
       expect(state.appointments, isEmpty);

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:careconnect/models/app_state.dart';
 import 'package:careconnect/screens/appointments_screen.dart';
+import 'package:careconnect/widgets/tap_button.dart';
 
 /// See the identical helper in medications_screen_test.dart for why this
 /// ListenableBuilder wrapper is needed: some actions here (deleting an
@@ -132,7 +133,7 @@ void main() {
   });
 
   group('AppointmentsScreen — delete', () {
-    testWidgets('deleting an appointment removes it immediately (no confirmation step)', (tester) async {
+    testWidgets('deleting an appointment asks for confirmation first, then removes it', (tester) async {
       final state = AppState()
         ..appointments = [
           Appointment(id: 'a1', title: 'Eye test', dateTime: 'Fri', location: 'Vision Plus', notes: ''),
@@ -142,9 +143,33 @@ void main() {
       await tester.tap(find.text('🗑 Delete'));
       await tester.pumpAndSettle();
 
+      // The confirm dialog is showing; nothing deleted yet.
+      expect(state.appointments, isNotEmpty);
+      expect(find.text('Delete appointment?'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(TapButton, 'Delete'));
+      await tester.pumpAndSettle();
+
       expect(state.appointments, isEmpty);
       expect(find.text('Eye test'), findsNothing);
       expect(find.text('No appointments yet'), findsOneWidget);
+    });
+
+    testWidgets('cancelling the delete confirmation keeps the appointment', (tester) async {
+      final state = AppState()
+        ..appointments = [
+          Appointment(id: 'a1', title: 'Eye test', dateTime: 'Fri', location: 'Vision Plus', notes: ''),
+        ];
+      await tester.pumpWidget(_wrap(state));
+
+      await tester.tap(find.text('🗑 Delete'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(TapButton, 'Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(state.appointments, isNotEmpty);
+      expect(find.text('Eye test'), findsOneWidget);
     });
   });
 }

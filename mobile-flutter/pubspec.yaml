@@ -21,6 +21,9 @@ dependencies:
   # addListener + setState at the app root. See lib/main.dart.
   provider: ^6.1.2
 
+  # Opens the tel: link from the SOS emergency dialog (Assignment 3 §3.3).
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

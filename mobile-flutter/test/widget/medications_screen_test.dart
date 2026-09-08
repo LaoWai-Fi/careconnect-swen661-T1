@@ -168,6 +168,43 @@ void main() {
 
       expect(state.medications.first.taken, isTrue);
       expect(find.byTooltip('Mark as not taken'), findsOneWidget);
+
+      // Let the transient "✓ Taken!" confirmation's clear-timer finish so
+      // no timer is pending when the test ends.
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('marking as taken shows a transient "✓ Taken!" confirmation that self-clears', (tester) async {
+      final state = AppState()
+        ..medications = [Medication(id: 'm1', name: 'Amlodipine', dose: '5 mg', time: '8:30 am', notes: '')];
+      await tester.pumpWidget(_wrap(state));
+
+      expect(find.text('✓ Taken!'), findsNothing);
+      await tester.tap(find.byTooltip('Mark as taken'));
+      await tester.pumpAndSettle();
+
+      // Inline confirmation appears next to the action...
+      expect(find.text('✓ Taken!'), findsOneWidget);
+
+      // ...and clears itself after ~3s.
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pumpAndSettle();
+      expect(find.text('✓ Taken!'), findsNothing);
+    });
+
+    testWidgets('unmarking a taken medication shows no confirmation', (tester) async {
+      final state = AppState()
+        ..medications = [
+          Medication(id: 'm1', name: 'Amlodipine', dose: '5 mg', time: '8:30 am', notes: '', taken: true),
+        ];
+      await tester.pumpWidget(_wrap(state));
+
+      await tester.tap(find.byTooltip('Mark as not taken'));
+      await tester.pumpAndSettle();
+
+      expect(state.medications.first.taken, isFalse);
+      expect(find.text('✓ Taken!'), findsNothing);
     });
   });
 }

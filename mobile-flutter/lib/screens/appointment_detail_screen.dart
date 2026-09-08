@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/app_state.dart';
 import '../theme/tokens.dart';
 import '../widgets/tap_button.dart';
-import 'appointments_screen.dart' show showApptFormSheet;
+import 'appointments_screen.dart' show confirmDeleteAppointment, showApptFormSheet;
 
 /// Appointment detail screen -- reached via a real `Navigator.pushNamed`
 /// from the appointments list, with the selected [Appointment] handed
@@ -159,7 +159,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                         child: TapButton(
                           label: '🗑 Delete',
                           variant: TapButtonVariant.destructive,
-                          onPressed: () => state.deleteAppointment(appt.id),
+                          onPressed: () => confirmDeleteAppointment(context, state, appt),
                         ),
                       ),
                     ],

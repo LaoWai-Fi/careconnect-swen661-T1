@@ -145,6 +145,41 @@ void showApptFormSheet(BuildContext context, AppState state, {Appointment? initi
   );
 }
 
+/// Confirms and performs deleting an appointment -- shared by the card's
+/// inline Delete button and [AppointmentDetailScreen]'s Delete action, so
+/// both offer the exact same confirm step (mirroring the medication delete
+/// flow in medications_screen.dart).
+void confirmDeleteAppointment(BuildContext context, AppState state, Appointment appt) {
+  showDialog<void>(
+    context: context,
+    builder: (ctx) {
+      final scheme = Theme.of(ctx).colorScheme;
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Delete appointment?', style: TextStyle(color: scheme.onSurface)),
+        content: Text("This will remove '${appt.title}' from the schedule. This cannot be undone."),
+        actions: [
+          TapButton(
+            label: 'Cancel',
+            variant: TapButtonVariant.outline,
+            size: TapButtonSize.sm,
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          TapButton(
+            label: 'Delete',
+            variant: TapButtonVariant.destructive,
+            size: TapButtonSize.sm,
+            onPressed: () {
+              state.deleteAppointment(appt.id);
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class _ApptCard extends StatelessWidget {
   const _ApptCard({required this.appt, required this.state});
 
@@ -257,7 +292,7 @@ class _ApptCard extends StatelessWidget {
                   label: '🗑 Delete',
                   variant: TapButtonVariant.destructive,
                   size: TapButtonSize.sm,
-                  onPressed: () => state.deleteAppointment(appt.id),
+                  onPressed: () => confirmDeleteAppointment(context, state, appt),
                 ),
               ),
             ],

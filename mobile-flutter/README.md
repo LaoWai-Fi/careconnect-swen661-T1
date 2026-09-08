@@ -70,10 +70,30 @@ design system with a **Left-Hand Mode** accessibility focus. Covers
     assignment); primary buttons 52-60dp.
   - Dashboard reordering works with Move Up / Move Down buttons, no drag
     required (2.5.7); long-press drag is offered only as an optional extra.
-  - Visible focus states on all interactive elements (2.4.7).
+  - Visible focus states on all interactive elements (2.4.7): TapButton
+    draws a 3px focus ring offset 2px (in `--ring`, or `--destructive` for
+    the destructive variant), per the design system's component library.
   - Semantic labels on icon-only buttons and on custom tappable rows (the
     message list's read/unread toggle, the dashboard's medication and
     message tiles, the nav items) for TalkBack/VoiceOver.
+- **Full TapButton interaction states** (per the Assignment 3 component
+  library, §6.3.1): every variant has hover (`--*-hover`) and press
+  (`--*-active`) background tokens wired in, a disabled state at 40%
+  opacity, and the keyboard focus ring above -- previously the button
+  rendered identically in every state.
+- **SOS dialog opens a real `tel:` link** (`url_launcher`), matching the
+  design system's SOS confirmation spec (§3.3) instead of just closing
+  the dialog.
+- **Appointment deletion confirms first**, via the same confirm dialog
+  pattern medications and messages already used -- previously it deleted
+  immediately with no confirmation step.
+- **"✓ Taken!" inline confirmation** on the medication card's mark-as-taken
+  toggle, matching the design system's inline status feedback pattern
+  (§6.3.8) already used by the Dashboard check-in and Activity refresh.
+- **A real TextTheme** in `app_theme.dart` implementing the Assignment 3
+  typography scale (§6.2: h1 32/800 ... caption 12/500, label 12/600
+  uppercase), applied as the app-wide `ThemeData.textTheme` instead of
+  screens each hand-rolling ad-hoc font sizes.
 - **Tests** (`test/`): unit tests for `AppState`'s business logic
   (medications, appointments, activity logging, message read/unread/
   archive/delete, settings, sign-in/sign-out, and the injected-clock
@@ -91,6 +111,9 @@ design system with a **Left-Hand Mode** accessibility focus. Covers
   `TapButton` / `CCFormField` / card components. `mocktail` mocks callback
   dependencies (e.g. verifying a button's `onPressed` fires exactly once)
   where that is a more direct check than inferring it from a side effect.
+  TapButton's interaction states are covered directly: disabled 40%
+  opacity, hover/press token colors, and the keyboard focus ring
+  (including the destructive variant ringing in `--destructive`).
 
 ## Project structure
 

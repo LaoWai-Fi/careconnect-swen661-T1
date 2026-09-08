@@ -162,14 +162,37 @@ void confirmDeleteMedication(BuildContext context, AppState state, Medication me
   );
 }
 
-class _MedCard extends StatelessWidget {
+class _MedCard extends StatefulWidget {
   const _MedCard({required this.med, required this.state});
 
   final Medication med;
   final AppState state;
 
   @override
+  State<_MedCard> createState() => _MedCardState();
+}
+
+class _MedCardState extends State<_MedCard> {
+  /// Shows a transient "✓ Taken!" confirmation when the medication is
+  /// marked as taken -- same inline-feedback pattern as the Dashboard's
+  /// check-in and the Activity screen's refresh button.
+  bool _justTaken = false;
+
+  void _handleTakenToggle() {
+    final wasTaken = widget.med.taken;
+    widget.state.toggleMedTaken(widget.med.id);
+    if (!wasTaken) {
+      setState(() => _justTaken = true);
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _justTaken = false);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final med = widget.med;
+    final state = widget.state;
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
     return Container(
@@ -250,11 +273,24 @@ class _MedCard extends StatelessWidget {
                         : scheme.onSurfaceVariant,
                   ),
                   tooltip: med.taken ? 'Mark as not taken' : 'Mark as taken',
-                  onPressed: () => state.toggleMedTaken(med.id),
+                  onPressed: _handleTakenToggle,
                 ),
               ),
             ],
           ),
+          if (_justTaken) ...[
+            const SizedBox(height: 8),
+            // Inline status confirmation (Assignment 3 §6.3.8): appears next
+            // to the action and self-clears after ~3s.
+            Text(
+              '✓ Taken!',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isLight ? CCTokens.successTextLight : CCTokens.successTextDark,
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [

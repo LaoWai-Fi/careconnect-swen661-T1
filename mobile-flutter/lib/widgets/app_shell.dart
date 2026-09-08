@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/app_state.dart';
 import '../theme/tokens.dart';
@@ -593,7 +594,15 @@ class _SosFab extends StatelessWidget {
                       size: TapButtonSize.lg,
                       fullWidth: true,
                       icon: Icons.phone,
-                      onPressed: () => Navigator.of(ctx).pop(),
+                      onPressed: () {
+                        // A real tel: link, per the design system's SOS
+                        // confirmation spec (Assignment 3 §3.3). On a device
+                        // with a dialer this opens the phone app pre-filled
+                        // with 911; on desktop/web it is a no-op, so the
+                        // dialog still closes either way.
+                        launchUrl(Uri(scheme: 'tel', path: '911'));
+                        Navigator.of(ctx).pop();
+                      },
                     ),
                     const SizedBox(height: 12),
                     TapButton(
