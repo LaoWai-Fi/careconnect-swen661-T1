@@ -1,8 +1,12 @@
 # CareConnect - Flutter (Mobile)
 
-The CareConnect mobile app (Android + iOS), implementing the team's Figma
-design system with a **Left-Hand Mode** accessibility focus. Covers
-**LO1: Design and build a mobile user interface**.
+CareConnect is a medical companion app for care recipients (patients)
+living with short-term memory loss and their caregivers: it lowers the
+daily cognitive load of remembering medications and appointments for the
+patient, while giving caregivers clear visibility into schedules and
+adherence. This folder is the Android + iOS build, implementing the
+team's Figma design system with a **Left-Hand Mode** accessibility focus.
+Covers **LO1: Design and build a mobile user interface**.
 
 ## What's implemented (Week 4)
 
@@ -209,6 +213,34 @@ for. Turn it into an HTML page one of these ways:
 Whichever method is used, take the coverage screenshot from the report's
 summary page (it shows the overall line percentage) for the submission
 package.
+
+## Test coverage evidence
+
+The assignment's minimum is **60% line coverage**. To get the overall
+percentage without installing `lcov`/`genhtml`, sum the `LF`/`LH` totals
+straight out of `coverage/lcov.info` after running `flutter test --coverage`:
+
+```bash
+awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{printf "Lines: %d/%d (%.1f%%)\n", lh, lf, 100*lh/lf}' coverage/lcov.info
+```
+
+<!--
+Submission checklist — fill in after running the command above (or opening
+coverage/html/index.html) on this branch, then attach the coverage/html/
+folder or a screenshot of its summary page to the submission package:
+
+Overall line coverage: __ % ( __ / __ lines )
+Generated: <date> from commit <sha> via `flutter test --coverage`
+-->
+
+> **Status on this branch:** the Flutter SDK is not available in the
+> environment this README was last edited from (`flutter` was not on
+> `PATH` and the machine was out of local disk space, so `brew install
+> --cask flutter` could not complete), so `coverage/lcov.info` has not
+> been generated here yet. `coverage/` and `lcov.info` are gitignored by
+> design (build output, not source) — run the two commands above locally
+> or in CI, fill in the numbers into this section, and attach the HTML
+> report or a summary screenshot to the submission.
 
 ## Known issues and limitations
 
