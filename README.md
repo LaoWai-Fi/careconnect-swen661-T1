@@ -10,7 +10,7 @@ CareConnect lowers the daily cognitive load for people who need help remembering
 |---|---|---|
 | Dom Puller | domspencer01@outlook.com | [LaoWai-Fi](https://github.com/LaoWai-Fi) |
 | Upneet Bir | upneetbir@gmail.com | [upneetsb](https://github.com/upneetsb) |
-| Wiliss Tako | wilisstako161@gmail.com | [wilisstako](https://github.com/wilisstako) |
+| Wiliss Tako | takowiliss@gmail.com | [wilisstako](https://github.com/wilisstako) |
 
 Full roles, communication plan, and Git workflow: [docs/team-charter.md](docs/team-charter.md).
 

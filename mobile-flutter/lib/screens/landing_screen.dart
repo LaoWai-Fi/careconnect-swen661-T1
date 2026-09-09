@@ -95,15 +95,26 @@ class _LandingScreenState extends State<LandingScreen> {
                         variant: TapButtonVariant.secondary,
                         size: TapButtonSize.lg,
                         fullWidth: true,
-                        onPressed: () => widget.state.navigate(CCPage.signup),
+                        onPressed: () => Navigator.of(context).pushNamed('/signup'),
                       ),
                       const SizedBox(height: 12),
                       TapButton(
                         label: 'I already have an account',
                         variant: TapButtonVariant.ghost,
+                        // Ghost buttons default to scheme.primary text, which
+                        // is the exact teal this hero section's background
+                        // is painted in -- without this override the button
+                        // is fully invisible (correct tap target, no visible
+                        // label). White reads correctly against the teal.
+                        foregroundColor: Colors.white,
+                        // Ghost buttons also have no border by default, which
+                        // left this secondary CTA with no visible outline at
+                        // all against the hero background -- add one so it
+                        // reads as a tappable button, matching the design.
+                        borderColor: Colors.white,
                         size: TapButtonSize.lg,
                         fullWidth: true,
-                        onPressed: () => widget.state.navigate(CCPage.signin),
+                        onPressed: () => Navigator.of(context).pushNamed('/signin'),
                       ),
                     ],
                   ),
@@ -157,7 +168,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     child: const Icon(Icons.smart_toy_outlined, size: 16, color: Colors.white),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
+                  const Expanded(
                     child: Text('CareConnect Assistant', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   ),
                   IconButton(
@@ -214,8 +225,8 @@ class _LandingScreenState extends State<LandingScreen> {
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 44,
-                    height: 44,
+                    width: 48,
+                    height: 48,
                     child: IconButton.filled(
                       icon: const Icon(Icons.send, size: 18),
                       tooltip: 'Send message',

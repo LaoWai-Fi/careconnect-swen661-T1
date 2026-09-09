@@ -34,6 +34,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild on state changes (the medication tile toggle, the Customize
+    // sheet, etc. call AppState methods with no paired local setState) so
+    // this screen stays correct even when it isn't being rebuilt by an
+    // ancestor listening to [state] -- see the same pattern in
+    // message_detail_screen.dart and messages_screen.dart. Without this,
+    // DashboardScreen reached via a named route (as it always is in the
+    // real app) doesn't reflect the change even though AppState did.
+    return ListenableBuilder(
+      listenable: widget.state,
+      builder: (context, _) => _buildScreen(context),
+    );
+  }
+
+  Widget _buildScreen(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
     final isWide = MediaQuery.sizeOf(context).width >= 768;
@@ -196,7 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   sub: 'taken today',
                   bg: isLight ? CCTokens.warningBgLight : CCTokens.warningBgDark,
                   borderColor: isLight ? CCTokens.warningBorderLight : CCTokens.warningBorderDark,
-                  onTap: () => state.navigate(CCPage.medications),
+                  onTap: () => Navigator.of(context).pushReplacementNamed('/medications'),
                 ),
                 StatCard(
                   icon: Icons.person_outline,
@@ -218,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   sub: nextAppt?.dateTime ?? '—',
                   bg: isLight ? CCTokens.infoBgLight : CCTokens.infoBgDark,
                   borderColor: isLight ? CCTokens.infoBorderLight : CCTokens.infoBorderDark,
-                  onTap: () => state.navigate(CCPage.appointments),
+                  onTap: () => Navigator.of(context).pushReplacementNamed('/appointments'),
                 ),
               ],
             ),
@@ -246,27 +260,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       case 'alerts':
         final untaken = meds.where((m) => !m.taken).toList();
-        final alerts = <AlertCard>[
+        // Each candidate carries the stable id AppState tracks dismissals
+        // under, so a dismissed alert (a) drops out of both this list and
+        // the count badge below together, and (b) stays dismissed if the
+        // user navigates away and back -- the dismissal lives on AppState,
+        // not on the card's own widget state.
+        final candidates = <({String id, AlertCard card})>[
           if (nextAppt != null && nextAppt.dateTime.toLowerCase().contains('today'))
-            AlertCard(
-              icon: Icons.event_outlined,
-              title: 'Appointment today',
-              body:
-                  '${nextAppt.title} at ${nextAppt.dateTime.split('—').length > 1 ? nextAppt.dateTime.split('—')[1].trim() : nextAppt.dateTime} — ${nextAppt.location.split('—').first.trim()}.',
+            (
+              id: AppState.alertAppointmentToday,
+              card: AlertCard(
+                icon: Icons.event_outlined,
+                title: 'Appointment today',
+                body:
+                    '${nextAppt.title} at ${nextAppt.dateTime.split('—').length > 1 ? nextAppt.dateTime.split('—')[1].trim() : nextAppt.dateTime} — ${nextAppt.location.split('—').first.trim()}.',
+                onDismiss: () => state.dismissAlert(AppState.alertAppointmentToday),
+              ),
             ),
           if (untaken.isNotEmpty)
-            AlertCard(
-              icon: Icons.medication_outlined,
-              title: '${untaken.length} medication${untaken.length > 1 ? 's' : ''} not yet taken',
-              body:
-                  '${untaken.map((m) => '${m.name} ${m.dose}').join(', ')} — scheduled for ${untaken.first.time}.',
+            (
+              id: AppState.alertMedsUntaken,
+              card: AlertCard(
+                icon: Icons.medication_outlined,
+                title: '${untaken.length} medication${untaken.length > 1 ? 's' : ''} not yet taken',
+                body:
+                    '${untaken.map((m) => '${m.name} ${m.dose}').join(', ')} — scheduled for ${untaken.first.time}.',
+                onDismiss: () => state.dismissAlert(AppState.alertMedsUntaken),
+              ),
             ),
           if (!state.checkedIn)
-            AlertCard(
-              icon: Icons.person_outline,
-              title: 'No check-in yet',
-              body: "Margaret hasn't checked in this morning. Tap the Check-in card above to record it.",
+            (
+              id: AppState.alertNoCheckIn,
+              card: AlertCard(
+                icon: Icons.person_outline,
+                title: 'No check-in yet',
+                body: "Margaret hasn't checked in this morning. Tap the Check-in card above to record it.",
+                onDismiss: () => state.dismissAlert(AppState.alertNoCheckIn),
+              ),
             ),
+        ];
+        final alerts = [
+          for (final c in candidates)
+            if (!state.dismissedAlertIds.contains(c.id)) c.card,
         ];
         if (alerts.isEmpty) return [const SizedBox.shrink()];
         return [
@@ -307,7 +342,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => state.navigate(CCPage.medications),
+                onPressed: () => Navigator.of(context).pushReplacementNamed('/medications'),
                 child: const Text('View all →'),
               ),
             ],
@@ -332,31 +367,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => state.navigate(CCPage.appointments),
+                onPressed: () => Navigator.of(context).pushReplacementNamed('/appointments'),
                 child: const Text('View all →'),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: scheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: scheme.outline),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(nextAppt.title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: scheme.onSurface)),
-                const SizedBox(height: 4),
-                Text('🕐 ${nextAppt.dateTime}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
-                Text('📍 ${nextAppt.location}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
-                const SizedBox(height: 4),
-                Text(nextAppt.notes, style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
-              ],
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              // Tapping this widget's own next-appointment card opens the
+              // same detail screen the Appointments list's card opens --
+              // see appointments_screen.dart's _ApptCard for the identical
+              // pattern (arguments: nextAppt hands that specific
+              // appointment across, the same way messages do above).
+              onTap: () => Navigator.of(context).pushNamed('/appointments/detail', arguments: nextAppt),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(nextAppt.title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: scheme.onSurface)),
+                    const SizedBox(height: 4),
+                    Text('🕐 ${nextAppt.dateTime}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
+                    Text('📍 ${nextAppt.location}', style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
+                    const SizedBox(height: 4),
+                    Text(nextAppt.notes, style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
+                  ],
+                ),
+              ),
             ),
           ),
+          const SizedBox(height: 24),
+        ];
+
+      case 'messages':
+        final unread = state.messages.where((m) => !m.read && !m.archived).toList();
+        return [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Unread messages',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: scheme.onSurface),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pushReplacementNamed('/messages'),
+                child: const Text('View all →'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (unread.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: scheme.outline),
+              ),
+              child: Text(
+                'No new messages',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Flex(
+              direction: isWide ? Axis.horizontal : Axis.vertical,
+              children: _spread(isWide, [
+                for (final msg in unread.take(3))
+                  _MessageTile(
+                    message: msg,
+                    onTap: () {
+                      state.markMessageRead(msg.id);
+                      Navigator.of(context).pushNamed('/messages/detail', arguments: msg);
+                    },
+                  ),
+              ]),
+            ),
           const SizedBox(height: 24),
         ];
 
@@ -377,7 +473,11 @@ class _MedTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    return Material(
+    return Semantics(
+      button: true,
+      label: '${med.name}, ${med.dose}, ${med.time}',
+      value: med.taken ? 'Taken' : 'Not yet taken',
+      child: Material(
       color: med.taken
           ? (isLight ? CCTokens.successBgLight : CCTokens.successBgDark)
           : scheme.surface,
@@ -431,6 +531,67 @@ class _MedTile extends StatelessWidget {
           ),
         ),
       ),
+      ),
+    );
+  }
+}
+
+/// Compact tappable message row on the dashboard.
+class _MessageTile extends StatelessWidget {
+  const _MessageTile({required this.message, required this.onTap});
+
+  final Message message;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: 'Unread message from ${message.from}: ${message.subject}',
+      child: Material(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 60),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: scheme.primary, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(color: scheme.primary, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        message.from,
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: scheme.onSurface),
+                      ),
+                      Text(
+                        message.subject,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(message.timestamp, style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant)),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -469,9 +630,12 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
     widget.state.reorderWidgets(_items);
   }
 
-  void _onReorder(int oldIndex, int newIndex) {
+  /// `onReorderItem` (replacing the deprecated `onReorder`, Flutter
+  /// 3.41+) already adjusts `newIndex` for the removed item at
+  /// `oldIndex` before calling this, so unlike the old `onReorder`
+  /// callback this must NOT also decrement newIndex itself.
+  void _onReorderItem(int oldIndex, int newIndex) {
     setState(() {
-      if (newIndex > oldIndex) newIndex -= 1;
       final moved = _items.removeAt(oldIndex);
       _items.insert(newIndex, moved);
     });
@@ -529,7 +693,20 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                           child: ReorderableListView.builder(
                             shrinkWrap: true,
                             buildDefaultDragHandles: false,
-                            onReorder: _onReorder,
+                            // This sheet sits inside the Dashboard's own
+                            // Scaffold, so the SOS button (a fixed
+                            // FloatingActionButton, bottom-right normally,
+                            // bottom-left in Left-Hand Mode -- but always
+                            // sitting over the RIGHT-aligned Move
+                            // Up/Down/toggle controls of whichever row ends
+                            // up at the very bottom) floats on top of it,
+                            // not behind it. Reserving this much room below
+                            // the last item gives the list somewhere to
+                            // scroll to, so every row's controls can be
+                            // brought clear of the button instead of ending
+                            // up stuck underneath it.
+                            padding: const EdgeInsets.only(bottom: 96),
+                            onReorderItem: _onReorderItem,
                             itemCount: _items.length,
                             proxyDecorator: (child, index, animation) => Material(
                               color: scheme.surfaceContainerHighest,
@@ -547,8 +724,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                     ReorderableDragStartListener(
                                       index: i,
                                       child: SizedBox(
-                                        width: 44,
-                                        height: 44,
+                                        width: 48,
+                                        height: 48,
                                         child: Icon(Icons.drag_indicator, color: scheme.onSurfaceVariant),
                                       ),
                                     ),
@@ -560,8 +737,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                     ),
                                     // Tap-based Move Up / Move Down (WCAG 2.5.7)
                                     SizedBox(
-                                      width: 44,
-                                      height: 44,
+                                      width: 48,
+                                      height: 48,
                                       child: IconButton(
                                         icon: const Icon(Icons.arrow_upward, size: 18),
                                         tooltip: 'Move ${w.label} up',
@@ -569,8 +746,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                       ),
                                     ),
                                     SizedBox(
-                                      width: 44,
-                                      height: 44,
+                                      width: 48,
+                                      height: 48,
                                       child: IconButton(
                                         icon: const Icon(Icons.arrow_downward, size: 18),
                                         tooltip: 'Move ${w.label} down',
@@ -582,8 +759,17 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                                       value: w.enabled,
                                       label: w.label,
                                       onChanged: (_) {
-                                        setState(() => w.enabled = !w.enabled);
+                                        // `w` is the same object referenced by
+                                        // `widget.state.dashboardWidgets`, so
+                                        // toggleWidget already flips it -- an
+                                        // extra local mutation here would flip
+                                        // it a second time and cancel out.
+                                        // The empty setState just forces this
+                                        // sheet's own build to re-run so the
+                                        // switch reflects the new value right
+                                        // away.
                                         widget.state.toggleWidget(w.id);
+                                        setState(() {});
                                       },
                                     ),
                                   ],
@@ -614,7 +800,6 @@ class _WidgetToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Semantics(
       label: '$label — ${value ? 'visible' : 'hidden'}',
       toggled: value,

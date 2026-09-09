@@ -16,10 +16,23 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
+  # State management (Week 4): AppState is a ChangeNotifier wired through
+  # the app via ChangeNotifierProvider/context.watch instead of a hand-rolled
+  # addListener + setState at the app root. See lib/main.dart.
+  provider: ^6.1.2
+
+  # Opens the tel: link from the SOS emergency dialog (Assignment 3 §3.3).
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+
+  # Used to mock callback dependencies in widget tests (e.g. verifying a
+  # button's onPressed is invoked exactly once) without relying on AppState
+  # side effects to observe the interaction.
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true

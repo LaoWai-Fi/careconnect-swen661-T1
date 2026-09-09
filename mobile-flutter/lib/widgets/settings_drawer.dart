@@ -100,9 +100,9 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                     child: _ChoiceChip(
                       selected: state.fontSize == f,
                       label: switch (f) {
-                        FontScale.normal => 'A Default',
-                        FontScale.large => 'A Large',
-                        FontScale.xlarge => 'A X-Large',
+                        FontScale.normal => 'Default',
+                        FontScale.large => 'Large',
+                        FontScale.xlarge => 'X-Large',
                       },
                       onTap: () => setState(() => state.setFontScale(f)),
                     ),
@@ -125,6 +125,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             onPressed: () {
               Navigator.of(context).pop();
               state.signOut();
+              Navigator.of(context).pushNamedAndRemoveUntil('/landing', (route) => false);
             },
           ),
         ],
