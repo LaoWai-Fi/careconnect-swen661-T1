@@ -1,22 +1,38 @@
-// Placeholder root component — replaced by the navigation shell in the
-// screens commit. Kept minimal so the state layer can be committed and tested
-// independently.
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// Root component — RN port of main.dart's CareConnectApp.
+//
+// Owns the global providers (AppState) and mounts the React Navigation root
+// navigator. Route map mirrors the Flutter app's named routes:
+//   landing, signin, signup, main (5 tabs), medicationDetail,
+//   appointmentDetail, messageDetail, archivedMessages
 
-export default function App() {
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View } from 'react-native';
+import { RootNavigator } from './navigation/RootNavigator';
+import { AppStateProvider, useAppState } from './state/AppState';
+import type { AppStateData } from './state/AppState';
+import { palette } from './theme/tokens';
+
+function AppFrame() {
+  const { state } = useAppState();
+  const scheme = state.theme === 'dark' ? 'dark' : 'light';
+  const p = palette(scheme);
+
   return (
-    <View style={styles.root}>
-      <StatusBar style="dark" />
-      <Text>CareConnect (React Native) — Week 5 scaffold</Text>
+    <View style={[styles.root, { backgroundColor: p.background }]}>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <RootNavigator />
     </View>
   );
 }
 
+export default function App({ initialState }: { initialState?: AppStateData }) {
+  return (
+    <AppStateProvider initialState={initialState}>
+      <AppFrame />
+    </AppStateProvider>
+  );
+}
+
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  root: { flex: 1 },
 });
