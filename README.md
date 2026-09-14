@@ -28,7 +28,7 @@ careconnect-swen661-T1/
     └── team-charter.md   # team roles, workflow, communication plan
 ```
 
-`web/` and `mobile-flutter/` are scaffolded — see [web/README.md](web/README.md) and [mobile-flutter/README.md](mobile-flutter/README.md) for their setup and feature writeups. `mobile-rn/` and `desktop-electron/` are placeholders (each with its own README and `.gitignore`) to be built out in later weeks.
+`web/` and `mobile-flutter/` are built out; `mobile-rn/` is the Week 5 React Native port of the Flutter app (117 tests, 82% statement coverage, React Navigation, ESLint-clean) — see [web/README.md](web/README.md), [mobile-flutter/README.md](mobile-flutter/README.md), and [mobile-rn/README.md](mobile-rn/README.md) for their setup and feature writeups. `desktop-electron/` is a placeholder (with its own README and `.gitignore`) to be built out in a later week. The two mobile toolchains are compared in [docs/rn-vs-flutter-comparison.md](docs/rn-vs-flutter-comparison.md); 
 
 ## Setup instructions
 
@@ -39,10 +39,9 @@ git clone https://github.com/LaoWai-Fi/careconnect-swen661-T1.git
 cd careconnect-swen661-T1
 
 cd web && npm install && npm run dev              # web app — see web/README.md
-cd mobile-flutter && flutter create . --platforms=android,ios --project-name careconnect && flutter run   # mobile app — see mobile-flutter/README.md
+cd mobile-flutter && flutter create . --platforms=android,ios --project-name careconnect && flutter run   # Flutter mobile app — see mobile-flutter/README.md
+cd mobile-rn && npm install && npx expo start     # React Native mobile app — see mobile-rn/README.md
 ```
-
-React Native and Electron setup commands will be added to their respective folders' READMEs once those apps are scaffolded.
 
 ## License
 

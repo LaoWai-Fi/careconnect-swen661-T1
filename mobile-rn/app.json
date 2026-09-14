@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "CareConnect",
+    "slug": "careconnect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "platforms": ["ios", "android"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {}
+  }
+}
