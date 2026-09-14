@@ -5,7 +5,8 @@
 // team's "No Drag-Only Actions" constraint (WCAG 2.5.7): nothing here
 // depends on a swipe gesture.
 
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from './ScaledText';
 import type { Message } from '../models/types';
 import { useAppState } from '../state/AppState';
 import { useAppTheme } from '../hooks/useAppTheme';

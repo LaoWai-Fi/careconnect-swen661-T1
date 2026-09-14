@@ -113,6 +113,21 @@ describe('DashboardScreen', () => {
       });
     });
 
+    test('exposes a drag handle per row as a convenience alongside the tap buttons', async () => {
+      // Regression test for "can't drag to re-order, was able to do this in
+      // Flutter" — dashboard_screen.dart's ReorderableListView keeps its
+      // Move Up/Down semantics AND offers a drag handle; this asserts the RN
+      // port now offers both too. (The drag gesture itself is driven by
+      // PanResponder's native touch-history tracking, which Jest can't
+      // simulate meaningfully — this is covered by the tap-based Move
+      // Up/Down test above and by manual verification in the running app.)
+      await renderDashboard();
+      await fireEvent.press(screen.getByText('✎'));
+      await screen.findByText('Customize Dashboard');
+      expect(screen.getByLabelText('Drag to reorder Alerts')).toBeTruthy();
+      expect(screen.getByText(/Long-press and drag/)).toBeTruthy();
+    });
+
     test('visibility toggle hides the section from the dashboard', async () => {
       await renderDashboard();
       await fireEvent.press(screen.getByText('✎'));

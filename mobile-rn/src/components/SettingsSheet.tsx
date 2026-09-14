@@ -5,7 +5,8 @@
 // anchors navigation and key actions to the left edge for one-handed,
 // left-thumb operation.
 
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from './ScaledText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette } from '../theme/tokens';
 import type { ColorScheme } from '../theme/tokens';

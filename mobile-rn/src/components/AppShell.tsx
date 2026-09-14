@@ -2,13 +2,17 @@
 //
 // Header (logo, greeting bar with date/time, settings + sign-out), bottom
 // tab nav with unread badge, SOS emergency button (tel: link behind a
-// confirmation dialog), and left-hand-mode anchoring that flips the tab bar
-// alignment so primary controls sit under the user's thumb.
+// confirmation dialog), and left-hand-mode anchoring that flips the header
+// icon order, the SOS corner, and the tab bar cluster so primary controls
+// sit under the user's thumb.
 
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from './ScaledText';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Logo } from './Cards';
 import { SettingsSheet } from './SettingsSheet';
+import { TapButton } from './TapButton';
 import type { Appointment, Medication } from '../models/types';
 import { useAppState } from '../state/AppState';
 import { useAppTheme } from '../hooks/useAppTheme';
@@ -44,9 +48,17 @@ export function AppShell({
 }: AppShellProps) {
   const { state, dispatch } = useAppState();
   const { p } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [sosOpen, setSosOpen] = useState(false);
   const unread = state.messages.filter((m) => !m.read && !m.archived).length;
   const leftHanded = state.handMode === 'left';
+  // Bottom nav cluster alignment is genuinely 3-way (Left / Right / Off);
+  // header icon order and the SOS corner only flip for Left (see
+  // app_shell.dart's _Header and _buildCompact — Right and Off share the
+  // same default layout there).
+  const navAlign =
+    state.handMode === 'left' ? 'flex-start' : state.handMode === 'right' ? 'flex-end' : 'space-evenly';
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -59,52 +71,64 @@ export function AppShell({
     dispatch({ type: 'signOut' });
   }
 
-  function handleSOS() {
-    Alert.alert(
-      'Emergency SOS',
-      'Call 911 now? This opens the phone dialer.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Call 911',
-          style: 'destructive',
-          onPress: () => {
-            // tel: link — opens the dialer. expo-linking is imported lazily to
-            // keep this component testable without mocking the module at
-            // import time.
-            import('expo-linking').then(({ openURL }) => openURL('tel:911'));
-          },
-        },
-      ],
-    );
+  function callEmergency() {
+    // tel: link — opens the dialer. expo-linking is imported lazily to keep
+    // this component testable without mocking the module at import time.
+    import('expo-linking').then(({ openURL }) => openURL('tel:911'));
+    setSosOpen(false);
   }
+
+  const titleBlock = (
+    <View style={{ flex: 1 }}>
+      <Text style={{ fontWeight: '700', fontSize: 16, color: p.onSurface }}>CareConnect</Text>
+      <Text style={{ fontSize: 12, color: p.onSurfaceVariant }}>
+        Viewing Margaret&apos;s care plan
+      </Text>
+    </View>
+  );
+
+  const headerIcons = (
+    <>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Settings"
+        onPress={() => setSettingsOpen(true)}
+        style={styles.iconBtn}
+      >
+        <Text style={{ fontSize: 20 }}>⚙️</Text>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Sign out"
+        onPress={handleSignOut}
+        style={styles.iconBtn}
+      >
+        <Text style={{ fontSize: 20 }}>🚪</Text>
+      </Pressable>
+    </>
+  );
 
   return (
     <View style={[styles.root, { backgroundColor: p.background }]}>
-      <View style={[styles.header, { backgroundColor: p.surface, borderBottomColor: p.outline }]}>
-        <Logo size={36} />
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: '700', fontSize: 16, color: p.onSurface }}>CareConnect</Text>
-          <Text style={{ fontSize: 12, color: p.onSurfaceVariant }}>
-            Viewing Margaret&apos;s care plan
-          </Text>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Settings"
-          onPress={() => setSettingsOpen(true)}
-          style={styles.iconBtn}
-        >
-          <Text style={{ fontSize: 20 }}>⚙️</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Sign out"
-          onPress={handleSignOut}
-          style={styles.iconBtn}
-        >
-          <Text style={{ fontSize: 20 }}>🚪</Text>
-        </Pressable>
+      <View
+        style={[
+          styles.header,
+          { backgroundColor: p.surface, borderBottomColor: p.outline, paddingTop: 12 + insets.top },
+        ]}
+      >
+        {leftHanded ? (
+          <>
+            {headerIcons}
+            {titleBlock}
+            <Logo size={36} />
+          </>
+        ) : (
+          <>
+            <Logo size={36} />
+            {titleBlock}
+            {headerIcons}
+          </>
+        )}
       </View>
 
       <View style={[styles.greetingBar, { backgroundColor: p.surfaceHighest }]}>
@@ -122,17 +146,30 @@ export function AppShell({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Emergency SOS — call 911"
-        onPress={handleSOS}
-        style={[styles.sos, { backgroundColor: '#DC2626', borderColor: '#B91C1C' }]}
+        onPress={() => setSosOpen(true)}
+        style={[
+          styles.sos,
+          {
+            backgroundColor: '#DC2626',
+            borderColor: '#B91C1C',
+            bottom: 96 + insets.bottom,
+            ...(leftHanded ? { left: 20 } : { right: 20 }),
+          },
+        ]}
       >
         <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 15 }}>SOS</Text>
       </Pressable>
 
       <View
+        testID="tab-bar"
         style={[
           styles.tabBar,
-          { backgroundColor: p.surface, borderTopColor: p.outline },
-          leftHanded && styles.tabBarLeft,
+          {
+            backgroundColor: p.surface,
+            borderTopColor: p.outline,
+            paddingBottom: 8 + insets.bottom,
+            justifyContent: navAlign,
+          },
         ]}
       >
         {NAV_ITEMS.map((item) => {
@@ -153,6 +190,7 @@ export function AppShell({
                   fontWeight: selected ? '700' : '500',
                   color: selected ? p.primary : p.onSurfaceVariant,
                 }}
+                numberOfLines={1}
               >
                 {item.label}
               </Text>
@@ -171,6 +209,47 @@ export function AppShell({
         onClose={() => setSettingsOpen(false)}
         onSignOut={handleSignOut}
       />
+
+      {/* SOS confirmation — RN port of app_shell.dart's _showSosDialog: a red
+          header block (emergency icon, title, description) over a full-width
+          destructive "SOS Emergency Call" button and a ghost "Cancel" button,
+          rather than a native Alert. */}
+      <Modal visible={sosOpen} transparent animationType="fade" onRequestClose={() => setSosOpen(false)}>
+        <Pressable
+          style={styles.sosBackdrop}
+          onPress={() => setSosOpen(false)}
+          accessibilityLabel="Close emergency dialog"
+        >
+          <Pressable
+            style={[styles.sosCard, { backgroundColor: p.surface }]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.sosHeader}>
+              <Text style={{ fontSize: 48 }}>🚨</Text>
+              <Text style={styles.sosTitle}>Emergency</Text>
+              <Text style={styles.sosBody}>
+                Press the button below to call emergency services immediately.
+              </Text>
+            </View>
+            <View style={styles.sosActions}>
+              <TapButton
+                label="📞 SOS Emergency Call"
+                variant="destructive"
+                size="lg"
+                fullWidth
+                onPress={callEmergency}
+              />
+              <TapButton
+                label="Cancel"
+                variant="ghost"
+                size="md"
+                fullWidth
+                onPress={() => setSosOpen(false)}
+              />
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -191,7 +270,6 @@ const styles = StyleSheet.create({
   iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   sos: {
     position: 'absolute',
-    right: 20,
     bottom: 96,
     width: 64,
     height: 64,
@@ -207,11 +285,9 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     paddingTop: 6,
   },
-  tabBarLeft: {
-    flexDirection: 'row-reverse',
-  },
   tabItem: {
-    flex: 1,
+    minWidth: 64,
+    maxWidth: 78,
     alignItems: 'center',
     gap: 2,
     minHeight: 48,
@@ -228,5 +304,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
+  },
+  sosBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  sosCard: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 24,
+    overflow: 'hidden',
+  },
+  sosHeader: {
+    width: '100%',
+    paddingVertical: 28,
+    paddingHorizontal: 24,
+    backgroundColor: '#B91C1C',
+    alignItems: 'center',
+    gap: 10,
+  },
+  sosTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  sosBody: {
+    fontSize: 14,
+    color: '#FECACA',
+    textAlign: 'center',
+  },
+  sosActions: {
+    padding: 20,
+    gap: 12,
   },
 });
