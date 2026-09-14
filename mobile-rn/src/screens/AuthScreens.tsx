@@ -6,7 +6,8 @@
 // email local-part.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import { Logo } from '../components/Cards';
 import { TapButton } from '../components/TapButton';
 import { FormField, Input } from '../components/FormField';

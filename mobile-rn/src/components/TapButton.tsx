@@ -12,9 +12,9 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { ScaledText as Text } from './ScaledText';
 import { palette, CCTokens } from '../theme/tokens';
 import type { ColorScheme } from '../theme/tokens';
 

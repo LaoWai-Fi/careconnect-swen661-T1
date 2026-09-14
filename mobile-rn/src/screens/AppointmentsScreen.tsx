@@ -11,9 +11,9 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import { TapButton } from '../components/TapButton';
 import { FormField, Input } from '../components/FormField';
 import type { Appointment } from '../models/types';

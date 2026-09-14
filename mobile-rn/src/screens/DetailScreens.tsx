@@ -5,8 +5,10 @@
 // Each detail screen guards against a stale item (deleted while open) by
 // popping back. Message detail offers Reply / Archive / Unarchive / Delete.
 
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TapButton } from '../components/TapButton';
 import { MessageRow } from '../components/MessageRow';
 import { ComposeSheet } from './MessagesScreen';
@@ -25,6 +27,7 @@ export function MedicationDetailScreen({
 }: MedicationDetailScreenProps) {
   const { state, dispatch } = useAppState();
   const { p, scheme } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const med = state.medications.find((m) => m.id === medicationId);
 
   if (!med) {
@@ -35,7 +38,7 @@ export function MedicationDetailScreen({
 
   return (
     <View style={[styles.root, { backgroundColor: p.background }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: 16 + insets.top }]}>
         <View style={styles.bound}>
           <TapButton label="← Back" variant="ghost" scheme={scheme} onPress={onBack} />
           <View style={[styles.card, { backgroundColor: p.surface, borderColor: p.outline }]}>
@@ -81,6 +84,7 @@ export function AppointmentDetailScreen({
 }: AppointmentDetailScreenProps) {
   const { state } = useAppState();
   const { p, scheme } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const appt = state.appointments.find((a) => a.id === appointmentId);
 
   if (!appt) {
@@ -90,7 +94,7 @@ export function AppointmentDetailScreen({
 
   return (
     <View style={[styles.root, { backgroundColor: p.background }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: 16 + insets.top }]}>
         <View style={styles.bound}>
           <TapButton label="← Back" variant="ghost" scheme={scheme} onPress={onBack} />
           <View style={[styles.card, { backgroundColor: p.surface, borderColor: p.outline }]}>
@@ -137,6 +141,7 @@ export interface MessageDetailScreenProps {
 export function MessageDetailScreen({ messageId, onBack }: MessageDetailScreenProps) {
   const { state, dispatch } = useAppState();
   const { p, scheme } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const [replying, setReplying] = useState(false);
   const message = state.messages.find((m) => m.id === messageId);
 
@@ -165,7 +170,7 @@ export function MessageDetailScreen({ messageId, onBack }: MessageDetailScreenPr
 
   return (
     <View style={[styles.root, { backgroundColor: p.background }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: 16 + insets.top }]}>
         <View style={styles.bound}>
           <TapButton label="← Back" variant="ghost" scheme={scheme} onPress={onBack} />
           <View style={[styles.card, { backgroundColor: p.surface, borderColor: p.outline }]}>
@@ -230,11 +235,12 @@ export function ArchivedMessagesScreen({
 }: ArchivedMessagesScreenProps) {
   const { state, dispatch } = useAppState();
   const { p, scheme } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const archived = state.messages.filter((m) => m.archived);
 
   return (
     <View style={[styles.root, { backgroundColor: p.background }]}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: 16 + insets.top }]}>
         <View style={styles.bound}>
           <TapButton label="← Back to messages" variant="ghost" scheme={scheme} onPress={onBack} />
           <Text style={[styles.title, { color: p.onSurface }]}>Archived messages</Text>
