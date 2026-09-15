@@ -5,7 +5,8 @@
 // drag-free alternative required by WCAG 2.5.7).
 
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Modal, PanResponder, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import { AlertCard, StatCard } from '../components/Cards';
 import { TapButton } from '../components/TapButton';
 import {
@@ -478,10 +479,18 @@ function MessageTile({ messageId, onOpen }: { messageId: string; onOpen: () => v
   );
 }
 
+/// Row height the drag math below assumes — each row in the list is fixed
+/// to this so a finger's vertical travel converts cleanly to "how many
+/// rows over" via `dy / ROW_HEIGHT`.
+const ROW_HEIGHT = 56;
+
 /// Customize Dashboard bottom sheet.
 ///
 /// Accessibility: reordering works entirely with taps (Move Up / Move Down
 /// buttons) — no drag gesture is required (WCAG 2.5.7 Dragging Movements).
+/// Long-press-and-drag on the ⠿ handle is an ADDITIONAL convenience on top
+/// of that, mirroring dashboard_screen.dart's ReorderableListView (which
+/// keeps its own Move Up/Down-equivalent semantics actions alongside drag).
 function CustomizeSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { state, dispatch } = useAppState();
   const { p } = useAppTheme();
@@ -490,14 +499,77 @@ function CustomizeSheet({ visible, onClose }: { visible: boolean; onClose: () =>
   const [items, setItems] = useState(() =>
     state.dashboardWidgets.slice().sort((a, b) => a.order - b.order),
   );
+  // Index currently being dragged, and the slot it's currently hovering
+  // over — both null outside a drag gesture.
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const dragY = useRef(new Animated.Value(0)).current;
+  // One Animated.Value per row, driving the "make room" shift of every row
+  // that ISN'T the one being dragged — kept in a ref (rather than re-created
+  // every render) so an in-flight Animated.timing isn't torn down mid-shift.
+  // Sized once: widgets are only reordered/toggled here, never added or
+  // removed, so `items.length` never changes for the life of this sheet.
+  const rowShift = useRef<Animated.Value[]>(items.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    items.forEach((_, j) => {
+      let shift = 0;
+      if (dragIndex !== null && hoverIndex !== null && j !== dragIndex) {
+        if (dragIndex < hoverIndex && j > dragIndex && j <= hoverIndex) shift = -ROW_HEIGHT;
+        else if (dragIndex > hoverIndex && j < dragIndex && j >= hoverIndex) shift = ROW_HEIGHT;
+      }
+      Animated.timing(rowShift[j], {
+        toValue: shift,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    });
+    // items.length only — `items` itself changes identity on every render
+    // via .slice() and would otherwise re-run this on every keystroke of a
+    // drag for no reason (dragY already drives the live-drag frame).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dragIndex, hoverIndex, items.length]);
 
   function move(from: number, to: number) {
-    if (to < 0 || to >= items.length) return;
+    if (to < 0 || to >= items.length || from === to) return;
     const next = items.slice();
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
     setItems(next);
     dispatch({ type: 'reorderWidgets', ordered: next });
+  }
+
+  function hoverIndexFor(startIndex: number, dy: number) {
+    return Math.max(0, Math.min(items.length - 1, Math.round(startIndex + dy / ROW_HEIGHT)));
+  }
+
+  function panResponderFor(index: number) {
+    return PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: (_evt, g) => Math.abs(g.dy) > 4,
+      onPanResponderGrant: () => {
+        dragY.setValue(0);
+        setDragIndex(index);
+        setHoverIndex(index);
+      },
+      onPanResponderMove: (_evt, g) => {
+        dragY.setValue(g.dy);
+        const hover = hoverIndexFor(index, g.dy);
+        setHoverIndex((prev) => (prev === hover ? prev : hover));
+      },
+      onPanResponderRelease: (_evt, g) => {
+        const hover = hoverIndexFor(index, g.dy);
+        dragY.setValue(0);
+        setDragIndex(null);
+        setHoverIndex(null);
+        move(index, hover);
+      },
+      onPanResponderTerminate: () => {
+        dragY.setValue(0);
+        setDragIndex(null);
+        setHoverIndex(null);
+      },
+    }).panHandlers;
   }
 
   return (
@@ -514,11 +586,35 @@ function CustomizeSheet({ visible, onClose }: { visible: boolean; onClose: () =>
             <TapButton label="Done" variant="ghost" size="sm" onPress={onClose} />
           </View>
           <Text style={{ fontSize: 13, color: p.onSurfaceVariant }}>
-            Use ↑ ↓ buttons to reorder. Toggle to show or hide.
+            Long-press and drag ⠿ to reorder, or use ↑ ↓ buttons. Toggle to show or hide.
           </Text>
-          <ScrollView>
+          <ScrollView scrollEnabled={dragIndex === null}>
+            {/* eslint-disable-next-line react-hooks/refs -- dragY/rowShift
+                are Animated.Value instances kept in refs so they're
+                referentially stable across renders (RN's standard pattern);
+                they're designed to be read during render to drive a style's
+                transform, unlike the DOM-ref misuse this rule targets. */}
             {items.map((w, i) => (
-              <View key={w.id} style={styles.customRow}>
+              <Animated.View
+                key={w.id}
+                style={[
+                  styles.customRow,
+                  {
+                    transform: [{ translateY: dragIndex === i ? dragY : rowShift[i] }],
+                    zIndex: dragIndex === i ? 10 : 0,
+                    elevation: dragIndex === i ? 6 : 0,
+                    opacity: dragIndex === i ? 0.95 : 1,
+                    backgroundColor: dragIndex === i ? p.surfaceHighest : 'transparent',
+                  },
+                ]}
+              >
+                <View
+                  accessibilityLabel={`Drag to reorder ${w.label}`}
+                  style={styles.dragHandle}
+                  {...panResponderFor(i)}
+                >
+                  <Text style={{ fontSize: 18, color: p.onSurfaceVariant }}>⠿</Text>
+                </View>
                 <Text style={{ flex: 1, fontSize: 14, color: p.onSurface }}>{w.label}</Text>
                 <Pressable
                   accessibilityRole="button"
@@ -549,7 +645,7 @@ function CustomizeSheet({ visible, onClose }: { visible: boolean; onClose: () =>
                     {w.enabled ? 'On' : 'Off'}
                   </Text>
                 </Pressable>
-              </View>
+              </Animated.View>
             ))}
           </ScrollView>
         </Pressable>
@@ -648,8 +744,15 @@ const styles = StyleSheet.create({
   customRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
+    height: ROW_HEIGHT,
+    borderRadius: 12,
     gap: 4,
+  },
+  dragHandle: {
+    width: 32,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   moveBtn: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   switchBtn: {

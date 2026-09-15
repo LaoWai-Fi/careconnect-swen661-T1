@@ -1,7 +1,8 @@
 // CareConnect cards — RN port of mobile-flutter/lib/widgets/cards.dart.
 
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from './ScaledText';
 import { palette, CCTokens } from '../theme/tokens';
 import type { ColorScheme } from '../theme/tokens';
 

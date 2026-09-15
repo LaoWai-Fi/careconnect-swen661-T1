@@ -49,12 +49,19 @@ const Tabs = createBottomTabNavigator<MainTabsParamList>();
  * Navigator.pushReplacementNamed: signing in leaves the auth flow, signing
  * out returns to landing. Rendered inside NavigationContainer so it can use
  * useNavigation. */
-function AuthGate() {
+function AuthGate({ ready }: { ready: boolean }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { state } = useAppState();
   const signedIn = state.userName.length > 0;
 
   useEffect(() => {
+    // AuthGate is a plain child of NavigationContainer, not a registered
+    // screen, so useNavigation() resolves to the container ref rather than a
+    // screen-scoped navigation prop. That ref isn't attached until
+    // NavigationContainer's onReady fires, and calling .getState()/.reset()
+    // on it before then just logs "hasn't been initialized yet" and no-ops.
+    // Skip until the parent tells us the container is ready.
+    if (!ready) return;
     const navState = navigation.getState();
     const current = navState?.routes[navState.index ?? 0]?.name;
     if (signedIn && (current === 'landing' || current === 'signin' || current === 'signup')) {
@@ -62,7 +69,7 @@ function AuthGate() {
     } else if (!signedIn && current !== 'landing') {
       navigation.reset({ index: 0, routes: [{ name: 'landing' }] });
     }
-  }, [signedIn, navigation]);
+  }, [ready, signedIn, navigation]);
 
   return null;
 }
@@ -145,6 +152,7 @@ export function RootNavigator() {
   const signedIn = state.userName.length > 0;
   const scheme = state.theme === 'dark' ? 'dark' : 'light';
   const p = palette(scheme);
+  const [navReady, setNavReady] = useState(false);
 
   return (
     <View style={[styles.root, { backgroundColor: p.background }]}>
@@ -152,8 +160,9 @@ export function RootNavigator() {
       <NavigationContainer
         theme={scheme === 'dark' ? DarkTheme : DefaultTheme}
         documentTitle={{ enabled: false }}
+        onReady={() => setNavReady(true)}
       >
-        <AuthGate />
+        <AuthGate ready={navReady} />
         <Stack.Navigator
           initialRouteName={signedIn ? 'main' : 'landing'}
           screenOptions={{ headerShown: false }}

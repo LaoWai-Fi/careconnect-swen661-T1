@@ -4,7 +4,8 @@
 // ghost "I already have an account" button whose white foreground/border
 // overrides keep it legible on the teal background.
 
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import { Logo } from '../components/Cards';
 import { TapButton } from '../components/TapButton';
 import { useAppTheme } from '../hooks/useAppTheme';

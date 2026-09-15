@@ -321,3 +321,11 @@ export function useAppState(): AppContextValue {
   if (!ctx) throw new Error('useAppState must be used inside <AppStateProvider>');
   return ctx;
 }
+
+/** Non-throwing variant for components (ScaledText) that render both inside
+ * the app tree and in isolated unit tests without an AppStateProvider —
+ * falls back to `null` instead of throwing so those tests don't need to
+ * wrap every rendered component in the provider just to satisfy Text. */
+export function useAppStateSafe(): AppContextValue | null {
+  return useContext(AppStateContext);
+}

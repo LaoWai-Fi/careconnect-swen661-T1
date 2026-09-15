@@ -32,6 +32,19 @@ describe('MessagesScreen', () => {
     });
   });
 
+  test('New Message opens the compose sheet with a blank draft', async () => {
+    // Regression test for "new message button is missing on message view" —
+    // MessagesScreen already had composing/setComposing state and rendered
+    // <ComposeSheet>, but nothing in the screen ever called setComposing(true)
+    // for a fresh message (only MessageDetailScreen's own Reply button did,
+    // via its own separate ComposeSheet instance).
+    await renderMessages();
+    fireEvent.press(screen.getByText('✉️ New Message'));
+    expect(await screen.findByText('New message')).toBeTruthy();
+    // Not a reply, so there's a Subject field and no quoted body.
+    expect(screen.getByText('Subject')).toBeTruthy();
+  });
+
   test('archive entry point navigates to the archived list', async () => {
     const onOpenArchive = jest.fn();
     await render(

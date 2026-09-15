@@ -5,7 +5,8 @@
 // the archive entry point.
 
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import { MessageRow } from '../components/MessageRow';
 import { TapButton } from '../components/TapButton';
 import { FormField, Input } from '../components/FormField';
@@ -37,13 +38,27 @@ export function MessagesScreen({ onOpenMessage, onOpenArchive }: MessagesScreenP
                 {active.filter((m) => !m.read).length} unread
               </Text>
             </View>
-            <TapButton
-              label="🗄 Archive"
-              variant="outline"
-              size="sm"
-              scheme={scheme}
-              onPress={onOpenArchive}
-            />
+            {/* Stacked (New Message above Archive), matching
+                messages_screen.dart's _buildScreen — two buttons side by
+                side here left too little room for "Messages" next to them. */}
+            <View style={styles.headerActions}>
+              <TapButton
+                label="✉️ New Message"
+                size="sm"
+                scheme={scheme}
+                onPress={() => {
+                  setReplyTo(null);
+                  setComposing(true);
+                }}
+              />
+              <TapButton
+                label="🗄 Archive"
+                variant="outline"
+                size="sm"
+                scheme={scheme}
+                onPress={onOpenArchive}
+              />
+            </View>
           </View>
 
           {active.length === 0 ? (
@@ -188,7 +203,8 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   scroll: { padding: 16 },
   bound: { maxWidth: 880, alignSelf: 'stretch', gap: 16 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  headerActions: { alignItems: 'flex-end', gap: 8 },
   title: { fontSize: 24, fontWeight: '700' },
   stack: { gap: 8 },
   empty: {

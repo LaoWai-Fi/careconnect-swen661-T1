@@ -4,7 +4,8 @@
 // re-checks for new activity. Tiles are color-coded per event type.
 
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScaledText as Text } from '../components/ScaledText';
 import type { ActivityEntry, ActivityType } from '../models/types';
 import { useAppState } from '../state/AppState';
 import { useAppTheme } from '../hooks/useAppTheme';

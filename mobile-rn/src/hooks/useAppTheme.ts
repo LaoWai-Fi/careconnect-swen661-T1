@@ -13,6 +13,11 @@ export interface AppTheme {
   textScale: number;
 }
 
+/** Shared with ScaledText so the two never drift apart. */
+export function textScaleFor(fontSize: 'normal' | 'large' | 'xlarge'): number {
+  return fontSize === 'xlarge' ? 1.3 : fontSize === 'large' ? 1.15 : 1;
+}
+
 export function useAppTheme(): AppTheme {
   const { state } = useAppState();
   const system = useColorScheme();
@@ -23,6 +28,6 @@ export function useAppTheme(): AppTheme {
   return {
     scheme,
     p: palette(scheme),
-    textScale: state.fontSize === 'xlarge' ? 1.3 : state.fontSize === 'large' ? 1.15 : 1,
+    textScale: textScaleFor(state.fontSize),
   };
 }

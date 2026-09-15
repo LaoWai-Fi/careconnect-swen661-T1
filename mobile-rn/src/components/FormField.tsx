@@ -5,7 +5,8 @@
 // users with cognitive load have an explicit association — WCAG 3.3.2.
 
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
+import { ScaledText as Text } from './ScaledText';
 import { palette, CCTokens } from '../theme/tokens';
 import type { ColorScheme } from '../theme/tokens';
 
