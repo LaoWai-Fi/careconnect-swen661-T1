@@ -75,6 +75,14 @@ test/
 
 Requires the [Flutter SDK](https://docs.flutter.dev/get-started/install)(3.27+ / Dart 3.6+).
 
+## Week 6 accessibility and E2E evidence
+
+- Flutter uses semantic labels/roles, visible focus states, 48dp minimum primary controls, live validation feedback, and a 200% text-size option.
+- `test/accessibility/accessibility_guidelines_test.dart` exercises Flutter's Android target-size and labelled-control guidelines.
+- `integration_test/critical_workflows_test.dart` covers sign-in and the daily check-in workflow. Run it with `flutter test integration_test` on a configured target.
+- Maestro flows are in [`../maestro/`](../maestro/) and use Android package `com.example.careconnect`.
+- The accessibility report, VPAT, and device screen-reader log are in [`../docs/week6/`](../docs/week6/). Complete the TalkBack and VoiceOver log on real devices before submitting.
+
 ```bash
 cd mobile-flutter
 flutter create . --platforms=android,ios --project-name careconnect   # one-time: generates android/ + ios/ shells

@@ -10,6 +10,8 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": {}
+    "android": {
+      "package": "com.careconnect.mobile"
+    }
   }
 }

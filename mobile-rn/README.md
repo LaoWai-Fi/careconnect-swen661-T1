@@ -64,6 +64,14 @@ Carried over from the Flutter build's constraints:
 - `accessibilityRole` / `accessibilityLabel` / `accessibilityState` on every interactive element
 - Left-hand mode reverses the tab bar and FAB placement
 
+### Week 6 accessibility and E2E evidence
+
+- Form inputs announce their visible field label plus a hint or validation error; example text is only a placeholder.
+- Settings offers a 200% text-size option, and all native text still honors platform font scaling.
+- RNTL tests verify button roles/states and labelled form feedback. Run `npm run coverage` to regenerate the HTML report.
+- Maestro flows are in [`../maestro/`](../maestro/) and use Android package `com.careconnect.mobile`.
+- The accessibility report, VPAT, and device screen-reader log are in [`../docs/week6/`](../docs/week6/). Complete the TalkBack and VoiceOver log on real devices before submitting.
+
 ## Project structure
 
 ```

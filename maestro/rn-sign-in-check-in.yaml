@@ -1,0 +1,14 @@
+appId: com.careconnect.mobile
+name: React Native sign in and daily check in
+---
+- launchApp:
+    clearState: true
+- tapOn: Sign in
+- tapOn: you@example.com
+- inputText: wiliss@example.com
+- tapOn: Enter password
+- inputText: secure-demo-password
+- tapOn: Sign in
+- assertVisible: Dashboard
+- tapOn: Not yet
+- assertVisible: "✓ Check-in recorded!"

@@ -43,12 +43,18 @@ class CCFormField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        child,
+        // Keep the control and its visible label in a common semantic group.
+        // TextField still exposes its native editable role; this supplies the
+        // programmatic label relationship that screen readers announce.
+        Semantics(container: true, label: label, child: child),
         if (error != null) ...[
           const SizedBox(height: 4),
-          Text(
-            error!,
+          Semantics(
+            liveRegion: true,
+            child: Text(
+              error!,
             style: TextStyle(color: scheme.error, fontSize: 14, fontWeight: FontWeight.w500),
+            ),
           ),
         ] else if (hint != null) ...[
           const SizedBox(height: 4),

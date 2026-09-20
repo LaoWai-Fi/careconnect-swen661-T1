@@ -29,7 +29,7 @@ const HAND_OPTIONS: { value: HandMode; label: string }[] = [
 const FONT_OPTIONS: { value: FontScale; label: string }[] = [
   { value: 'normal', label: 'Default' },
   { value: 'large', label: 'Large' },
-  { value: 'xlarge', label: 'X-Large' },
+  { value: 'xlarge', label: '200%' },
 ];
 
 export interface SettingsSheetProps {

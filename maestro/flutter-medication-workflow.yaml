@@ -1,0 +1,21 @@
+appId: com.example.careconnect
+name: Flutter medication management
+---
+- launchApp:
+    clearState: true
+- tapOn: I already have an account
+- tapOn: you@example.com
+- inputText: wiliss@example.com
+- tapOn: Enter password
+- inputText: secure-demo-password
+- tapOn: "→  Sign in"
+- tapOn: Medications
+- tapOn: "Add medication"
+- tapOn: "e.g. Metformin"
+- inputText: Lisinopril
+- tapOn: "e.g. 500 mg"
+- inputText: "10 mg"
+- tapOn: "e.g. 8:00 am"
+- inputText: "8:00 am"
+- tapOn: Add medication
+- assertVisible: Lisinopril

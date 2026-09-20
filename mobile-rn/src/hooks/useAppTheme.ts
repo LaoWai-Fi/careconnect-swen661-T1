@@ -9,13 +9,15 @@ import type { ColorScheme, Palette } from '../theme/tokens';
 export interface AppTheme {
   scheme: ColorScheme;
   p: Palette;
-  /** Multiplier applied to text sizes (normal 1, large 1.15, xlarge 1.3). */
+  /** Multiplier applied to text sizes (normal 1, large 1.15, xlarge 2.0). */
   textScale: number;
 }
 
 /** Shared with ScaledText so the two never drift apart. */
 export function textScaleFor(fontSize: 'normal' | 'large' | 'xlarge'): number {
-  return fontSize === 'xlarge' ? 1.3 : fontSize === 'large' ? 1.15 : 1;
+  // The 200% option verifies the WCAG reflow path, while platform font-scale
+  // preferences remain enabled by default on every native Text component.
+  return fontSize === 'xlarge' ? 2 : fontSize === 'large' ? 1.15 : 1;
 }
 
 export function useAppTheme(): AppTheme {

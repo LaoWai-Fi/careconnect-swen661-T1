@@ -72,7 +72,10 @@ class _CareConnectMaterialApp extends StatelessWidget {
         final scale = switch (state.fontSize) {
           FontScale.normal => 1.0,
           FontScale.large => 1.19,
-          FontScale.xlarge => 1.38,
+          // 200% is the assignment's high-text-size verification target.
+          // Layouts use scrollable bodies and wrapping controls so this does
+          // not require horizontal scrolling.
+          FontScale.xlarge => 2.0,
         };
         final system = MediaQuery.textScalerOf(context);
         return MediaQuery(
