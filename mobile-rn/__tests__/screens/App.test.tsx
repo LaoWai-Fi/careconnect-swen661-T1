@@ -37,10 +37,10 @@ describe('App routing', () => {
     await mountApp();
     await fireEvent.press(screen.getByText('Get started'));
     await screen.findByText('Create your account');
-    await fireEvent.changeText(screen.getByLabelText('e.g. Sarah Chen'), 'Sarah Chen');
-    await fireEvent.changeText(screen.getByLabelText('you@example.com'), 'sarah@family.com');
-    await fireEvent.changeText(screen.getByLabelText('At least 6 characters'), 'secret123');
-    await fireEvent.changeText(screen.getByLabelText('Repeat your password'), 'secret123');
+    await fireEvent.changeText(screen.getByLabelText('Name'), 'Sarah Chen');
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'sarah@family.com');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'secret123');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'secret123');
     await flushReact();
     await fireEvent.press(screen.getByText('Create account'));
     // Wait out the 700ms fake network delay inside act().

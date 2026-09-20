@@ -21,7 +21,16 @@ This report covers the Flutter and React Native CareConnect mobile apps. The rev
 | React Native | Component and integration | Jest/RNTL tests cover accessibility roles, disabled state, form labels/hints/errors, app navigation, forms, medication and message workflows. |
 | Both | E2E | `maestro/` contains sign-in/check-in, medication-management, and message-composition flows for each application. |
 
-## Coverage commands
+## Completed automated verification
+
+| App | Result | Coverage evidence |
+| --- | --- | --- |
+| Flutter | `flutter test --coverage` passed, including the accessibility guideline test. | 93.90% line coverage (2,033/2,165 lines). |
+| React Native | `npm run coverage -- --runInBand` passed: 15 suites / 131 tests. | 79.97% statements, 77.93% branches, 69.01% functions, and 82.08% lines (495/603). |
+
+Both reported line-coverage results exceed the course's 75% requirement. Generated evidence is stored locally under `artifacts/week6/coverage/` for submission packaging; the source folders' normal build/coverage outputs remain ignored by Git.
+
+## Reproduction commands
 
 ```powershell
 cd mobile-flutter
@@ -33,7 +42,7 @@ npm ci
 npm run coverage
 ```
 
-The previous React Native evidence reported 82.03% statements and 84.31% lines. Run the commands above after dependencies and a device/emulator are available to regenerate final Week 6 coverage evidence; this checkout does not contain installed Flutter or Node dependencies.
+The commands above were run successfully on September 21, 2026 with Flutter 3.47.5, Android SDK 36, and the lockfile-pinned React Native dependencies. The coverage results above are current automated evidence.
 
 ## Manual screen-reader protocol
 
@@ -46,8 +55,10 @@ Build/install each app, then run the relevant flow:
 ```powershell
 maestro test maestro/flutter-sign-in-check-in.yaml
 maestro test maestro/flutter-medication-workflow.yaml
+maestro test maestro/flutter-message-workflow.yaml
 maestro test maestro/rn-sign-in-check-in.yaml
 maestro test maestro/rn-medication-workflow.yaml
+maestro test maestro/rn-message-workflow.yaml
 ```
 
-Use the Flutter Android package `com.example.careconnect` and the Expo Android package `com.careconnect.mobile`. Capture the successful Maestro output and screenshots/video as final submission evidence.
+Use the Flutter Android package `com.example.careconnect` and the Expo Android package `com.careconnect.mobile`. The build artifacts are `artifacts/week6/CareConnect-Flutter-Week6-release.apk` and `artifacts/week6/CareConnect-ReactNative-Week6-debug.apk`. Capture the successful Maestro output and screenshots/video as final submission evidence.

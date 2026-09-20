@@ -178,7 +178,7 @@ def create_vpat():
     doc.add_heading('Known limitations and completion actions', level=1)
     for text in [
         'TalkBack and VoiceOver behavior cannot be certified from a source-code review. Complete the four rows in SCREEN_READER_TEST_LOG.md and attach the two requested recordings.',
-        'Run coverage and Maestro commands after Flutter, Node dependencies and target devices are configured. Save their outputs with the submission evidence.',
+        'Automated coverage is complete: Flutter achieved 93.90% line coverage and React Native achieved 82.08% line coverage. Run Maestro on installed builds and save that device output with the submission evidence.',
         'Recheck text reflow, focus visibility, modal focus return, and custom contrast pairs at 200% text size on the actual Android and iOS builds.',
     ]:
         doc.add_paragraph(text, style='List Bullet')
@@ -195,10 +195,10 @@ def create_submission_items():
     doc.add_heading('Submission summary', level=1)
     doc.add_paragraph('This package documents the Week 6 accessibility and UI testing work for both CareConnect mobile applications. It includes implementation evidence, automated testing assets, coverage instructions, and the required device-testing record.')
     add_table(doc, ['Deliverable', 'Location or evidence', 'Final submit action'], [
-        ('Accessible Flutter app', 'mobile-flutter/ with Semantics, 200% text size, guideline test and integration test.', 'Run Flutter coverage and device tests.'),
-        ('Accessible React Native app', 'mobile-rn/ with labelled inputs, announced errors, 200% text size and RNTL tests.', 'Run npm coverage and device tests.'),
-        ('E2E tests', 'maestro/ contains four critical workflow definitions.', 'Execute on installed Android/iOS builds; save output.'),
-        ('Coverage evidence', 'Existing RN baseline: 82.03% statements / 84.31% lines; regenerated reports required after Week 6 changes.', 'Attach final Flutter and RN HTML/summary reports.'),
+        ('Accessible Flutter app', 'mobile-flutter/ with Semantics, 200% text size, guideline test and integration test.', 'Flutter tests passed; run device tests.'),
+        ('Accessible React Native app', 'mobile-rn/ with labelled inputs, announced errors, 200% text size and RNTL tests.', '15 suites / 131 tests passed; run device tests.'),
+        ('E2E tests', 'maestro/ contains six critical workflow definitions.', 'Execute on installed Android/iOS builds; save output.'),
+        ('Coverage evidence', 'Flutter: 93.90% lines. React Native: 79.97% statements / 82.08% lines.', 'Attach the generated coverage reports.'),
         ('VPAT', 'docs/week6/CareConnect_Week6_VPAT.docx', 'Update pending device observations, then submit PDF or Word.'),
         ('Screen reader evidence', 'docs/week6/SCREEN_READER_TEST_LOG.md', 'Complete TalkBack and VoiceOver rows and attach two recordings.'),
     ], [1.3, 3.6, 2.2])

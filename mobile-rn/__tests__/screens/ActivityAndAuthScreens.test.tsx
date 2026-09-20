@@ -67,8 +67,8 @@ describe('SignInScreen', () => {
         <SignInScreen onBack={jest.fn()} />
       </TestAppProviders>,
     );
-    await fireEvent.changeText(screen.getByLabelText('you@example.com'), 'sarah@family.com');
-    await fireEvent.changeText(screen.getByLabelText('Your password'), 'secret123');
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'sarah@family.com');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'secret123');
     await flushReact();
     await fireEvent.press(screen.getByText('Sign in'));
     // Wait out the full 700ms fake delay inside act() so the signIn dispatch
@@ -100,10 +100,10 @@ describe('SignUpScreen', () => {
         <SignUpScreen onBack={jest.fn()} />
       </TestAppProviders>,
     );
-    await fireEvent.changeText(await screen.findByLabelText('e.g. Sarah Chen'), 'Sarah Chen');
-    await fireEvent.changeText(screen.getByLabelText('you@example.com'), 'sarah@family.com');
-    await fireEvent.changeText(screen.getByLabelText('At least 6 characters'), 'secret123');
-    await fireEvent.changeText(screen.getByLabelText('Repeat your password'), 'different1');
+    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Sarah Chen');
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'sarah@family.com');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'secret123');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'different1');
     await flushReact();
     await fireEvent.press(screen.getByText('Create account'));
     expect(await screen.findByText('Passwords do not match.')).toBeTruthy();
