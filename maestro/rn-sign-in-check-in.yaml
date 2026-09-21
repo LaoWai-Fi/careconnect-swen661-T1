@@ -3,11 +3,12 @@ name: React Native sign in and daily check in
 ---
 - launchApp:
     clearState: true
-- tapOn: Sign in
+- tapOn: I already have an account
 - tapOn: you@example.com
 - inputText: wiliss@example.com
 - tapOn: Enter password
 - inputText: secure-demo-password
+- hideKeyboard
 - tapOn: Sign in
 - assertVisible: Dashboard
 - tapOn: Not yet
