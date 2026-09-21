@@ -11,5 +11,8 @@ Thumbs.db
 .env.*
 !.env.example
 
+# Locally built APKs and generated coverage evidence are delivered separately.
+artifacts/
+
 # Claude Code local settings (machine-specific, not shared with the team)
 .claude/settings.local.json

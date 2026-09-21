@@ -29,8 +29,8 @@ describe('ScaledText', () => {
     expect((await renderScaled('large', { fontSize: 16 })).fontSize).toBeCloseTo(18.4);
   });
 
-  test('scales text by 1.3x when Text Size is X-Large', async () => {
-    expect((await renderScaled('xlarge', { fontSize: 16 })).fontSize).toBeCloseTo(20.8);
+  test('scales text to 200% when the accessibility size is selected', async () => {
+    expect((await renderScaled('xlarge', { fontSize: 16 })).fontSize).toBeCloseTo(32);
   });
 
   test('scales a fontSize supplied via a style array', async () => {
@@ -42,7 +42,7 @@ describe('ScaledText', () => {
       </AppStateProvider>,
     );
     const flat = StyleSheet.flatten(getByText('Title').props.style) as { fontSize?: number };
-    expect(flat.fontSize).toBeCloseTo(26);
+    expect(flat.fontSize).toBeCloseTo(40);
   });
 
   test('leaves text with no explicit fontSize untouched', async () => {

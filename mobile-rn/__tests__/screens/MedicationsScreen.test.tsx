@@ -51,9 +51,9 @@ describe('MedicationsScreen', () => {
     await renderMeds();
     await fireEvent.press(screen.getByText('+ Add medication'));
     await screen.findByText('Add medication');
-    await fireEvent.changeText(screen.getByLabelText('e.g. Metformin'), 'Lisinopril');
-    await fireEvent.changeText(screen.getByLabelText('e.g. 500 mg'), '10 mg — 1 tablet');
-    await fireEvent.changeText(screen.getByLabelText('e.g. 8:00 AM'), '9:00 pm');
+    await fireEvent.changeText(screen.getByLabelText('Name'), 'Lisinopril');
+    await fireEvent.changeText(screen.getByLabelText('Dose'), '10 mg — 1 tablet');
+    await fireEvent.changeText(screen.getByLabelText('Time'), '9:00 pm');
     await flushReact();
     await fireEvent.press(screen.getByText('Save medication'));
     await waitFor(() => {

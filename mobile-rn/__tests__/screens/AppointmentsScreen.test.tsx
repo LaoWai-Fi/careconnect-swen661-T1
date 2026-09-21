@@ -50,16 +50,16 @@ describe('AppointmentsScreen', () => {
     await renderAppts();
     await fireEvent.press(screen.getByText('+ Add appointment'));
     await screen.findByText('Add appointment');
-    await fireEvent.changeText(screen.getByLabelText('e.g. Cardiology follow-up'), 'Dentist');
+    await fireEvent.changeText(screen.getByLabelText('Title'), 'Dentist');
     await fireEvent.changeText(
-      screen.getByLabelText('e.g. Today — 2:30 PM'),
+      screen.getByLabelText('Date & time'),
       'Tomorrow — 9:00 am',
     );
     await fireEvent.changeText(
-      screen.getByLabelText('e.g. Rochester General — Cardiology'),
+      screen.getByLabelText('Location'),
       'Westfield Dental',
     );
-    await fireEvent.changeText(screen.getByLabelText('e.g. Sarah (daughter)'), 'Emma Thompson');
+    await fireEvent.changeText(screen.getByLabelText('Assign to'), 'Emma Thompson');
     await flushReact();
     await fireEvent.press(screen.getByText('Save appointment'));
     await waitFor(() => {

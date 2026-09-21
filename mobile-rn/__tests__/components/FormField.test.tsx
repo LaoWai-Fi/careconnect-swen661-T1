@@ -51,8 +51,23 @@ describe('Input', () => {
     expect(onChange).toHaveBeenCalledWith('Amlodipine');
   });
 
-  it('exposes the placeholder as an accessibility label', async () => {
-    await render(<Input value="" onChangeText={() => {}} placeholder="Medication name" />);
-    expect(screen.getByLabelText('Medication name')).toBeTruthy();
+  it('uses the visible FormField label rather than its example placeholder', async () => {
+    await render(
+      <FormField label="Medication name" hint="Enter the name on the prescription">
+        <Input value="" onChangeText={() => {}} placeholder="e.g. Metformin" />
+      </FormField>,
+    );
+    const input = screen.getByLabelText('Medication name');
+    expect(input.props.accessibilityHint).toBe('Enter the name on the prescription');
+  });
+
+  it('announces validation feedback as the input hint', async () => {
+    await render(
+      <FormField label="Dose" error="Enter the dose.">
+        <Input value="" onChangeText={() => {}} placeholder="e.g. 500 mg" hasError />
+      </FormField>,
+    );
+    const input = screen.getByLabelText('Dose');
+    expect(input.props.accessibilityHint).toBe('Enter the dose.');
   });
 });

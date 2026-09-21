@@ -1,0 +1,21 @@
+appId: com.careconnect.mobile
+name: React Native medication management
+---
+- launchApp:
+    clearState: true
+- tapOn: Sign in
+- tapOn: you@example.com
+- inputText: wiliss@example.com
+- tapOn: Enter password
+- inputText: secure-demo-password
+- tapOn: Sign in
+- tapOn: Meds
+- tapOn: "Add medication"
+- tapOn: "e.g. Metformin"
+- inputText: Lisinopril
+- tapOn: "e.g. 500 mg"
+- inputText: "10 mg"
+- tapOn: "e.g. 8:00 AM"
+- inputText: "8:00 AM"
+- tapOn: Save medication
+- assertVisible: Lisinopril

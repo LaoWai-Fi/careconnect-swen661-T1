@@ -4,7 +4,7 @@
 // The label is always visible (never placeholder-only) so screen readers and
 // users with cognitive load have an explicit association — WCAG 3.3.2.
 
-import { useState } from 'react';
+import { cloneElement, isValidElement, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { ScaledText as Text } from './ScaledText';
 import { palette, CCTokens } from '../theme/tokens';
@@ -28,15 +28,27 @@ export function FormField({
   scheme = 'light',
 }: FormFieldProps) {
   const p = palette(scheme);
+  // React Native does not automatically associate adjacent visible text with
+  // a TextInput. Propagate this field's visible label and supporting message
+  // to our Input so TalkBack and VoiceOver announce the same information a
+  // sighted user receives (WCAG 1.3.1 and 3.3.2).
+  const labelledChild = isValidElement<InputProps>(children)
+    ? cloneElement(children, {
+        accessibilityLabel: children.props.accessibilityLabel ?? label,
+        accessibilityHint: children.props.accessibilityHint ?? error ?? hint,
+      })
+    : children;
   return (
     <View style={styles.field}>
       <Text style={[styles.label, { color: p.onSurface }]}>
         {label}
         {required ? <Text style={{ color: p.error }}> *</Text> : null}
       </Text>
-      {children}
+      {labelledChild}
       {error ? (
-        <Text style={[styles.message, { color: p.error }]}>{error}</Text>
+        <Text accessibilityLiveRegion="polite" style={[styles.message, { color: p.error }]}>
+          {error}
+        </Text>
       ) : hint ? (
         <Text style={[styles.message, { color: p.onSurfaceVariant }]}>{hint}</Text>
       ) : null}
@@ -53,6 +65,11 @@ export interface InputProps {
   autoFocus?: boolean;
   hasError?: boolean;
   onSubmitEditing?: () => void;
+  /** A meaningful control name, normally supplied by FormField from its
+   * visible label. It must not rely on an example placeholder. */
+  accessibilityLabel?: string;
+  /** Guidance or the latest validation error announced after the label. */
+  accessibilityHint?: string;
   scheme?: ColorScheme;
   testID?: string;
 }
@@ -68,6 +85,8 @@ export function Input({
   autoFocus = false,
   hasError = false,
   onSubmitEditing,
+  accessibilityLabel,
+  accessibilityHint,
   scheme = 'light',
   testID,
 }: InputProps) {
@@ -87,7 +106,8 @@ export function Input({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       onSubmitEditing={onSubmitEditing}
-      accessibilityLabel={placeholder}
+      accessibilityLabel={accessibilityLabel ?? placeholder ?? 'Text input'}
+      accessibilityHint={accessibilityHint}
       style={[
         styles.input,
         {

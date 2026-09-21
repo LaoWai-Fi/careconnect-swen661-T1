@@ -102,7 +102,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                       label: switch (f) {
                         FontScale.normal => 'Default',
                         FontScale.large => 'Large',
-                        FontScale.xlarge => 'X-Large',
+                        FontScale.xlarge => '200%',
                       },
                       onTap: () => setState(() => state.setFontScale(f)),
                     ),

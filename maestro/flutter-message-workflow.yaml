@@ -1,0 +1,21 @@
+appId: com.example.careconnect
+name: Flutter compose a caregiver message
+---
+- launchApp:
+    clearState: true
+- tapOn: I already have an account
+- tapOn: you@example.com
+- inputText: wiliss@example.com
+- tapOn: Enter password
+- inputText: secure-demo-password
+- tapOn: "→  Sign in"
+- tapOn: Messages
+- tapOn: "✉️ New Message"
+- tapOn: "e.g. Sarah (daughter)"
+- inputText: Sarah
+- tapOn: "e.g. Margaret's visit summary"
+- inputText: Visit update
+- tapOn: "Write your update…"
+- inputText: Margaret is doing well today.
+- tapOn: Send
+- assertVisible: Visit update

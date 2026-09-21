@@ -77,7 +77,7 @@ export function SignInScreen({ onBack }: SignInScreenProps) {
           <Input
             value={password}
             onChangeText={setPassword}
-            placeholder="Your password"
+            placeholder="Enter password"
             secureTextEntry
             hasError={Boolean(errors.password)}
             scheme={scheme}
@@ -161,7 +161,7 @@ export function SignUpScreen({ onBack }: SignUpScreenProps) {
           <Input
             value={password}
             onChangeText={setPassword}
-            placeholder="At least 6 characters"
+            placeholder="Enter password"
             secureTextEntry
             hasError={Boolean(errors.password)}
             scheme={scheme}
@@ -171,7 +171,7 @@ export function SignUpScreen({ onBack }: SignUpScreenProps) {
           <Input
             value={confirm}
             onChangeText={setConfirm}
-            placeholder="Repeat your password"
+            placeholder="Re-enter password"
             secureTextEntry
             hasError={Boolean(errors.confirm)}
             scheme={scheme}

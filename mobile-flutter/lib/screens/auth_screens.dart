@@ -96,6 +96,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           error: _passwordError,
                           child: CCInput(
                             controller: _password,
+                            placeholder: 'Enter password',
                             obscure: true,
                             error: _passwordError != null,
                             onSubmitted: (_) => _submit(),
@@ -252,14 +253,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           required: true,
                           hint: 'At least 6 characters.',
                           error: _passwordError,
-                          child: CCInput(controller: _password, obscure: true, error: _passwordError != null),
+                          child: CCInput(
+                            controller: _password,
+                            placeholder: 'Enter password',
+                            obscure: true,
+                            error: _passwordError != null,
+                          ),
                         ),
                         const SizedBox(height: 18),
                         CCFormField(
                           label: 'Confirm password',
                           required: true,
                           error: _confirmError,
-                          child: CCInput(controller: _confirm, obscure: true, error: _confirmError != null),
+                          child: CCInput(
+                            controller: _confirm,
+                            placeholder: 'Re-enter password',
+                            obscure: true,
+                            error: _confirmError != null,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         TapButton(
