@@ -10,5 +10,7 @@ name: Flutter sign in and daily check in
 - inputText: secure-demo-password
 - tapOn: "→  Sign in"
 - assertVisible: Dashboard
+- takeScreenshot: flutter-dashboard-signed-in
 - tapOn: Not yet
 - assertVisible: "✓ Check-in recorded!"
+- takeScreenshot: flutter-check-in-recorded

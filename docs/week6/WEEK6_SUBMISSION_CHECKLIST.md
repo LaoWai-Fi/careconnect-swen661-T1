@@ -4,7 +4,9 @@
 
 - Flutter and React Native accessibility corrections and automated tests
 - Flutter integration test and Flutter accessibility guideline test
-- Six Maestro workflow definitions in `maestro/`
+- Six Maestro workflow definitions in `maestro/`, with run instructions in
+  [`maestro/README.md`](../../maestro/README.md) and the evidence record in
+  [`MAESTRO_EVIDENCE.md`](MAESTRO_EVIDENCE.md)
 - VPAT Word document
 - Accessibility test report and screen-reader test log
 - Updated app build/test instructions

@@ -10,6 +10,8 @@ name: Flutter medication management
 - inputText: secure-demo-password
 - tapOn: "→  Sign in"
 - tapOn: Medications
+- assertVisible: Medications
+- takeScreenshot: flutter-medications-before-add
 - tapOn: "Add medication"
 - tapOn: "e.g. Metformin"
 - inputText: Lisinopril
@@ -19,3 +21,4 @@ name: Flutter medication management
 - inputText: "8:00 am"
 - tapOn: Add medication
 - assertVisible: Lisinopril
+- takeScreenshot: flutter-medication-added
