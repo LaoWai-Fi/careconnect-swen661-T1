@@ -16,3 +16,24 @@ artifacts/
 
 # Claude Code local settings (machine-specific, not shared with the team)
 .claude/settings.local.json
+
+# Office documents and recordings. Submission documents (VPAT, submission
+# items) and screen-reader videos are delivered through the course site,
+# not this repository.
+*.docx
+*.xlsx
+*.pptx
+*.pdf
+*.mp4
+*.mov
+~$*
+
+# Build outputs and local caches that can appear in any app folder
+*.apk
+*.aab
+*.ipa
+.cxx/
+.kotlin/
+.gradle/
+local.properties
+coverage/

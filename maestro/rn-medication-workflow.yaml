@@ -3,22 +3,43 @@ name: React Native medication management
 ---
 - launchApp:
     clearState: true
-- tapOn: Sign in
+- extendedWaitUntil:
+    visible: I already have an account
+    timeout: 20000
+- waitForAnimationToEnd
+- tapOn: I already have an account
+# Never use hideKeyboard in these flows: on Android it sends BACK, which
+# leaves the screen when no soft keyboard is showing. Enter on a single-line
+# React Native input blurs it and closes the keyboard instead.
 - tapOn: you@example.com
 - inputText: wiliss@example.com
+- pressKey: Enter
 - tapOn: Enter password
 - inputText: secure-demo-password
+- pressKey: Enter
 - tapOn: Sign in
+- extendedWaitUntil:
+    visible: Dashboard
+    timeout: 10000
 - tapOn: Meds
 - assertVisible: Medications
 - takeScreenshot: rn-medications-before-add
-- tapOn: "Add medication"
-- tapOn: "e.g. Metformin"
+# The button reads "+ Add medication"; match the end of the label.
+- tapOn: ".*Add medication"
+- tapOn: e.g. Metformin
 - inputText: Lisinopril
-- tapOn: "e.g. 500 mg"
+- pressKey: Enter
+- tapOn: e.g. 500 mg
 - inputText: "10 mg"
-- tapOn: "e.g. 8:00 AM"
+- pressKey: Enter
+- tapOn: e.g. 8:00 AM
 - inputText: "8:00 AM"
+- pressKey: Enter
 - tapOn: Save medication
+# New medications are appended to the end of the list.
+- scrollUntilVisible:
+    element: Lisinopril
+    direction: DOWN
+    timeout: 20000
 - assertVisible: Lisinopril
 - takeScreenshot: rn-medication-added

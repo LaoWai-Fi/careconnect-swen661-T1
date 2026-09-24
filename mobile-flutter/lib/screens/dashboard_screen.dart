@@ -224,6 +224,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ? (isLight ? CCTokens.successBorderLight : CCTokens.successBorderDark)
                       : scheme.outline,
                   onTap: _handleCheckIn,
+                  semanticsId: 'dashboard-checkin',
                 ),
                 StatCard(
                   icon: Icons.event_outlined,

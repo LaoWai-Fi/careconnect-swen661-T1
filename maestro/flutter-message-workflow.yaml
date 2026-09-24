@@ -3,22 +3,64 @@ name: Flutter compose a caregiver message
 ---
 - launchApp:
     clearState: true
-- tapOn: I already have an account
-- tapOn: you@example.com
+# Wait for Flutter's first frame and semantics tree before tapping.
+- extendedWaitUntil:
+    visible:
+      id: landing-signin
+    timeout: 15000
+- waitForAnimationToEnd
+# Targets use Semantics.identifier (Android resource-id), not visible text,
+# so they are stable and work for the obscured password field.
+- tapOn:
+    id: landing-signin
+- extendedWaitUntil:
+    visible:
+      id: signin-email
+    timeout: 10000
+# Never use hideKeyboard in these flows: on Android it sends BACK, which
+# pops the current screen when no soft keyboard is showing. Instead, Enter
+# on a single-line field closes the keyboard (and on the sign-in fields it
+# submits the form, which is how the second Enter signs in).
+- tapOn:
+    id: signin-email
 - inputText: wiliss@example.com
-- tapOn: Enter password
+- pressKey: Enter
+- tapOn:
+    id: signin-password
 - inputText: secure-demo-password
-- tapOn: "→  Sign in"
-- tapOn: Messages
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: Dashboard
+    timeout: 10000
+- tapOn:
+    id: nav-messages
 - assertVisible: Messages
 - takeScreenshot: flutter-messages-before-compose
-- tapOn: "✉️ New Message"
-- tapOn: "e.g. Sarah (daughter)"
+- tapOn:
+    id: messages-new
+- extendedWaitUntil:
+    visible:
+      id: compose-to
+    timeout: 5000
+- tapOn:
+    id: compose-to
 - inputText: Sarah
-- tapOn: "e.g. Margaret's visit summary"
+- pressKey: Enter
+- tapOn:
+    id: compose-subject
 - inputText: Visit update
-- tapOn: "Write your update…"
+- pressKey: Enter
+- tapOn:
+    id: compose-body
 - inputText: Margaret is doing well today.
-- tapOn: Send
-- assertVisible: Visit update
+# Body is multi-line, so Enter would add a newline instead of closing the
+# keyboard. The sheet lifts above the keyboard, so scroll Send into view.
+- scrollUntilVisible:
+    element:
+      id: compose-send
+    direction: DOWN
+- tapOn:
+    id: compose-send
+# Inbox rows merge sender/subject/preview into one node, so match with a regex.
+- assertVisible: ".*Visit update.*"
 - takeScreenshot: flutter-message-sent

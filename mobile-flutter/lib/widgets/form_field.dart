@@ -14,6 +14,7 @@ class CCFormField extends StatelessWidget {
     this.required = false,
     this.hint,
     this.error,
+    this.semanticsId,
   });
 
   final String label;
@@ -21,6 +22,13 @@ class CCFormField extends StatelessWidget {
   final bool required;
   final String? hint;
   final String? error;
+
+  /// Stable test identifier for the input, exposed through
+  /// [Semantics.identifier] (the resource-id on Android). Lets Maestro target
+  /// the field with `id:` even when it is obscured (password fields do not
+  /// expose their text or hint to UI Automator). Not announced by screen
+  /// readers.
+  final String? semanticsId;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +54,12 @@ class CCFormField extends StatelessWidget {
         // Keep the control and its visible label in a common semantic group.
         // TextField still exposes its native editable role; this supplies the
         // programmatic label relationship that screen readers announce.
-        Semantics(container: true, label: label, child: child),
+        Semantics(
+          container: true,
+          label: label,
+          identifier: semanticsId,
+          child: child,
+        ),
         if (error != null) ...[
           const SizedBox(height: 4),
           Semantics(

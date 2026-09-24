@@ -3,22 +3,67 @@ name: Flutter medication management
 ---
 - launchApp:
     clearState: true
-- tapOn: I already have an account
-- tapOn: you@example.com
+# Wait for Flutter's first frame and semantics tree before tapping.
+- extendedWaitUntil:
+    visible:
+      id: landing-signin
+    timeout: 15000
+- waitForAnimationToEnd
+# Targets use Semantics.identifier (Android resource-id), not visible text,
+# so they are stable and work for the obscured password field.
+- tapOn:
+    id: landing-signin
+- extendedWaitUntil:
+    visible:
+      id: signin-email
+    timeout: 10000
+# Never use hideKeyboard in these flows: on Android it sends BACK, which
+# pops the current screen when no soft keyboard is showing. Instead, Enter
+# on a single-line field closes the keyboard (and on the sign-in fields it
+# submits the form, which is how the second Enter signs in).
+- tapOn:
+    id: signin-email
 - inputText: wiliss@example.com
-- tapOn: Enter password
+- pressKey: Enter
+- tapOn:
+    id: signin-password
 - inputText: secure-demo-password
-- tapOn: "→  Sign in"
-- tapOn: Medications
-- assertVisible: Medications
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: Dashboard
+    timeout: 10000
+- tapOn:
+    id: nav-medications
+- assertVisible: Manage medications
 - takeScreenshot: flutter-medications-before-add
-- tapOn: "Add medication"
-- tapOn: "e.g. Metformin"
+- tapOn:
+    id: medications-add
+- extendedWaitUntil:
+    visible: Add new medication
+    timeout: 5000
+- tapOn:
+    id: med-name
 - inputText: Lisinopril
-- tapOn: "e.g. 500 mg"
+- pressKey: Enter
+- tapOn:
+    id: med-dose
 - inputText: "10 mg"
-- tapOn: "e.g. 8:00 am"
+- pressKey: Enter
+# Schedule time is pre-filled with 08:30, so clear it before typing.
+- tapOn:
+    id: med-time
+- eraseText
 - inputText: "8:00 am"
-- tapOn: Add medication
-- assertVisible: Lisinopril
+- pressKey: Enter
+- tapOn:
+    id: med-save
+# New medications are appended to the end of the list, so scroll down until
+# the card is on screen. The card merges name/dose/time into one
+# accessibility node, so match it with a regex.
+- scrollUntilVisible:
+    element:
+      text: ".*Lisinopril.*"
+    direction: DOWN
+    timeout: 20000
+- assertVisible: ".*Lisinopril.*"
 - takeScreenshot: flutter-medication-added

@@ -115,6 +115,7 @@ class _LandingScreenState extends State<LandingScreen> {
                         size: TapButtonSize.lg,
                         fullWidth: true,
                         onPressed: () => Navigator.of(context).pushNamed('/signin'),
+                        semanticsId: 'landing-signin',
                       ),
                     ],
                   ),

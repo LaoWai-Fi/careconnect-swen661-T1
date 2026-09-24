@@ -32,6 +32,7 @@ class TapButton extends StatefulWidget {
     this.autofocus = false,
     this.foregroundColor,
     this.borderColor,
+    this.semanticsId,
   });
 
   final String label;
@@ -54,6 +55,12 @@ class TapButton extends StatefulWidget {
   /// outline against a colored background, e.g. the landing screen's
   /// secondary CTA on its teal hero section.
   final Color? borderColor;
+
+  /// Stable test identifier exposed through [Semantics.identifier]. On
+  /// Android it surfaces as the accessibility node's resource-id, so UI test
+  /// tools such as Maestro can target the button with `id:` instead of its
+  /// visible label. It is not announced by screen readers.
+  final String? semanticsId;
 
   double get minHeight => switch (size) {
     TapButtonSize.sm => CCTokens.buttonSm,
@@ -198,6 +205,7 @@ class _TapButtonState extends State<TapButton> {
         child: Semantics(
           button: true,
           enabled: enabled,
+          identifier: widget.semanticsId,
           child: Opacity(
             // Disabled state: 40% opacity, per §6.3.1.
             opacity: enabled ? 1.0 : 0.4,

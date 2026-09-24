@@ -3,14 +3,44 @@ name: Flutter sign in and daily check in
 ---
 - launchApp:
     clearState: true
-- tapOn: I already have an account
-- tapOn: you@example.com
+# Wait for Flutter's first frame and semantics tree before tapping.
+- extendedWaitUntil:
+    visible:
+      id: landing-signin
+    timeout: 15000
+- waitForAnimationToEnd
+# Targets use Semantics.identifier (Android resource-id), not visible text,
+# so they are stable and work for the obscured password field.
+- tapOn:
+    id: landing-signin
+- extendedWaitUntil:
+    visible:
+      id: signin-email
+    timeout: 10000
+# Never use hideKeyboard in these flows: on Android it sends BACK, which
+# pops the current screen when no soft keyboard is showing. Instead, Enter
+# on a single-line field closes the keyboard (and on the sign-in fields it
+# submits the form, which is how the second Enter signs in).
+- tapOn:
+    id: signin-email
 - inputText: wiliss@example.com
-- tapOn: Enter password
+- pressKey: Enter
+- tapOn:
+    id: signin-password
 - inputText: secure-demo-password
-- tapOn: "→  Sign in"
-- assertVisible: Dashboard
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: Dashboard
+    timeout: 10000
 - takeScreenshot: flutter-dashboard-signed-in
-- tapOn: Not yet
+# The Check-in stat card merges its label/value/sub text into one
+# accessibility node, so it is targeted by id rather than "Not yet".
+- scrollUntilVisible:
+    element:
+      id: dashboard-checkin
+    direction: DOWN
+- tapOn:
+    id: dashboard-checkin
+# Feedback banner clears itself after ~3 s, so assert and capture right away.
 - assertVisible: "✓ Check-in recorded!"
 - takeScreenshot: flutter-check-in-recorded
