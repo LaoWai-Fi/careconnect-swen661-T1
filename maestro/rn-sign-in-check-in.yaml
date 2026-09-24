@@ -11,5 +11,7 @@ name: React Native sign in and daily check in
 - hideKeyboard
 - tapOn: Sign in
 - assertVisible: Dashboard
+- takeScreenshot: rn-dashboard-signed-in
 - tapOn: Not yet
 - assertVisible: "✓ Check-in recorded!"
+- takeScreenshot: rn-check-in-recorded

@@ -10,6 +10,8 @@ name: Flutter compose a caregiver message
 - inputText: secure-demo-password
 - tapOn: "→  Sign in"
 - tapOn: Messages
+- assertVisible: Messages
+- takeScreenshot: flutter-messages-before-compose
 - tapOn: "✉️ New Message"
 - tapOn: "e.g. Sarah (daughter)"
 - inputText: Sarah
@@ -19,3 +21,4 @@ name: Flutter compose a caregiver message
 - inputText: Margaret is doing well today.
 - tapOn: Send
 - assertVisible: Visit update
+- takeScreenshot: flutter-message-sent

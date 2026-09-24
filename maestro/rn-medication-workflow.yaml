@@ -10,6 +10,8 @@ name: React Native medication management
 - inputText: secure-demo-password
 - tapOn: Sign in
 - tapOn: Meds
+- assertVisible: Medications
+- takeScreenshot: rn-medications-before-add
 - tapOn: "Add medication"
 - tapOn: "e.g. Metformin"
 - inputText: Lisinopril
@@ -19,3 +21,4 @@ name: React Native medication management
 - inputText: "8:00 AM"
 - tapOn: Save medication
 - assertVisible: Lisinopril
+- takeScreenshot: rn-medication-added
