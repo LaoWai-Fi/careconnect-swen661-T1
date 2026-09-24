@@ -42,14 +42,3 @@ This Maestro version writes `takeScreenshot` images to
 `%USERPROFILE%\.maestro\tests\<run timestamp>\<flow name>\takeScreenshot\`,
 not to the directory the command is run from. Copy them from there into the
 evidence folder after each passing run.
-
-## Blockers and handoff
-
-- A physical Android device or configured emulator is required to produce
-  truthful Maestro results and screenshots.
-- Screen-reader evidence is separate: the TalkBack recordings are submitted
-  with the team's Week 6 submission document. Maestro screenshots do not
-  replace them.
-- If a selector fails on device, record the exact device/build and failure
-  output here, fix the flow or app, then rerun the affected flow. Do not
-  replace a failed run with a manual screenshot.
