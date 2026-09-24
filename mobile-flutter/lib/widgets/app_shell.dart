@@ -332,6 +332,7 @@ class _NavButton extends StatelessWidget {
       selected: active,
       button: true,
       label: label,
+      identifier: 'nav-${item.tab.name}',
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -454,6 +455,7 @@ class _SideNavBtn extends StatelessWidget {
             selected: active,
             button: true,
             label: label,
+            identifier: 'nav-${item.tab.name}',
             child: Container(
               constraints: const BoxConstraints(minHeight: 52),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

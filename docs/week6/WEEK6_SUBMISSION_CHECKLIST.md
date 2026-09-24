@@ -7,16 +7,15 @@
 - Six Maestro workflow definitions in `maestro/`, with run instructions in
   [`maestro/README.md`](../../maestro/README.md) and the evidence record in
   [`MAESTRO_EVIDENCE.md`](MAESTRO_EVIDENCE.md)
-- VPAT Word document
-- Accessibility test report and screen-reader test log
+- Accessibility test report
 - Updated app build/test instructions
 
 ## Complete before submitting
 
 - [x] Run `flutter test --coverage`: passed with 93.90% line coverage.
 - [x] Run `npm ci` then `npm run coverage -- --runInBand`: 15 suites / 131 tests passed, with 82.08% line coverage.
-- [ ] Install each build on the intended Android/iOS test device and execute the matching Maestro flows; save output/screenshots.
-- [ ] Complete all four TalkBack/VoiceOver rows in `SCREEN_READER_TEST_LOG.md` and record the two screen-reader demonstrations.
-- [x] Build Android APKs: `artifacts/week6/CareConnect-Flutter-Week6-release.apk` and `artifacts/week6/CareConnect-ReactNative-Week6-debug.apk` (both signature-verified).
+- [x] Install each build on an Android device and execute the matching Maestro flows; save output/screenshots: all six flows passed on 2026-09-24, evidence recorded in [`MAESTRO_EVIDENCE.md`](MAESTRO_EVIDENCE.md).
+- [x] Record TalkBack walkthroughs of both apps (September 21, 2026). The recordings are submitted separately and linked in the Week 6 submission document. VoiceOver not tested: no iOS builds.
+- [x] Build Android APKs: `artifacts/week6/CareConnect-Flutter-Week6-release.apk` and `artifacts/week6/CareConnect-ReactNative-Week6-release.apk` (release build with the JS bundle embedded).
 - [ ] Complete the individual Week 6 feedback/evaluation truthfully for each teammate.
-- [ ] Review the VPAT status notes and update any item where device testing finds a defect.
+- [x] Update the VPAT statuses from the TalkBack and Maestro results. The VPAT now lives in the Week 6 submission document, not in this repository.

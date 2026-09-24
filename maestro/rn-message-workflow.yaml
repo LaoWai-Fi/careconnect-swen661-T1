@@ -3,22 +3,42 @@ name: React Native compose a caregiver message
 ---
 - launchApp:
     clearState: true
-- tapOn: Sign in
+- extendedWaitUntil:
+    visible: I already have an account
+    timeout: 20000
+- waitForAnimationToEnd
+- tapOn: I already have an account
+# Never use hideKeyboard in these flows: on Android it sends BACK, which
+# leaves the screen when no soft keyboard is showing. Enter on a single-line
+# React Native input blurs it and closes the keyboard instead.
 - tapOn: you@example.com
 - inputText: wiliss@example.com
+- pressKey: Enter
 - tapOn: Enter password
 - inputText: secure-demo-password
+- pressKey: Enter
 - tapOn: Sign in
+- extendedWaitUntil:
+    visible: Dashboard
+    timeout: 10000
 - tapOn: Messages
 - assertVisible: Messages
 - takeScreenshot: rn-messages-before-compose
-- tapOn: "✉️ New Message"
-- tapOn: "e.g. Sarah (daughter)"
-- inputText: Sarah
-- tapOn: "e.g. Margaret's visit summary"
-- inputText: Visit update
-- tapOn: "Write your update…"
+# The button label starts with an emoji; match the text part only.
+- tapOn: ".*New Message"
+# Fill the multi-line Message field first: Enter adds a newline there instead
+# of closing the keyboard. The single-line fields below it then close the
+# keyboard with Enter, so Send is never hidden behind it.
+- tapOn: Write your update…
 - inputText: Margaret is doing well today.
+# Parentheses are regex groups in Maestro, so they are escaped here.
+- tapOn: 'e\.g\. Sarah \(daughter\)'
+- inputText: Sarah
+- pressKey: Enter
+- tapOn: e.g. Margaret's visit summary
+- inputText: Visit update
+- pressKey: Enter
 - tapOn: Send
-- assertVisible: Visit update
+# New messages are added to the top of the inbox.
+- assertVisible: ".*Visit update.*"
 - takeScreenshot: rn-message-sent

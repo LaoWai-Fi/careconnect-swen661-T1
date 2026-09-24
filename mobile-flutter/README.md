@@ -81,7 +81,7 @@ Requires the [Flutter SDK](https://docs.flutter.dev/get-started/install)(3.27+ /
 - `test/accessibility/accessibility_guidelines_test.dart` exercises Flutter's Android target-size and labelled-control guidelines.
 - `integration_test/critical_workflows_test.dart` covers sign-in and the daily check-in workflow. Run it with `flutter test integration_test` on a configured target.
 - Maestro flows are in [`../maestro/`](../maestro/) and use Android package `com.example.careconnect`.
-- The accessibility report, VPAT, and device screen-reader log are in [`../docs/week6/`](../docs/week6/). Complete the TalkBack and VoiceOver log on real devices before submitting.
+- The accessibility test report and Maestro evidence record are in [`../docs/week6/`](../docs/week6/). The VPAT and TalkBack recordings are part of the team's Week 6 submission document.
 
 ```bash
 cd mobile-flutter

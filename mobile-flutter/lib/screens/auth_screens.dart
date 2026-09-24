@@ -80,6 +80,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           label: 'Email address',
                           required: true,
                           error: _emailError,
+                          semanticsId: 'signin-email',
                           child: CCInput(
                             controller: _email,
                             placeholder: 'you@example.com',
@@ -94,6 +95,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           required: true,
                           hint: 'Any password works — this is a demonstration app.',
                           error: _passwordError,
+                          semanticsId: 'signin-password',
                           child: CCInput(
                             controller: _password,
                             placeholder: 'Enter password',
@@ -105,6 +107,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         const SizedBox(height: 24),
                         TapButton(
                           label: _loading ? 'Signing in…' : '→  Sign in',
+                          semanticsId: 'signin-submit',
                           size: TapButtonSize.lg,
                           fullWidth: true,
                           onPressed: _loading ? null : _submit,

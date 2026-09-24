@@ -70,7 +70,7 @@ Carried over from the Flutter build's constraints:
 - Settings offers a 200% text-size option, and all native text still honors platform font scaling.
 - RNTL tests verify button roles/states and labelled form feedback. Run `npm run coverage` to regenerate the HTML report.
 - Maestro flows are in [`../maestro/`](../maestro/) and use Android package `com.careconnect.mobile`.
-- The accessibility report, VPAT, and device screen-reader log are in [`../docs/week6/`](../docs/week6/). Complete the TalkBack and VoiceOver log on real devices before submitting.
+- The accessibility test report and Maestro evidence record are in [`../docs/week6/`](../docs/week6/). The VPAT and TalkBack recordings are part of the team's Week 6 submission document.
 
 ## Project structure
 

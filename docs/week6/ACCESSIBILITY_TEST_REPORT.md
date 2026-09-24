@@ -44,9 +44,9 @@ npm run coverage
 
 The commands above were run successfully on September 21, 2026 with Flutter 3.47.5, Android SDK 36, and the lockfile-pinned React Native dependencies. The coverage results above are current automated evidence.
 
-## Manual screen-reader protocol
+## Screen-reader testing
 
-Complete the checks in `SCREEN_READER_TEST_LOG.md` on a real Android device/emulator with TalkBack and an iOS device/simulator with VoiceOver. Record the tester, device/OS, build identifier, date, outcome, defects, and a 2–3 minute capture per app. Automated tests cannot prove a screen reader's spoken order or announcements on an actual platform.
+Both apps were walked through with TalkBack on an Android emulator on September 21, 2026, and each session was recorded. The recordings, the updated VPAT statuses, and the known limitations are in the team's Week 6 submission document rather than in this repository. No iOS builds were produced, so VoiceOver was not tested.
 
 ## Maestro execution
 
@@ -61,4 +61,4 @@ maestro test maestro/rn-medication-workflow.yaml
 maestro test maestro/rn-message-workflow.yaml
 ```
 
-Use the Flutter Android package `com.example.careconnect` and the Expo Android package `com.careconnect.mobile`. The build artifacts are `artifacts/week6/CareConnect-Flutter-Week6-release.apk` and `artifacts/week6/CareConnect-ReactNative-Week6-debug.apk`. Capture the successful Maestro output and screenshots/video as final submission evidence.
+Use the Flutter Android package `com.example.careconnect` and the Expo Android package `com.careconnect.mobile`. The build artifacts are `artifacts/week6/CareConnect-Flutter-Week6-release.apk` and `artifacts/week6/CareConnect-ReactNative-Week6-release.apk`. Capture the successful Maestro output and screenshots/video as final submission evidence.

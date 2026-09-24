@@ -65,6 +65,7 @@ class StatCard extends StatelessWidget {
     required this.bg,
     required this.borderColor,
     this.onTap,
+    this.semanticsId,
   });
 
   final IconData icon;
@@ -75,9 +76,21 @@ class StatCard extends StatelessWidget {
   final Color borderColor;
   final VoidCallback? onTap;
 
+  /// Stable test identifier ([Semantics.identifier], the Android
+  /// resource-id) so UI tests can target the card with Maestro `id:`.
+  final String? semanticsId;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      container: semanticsId != null,
+      identifier: semanticsId,
+      child: _buildCard(scheme),
+    );
+  }
+
+  Widget _buildCard(ColorScheme scheme) {
     return Material(
       color: bg,
       borderRadius: BorderRadius.circular(16),

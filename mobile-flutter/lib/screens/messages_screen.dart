@@ -59,6 +59,7 @@ class MessagesScreen extends StatelessWidget {
                       TapButton(
                         label: 'New Message',
                         icon: Icons.mail_outline,
+                        semanticsId: 'messages-new',
                         size: TapButtonSize.sm,
                         onPressed: () => showComposeSheet(context, state),
                       ),
@@ -341,11 +342,13 @@ class _ComposeSheetState extends State<_ComposeSheet> {
                 label: 'To',
                 required: true,
                 error: _toError,
+                semanticsId: 'compose-to',
                 child: CCInput(controller: _to, placeholder: 'Recipient name', error: _toError != null),
               ),
               const SizedBox(height: 16),
               CCFormField(
                 label: 'Subject',
+                semanticsId: 'compose-subject',
                 child: CCInput(controller: _subject, placeholder: 'Subject'),
               ),
               const SizedBox(height: 16),
@@ -353,6 +356,7 @@ class _ComposeSheetState extends State<_ComposeSheet> {
                 label: 'Body',
                 required: true,
                 error: _bodyError,
+                semanticsId: 'compose-body',
                 child: CCInput(controller: _body, placeholder: 'Write your message…', minLines: 6, maxLines: 10, error: _bodyError != null),
               ),
               const SizedBox(height: 20),
@@ -368,7 +372,7 @@ class _ComposeSheetState extends State<_ComposeSheet> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: TapButton(label: 'Send', size: TapButtonSize.lg, onPressed: _send),
+                    child: TapButton(label: 'Send', size: TapButtonSize.lg, onPressed: _send, semanticsId: 'compose-send'),
                   ),
                 ],
               ),
