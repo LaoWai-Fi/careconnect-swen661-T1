@@ -29,7 +29,7 @@ careconnect-swen661-T1/
     └── team-charter.md   # team roles, workflow, communication plan
 ```
 
-`web/` and `mobile-flutter/` are built out; `mobile-rn/` is the Week 5 React Native port of the Flutter app (117 tests, 82% statement coverage, React Navigation, ESLint-clean) — see [web/README.md](web/README.md), [mobile-flutter/README.md](mobile-flutter/README.md), and [mobile-rn/README.md](mobile-rn/README.md) for their setup and feature writeups. `desktop-electron/` is a placeholder (with its own README and `.gitignore`) to be built out in a later week. The two mobile toolchains are compared in [docs/rn-vs-flutter-comparison.md](docs/rn-vs-flutter-comparison.md); 
+`web/` and `mobile-flutter/` are built out; `mobile-rn/` is the Week 5 React Native port of the Flutter app (117 tests, 82% statement coverage, React Navigation, ESLint-clean) — see [web/README.md](web/README.md), [mobile-flutter/README.md](mobile-flutter/README.md), and [mobile-rn/README.md](mobile-rn/README.md) for their setup and feature writeups. `desktop-electron/` now contains the Week 7 desktop prototype; see its [README](desktop-electron/README.md) and the [Week 7 submission index](docs/week7/README.md). The two mobile toolchains are compared in [docs/rn-vs-flutter-comparison.md](docs/rn-vs-flutter-comparison.md);
 
 ## Setup instructions
 

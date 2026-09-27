@@ -1,0 +1,74 @@
+{
+  "checkedAt": "2026-09-27T17:29:07.835Z",
+  "viewport": "1440 × 900",
+  "checks": [
+    {
+      "description": "Desktop welcome screen renders",
+      "passed": true
+    },
+    {
+      "description": "Sign-in form renders",
+      "passed": true
+    },
+    {
+      "description": "Care workspace opens after demo sign-in",
+      "passed": true
+    },
+    {
+      "description": "Menu bar and toolbar render",
+      "passed": true
+    },
+    {
+      "description": "Medication workspace navigation works",
+      "passed": true
+    },
+    {
+      "description": "Message workspace navigation works",
+      "passed": true
+    },
+    {
+      "description": "Ctrl+2 keyboard navigation opens medications",
+      "passed": true
+    },
+    {
+      "description": "Ctrl+5 keyboard navigation opens messages",
+      "passed": true
+    },
+    {
+      "description": "Ctrl+S saves the current workspace view",
+      "passed": true
+    },
+    {
+      "description": "F1 opens keyboard shortcut reference",
+      "passed": true
+    },
+    {
+      "description": "Alt+H opens the Help menu",
+      "passed": true
+    },
+    {
+      "description": "Escape closes the Help menu",
+      "passed": true
+    },
+    {
+      "description": "Keyboard shortcut reference opens from Help menu",
+      "passed": true
+    },
+    {
+      "description": "Desktop settings open",
+      "passed": true
+    },
+    {
+      "description": "High-contrast mode can be enabled",
+      "passed": true
+    },
+    {
+      "description": "Light theme can be selected",
+      "passed": true
+    },
+    {
+      "description": "Overview opens in light theme",
+      "passed": true
+    }
+  ]
+}
