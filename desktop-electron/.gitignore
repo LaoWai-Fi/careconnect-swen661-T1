@@ -1,6 +1,8 @@
 # Standard Electron .gitignore (matches Electron Forge / electron-builder scaffolds)
 
 node_modules/
+.electron-user-data/
+.electron-smoke-user-data/
 
 # Build output
 dist/
