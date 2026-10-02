@@ -44,9 +44,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # macos-13 is GitHub's Intel runner. If GitHub retires it, drop this row
-          # and use dist:mac on macos-latest, which cross-builds x64 as well.
-          - os: macos-13
+          # macos-15-intel is GitHub's Intel runner (macos-13 was retired Dec 2025).
+          # If it is retired too, drop this row and use dist:mac on macos-latest,
+          # which cross-builds x64 as well.
+          - os: macos-15-intel
             label: macOS-Intel
             script: dist:mac:intel
             files: |
