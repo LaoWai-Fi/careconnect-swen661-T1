@@ -1241,10 +1241,17 @@ export default function AppShell({
                   keys="Ctrl/Cmd 1–5"
                 />
                 <Shortcut label="Close menu or dialog" keys="Esc" />
-                <Shortcut
-                  label="Open File / Edit / View / Help menu"
-                  keys="Alt+F / E / V / H"
-                />
+                {IS_MAC ? (
+                  <Shortcut
+                    label="Move to the menu bar"
+                    keys="Ctrl+F2 (VoiceOver: VO+M)"
+                  />
+                ) : (
+                  <Shortcut
+                    label="Open File / Edit / View / Help menu"
+                    keys="Alt+F / E / V / H"
+                  />
+                )}
               </div>
               <div>
                 <p className="settings-heading">Actions</p>

@@ -44,6 +44,15 @@ function bootstrap(electron, { env = process.env, platform = process.platform, l
   if (env.CARECONNECT_DISABLE_GPU === '1') app.disableHardwareAcceleration()
   app.setName(APP_NAME)
   if (platform === 'win32') app.setAppUserModelId(APP_ID) // required for Windows toast notifications
+  if (isMac) {
+    // Backs the native "About CareConnect" item in the macOS app menu.
+    app.setAboutPanelOptions({
+      applicationName: APP_NAME,
+      applicationVersion: app.getVersion(),
+      copyright: 'Copyright 2026 SWEN 661 Team 1',
+      credits: 'SWEN 661 Team 1. Sample data only; CareConnect cannot place emergency calls.',
+    })
+  }
 
   // Only one CareConnect window: a second launch focuses the first one.
   if (!app.requestSingleInstanceLock()) {

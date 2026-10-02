@@ -36,13 +36,16 @@ function buildMenuTemplate({ send, signedIn, isMac, isDev, onAbout, onReportIssu
     ...extra,
   })
 
+  // On macOS the native About panel (configured with setAboutPanelOptions) is used.
+  const aboutItem = isMac ? { role: 'about', label: 'About ' + appName } : { label: '&About ' + appName, click: onAbout }
+
   const template = []
 
   if (isMac) {
     template.push({
       label: appName,
       submenu: [
-        { label: 'About ' + appName, click: onAbout },
+        aboutItem,
         { type: 'separator' },
         cmd('Settings…', 'settings', 'CmdOrCtrl+,'),
         { type: 'separator' },
@@ -81,6 +84,7 @@ function buildMenuTemplate({ send, signedIn, isMac, isDev, onAbout, onReportIssu
       { role: 'cut' },
       { role: 'copy' },
       { role: 'paste' },
+      ...(isMac ? [{ role: 'pasteAndMatchStyle' }] : []),
       { role: 'selectAll' },
       { type: 'separator' },
       cmd('&Find in CareConnect', 'search', 'CmdOrCtrl+F'),
@@ -108,14 +112,16 @@ function buildMenuTemplate({ send, signedIn, isMac, isDev, onAbout, onReportIssu
     template.push({ role: 'windowMenu' })
   }
 
+  // role 'help' makes macOS add its Help search field to this menu.
   template.push({
     label: '&Help',
+    ...(isMac ? { role: 'help' } : {}),
     submenu: [
       { label: '&Keyboard shortcuts', accelerator: 'F1', click: () => send('shortcuts') },
       { label: 'CareConnect &help', click: () => send('help') },
       { type: 'separator' },
       { label: '&Report an issue…', click: onReportIssue },
-      ...(isMac ? [] : [{ type: 'separator' }, { label: '&About ' + appName, click: onAbout }]),
+      ...(isMac ? [] : [{ type: 'separator' }, aboutItem]),
     ],
   })
 

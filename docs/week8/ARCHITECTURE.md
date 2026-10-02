@@ -36,11 +36,11 @@ The renderer never receives `ipcRenderer` or any Node API. If `window.careConnec
 
 | Module | Responsibility |
 |---|---|
-| `electron/main.cjs` | Composition root. `bootstrap(electron)` takes the Electron module as a parameter so Jest can start the whole main process against a fake. Creates the window, wires menu, tray, IPC, updater, single-instance lock, window title and badge updates. |
+| `electron/main.cjs` | Composition root. `bootstrap(electron)` takes the Electron module as a parameter so Jest can start the whole main process against a fake. Creates the window, wires menu, tray, IPC, updater, single-instance lock, window title and badge updates. On macOS it also sets the native About panel text, uses the template icon for the menu bar item and keeps the app running after the last window closes. |
 | `electron/channels.cjs` | The IPC channel names and the list of menu actions the renderer accepts. |
 | `electron/ipc.cjs` | Registers all IPC handlers. Each one checks the sender, validates its arguments and returns `{ ok, ... }` instead of throwing. |
 | `electron/preload.cjs` | Builds the `window.careConnect` API with `contextBridge`. Keeps its own copy of the channel names (a sandboxed preload cannot require local files); a unit test keeps the copies identical. |
-| `electron/menu.cjs` | `buildMenuTemplate()` is a pure function that produces the native File / Edit / View / Help menu with accelerators and Alt mnemonics. Care plan items are disabled until sign-in. |
+| `electron/menu.cjs` | `buildMenuTemplate()` is a pure function that produces the native menu with accelerators: File / Edit / View / Help with Alt mnemonics on Windows and Linux, and on macOS an app menu (native About role, Settings, Hide, Quit), a Window menu and a Help menu with the `help` role so macOS adds its search field. Care plan items are disabled until sign-in. |
 | `electron/windowState.cjs` | Saves and restores window size, position and maximized state (`window-state.json`), and rejects bounds that would be off-screen. |
 | `electron/careStore.cjs` | Reads and writes `care-data.json` in userData. Atomic write (temp file then rename), 5 MB limit, corrupt files set aside as `.corrupt`. |
 | `electron/tray.cjs` | Tray icon, tooltip and context menu (next medication, unread count, quick actions). |
@@ -120,9 +120,10 @@ Additional measures: payload validation with a 5 MB limit, control-character str
 Packaging uses electron-builder with the `build` section of `desktop-electron/package.json`.
 
 - Files packed: `dist/`, `electron/`, `assets/`, `package.json`, inside an ASAR archive. Output goes to `release/`.
-- Windows (primary): NSIS x64 installer `CareConnect-Setup-0.8.0.exe`, per-user, choose install directory, Desktop and Start Menu shortcuts. Built with `npm run dist:win` on a Windows machine.
-- Linux: AppImage and deb (`npm run dist:linux`). The AppImage was built and launched headless in a container to prove the configuration.
-- macOS: dmg (`npm run dist:mac`), must be built on a Mac. Not built yet.
+- macOS (primary target, Intel x64 and Apple Silicon arm64): `.dmg` and `.zip` per architecture, named `CareConnect-<version>-mac-<arch>.<ext>`. `npm run dist:mac:intel` (Intel), `dist:mac:arm` (Apple Silicon) or `dist:mac` (both). The zip is required by `electron-updater` on macOS. The icon is `assets/icon.png` (1024 px), the menu bar icon is the template image `assets/trayTemplate.png` (with `@2x`), and `assets/entitlements.mac.plist` is wired in for later hardened runtime and notarization. Dmg files are built on a Mac or on the GitHub macOS runners (`.github/workflows/desktop-electron.yml`); the app folder was also assembled from Linux to validate the config.
+- Windows (secondary): NSIS x64 installer `CareConnect-Setup-0.8.0.exe`, per-user, choose install directory, Desktop and Start Menu shortcuts (`npm run dist:win`, built on Windows or the CI Windows runner).
+- Linux (tertiary): AppImage and deb (`npm run dist:linux`). The AppImage was built and launched headless in a container to prove the configuration.
 - Fuses are flipped at package time (`electronFuses`).
 - Auto-update: `electron-updater` reads the `publish` entry (GitHub, `LaoWai-Fi/careconnect-swen661-T1`). It runs only in packaged builds and can be disabled with `CARECONNECT_DISABLE_UPDATES=1`. A GitHub Release containing the installer and `latest.yml` must exist for updates to be found; until then the check fails quietly.
-- Code signing: none. The installer is unsigned, so Windows SmartScreen warns on first run and update packages are not verified by a publisher certificate.
+- Code signing: none with a Developer ID or certificate. macOS builds are ad-hoc signed (needed on Apple Silicon) and not notarized, so Gatekeeper warns on first launch (Control-click > Open); Windows SmartScreen warns on first run; update packages are not verified by a publisher certificate. The README explains how someone with an Apple Developer ID can turn on hardened runtime and notarization.
+- CI: GitHub Actions runs typecheck, lint, Jest and the e2e tests on Ubuntu, then builds installers on macOS Intel, macOS Apple Silicon and Windows runners and uploads them as artifacts.

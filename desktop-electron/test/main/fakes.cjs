@@ -132,6 +132,7 @@ function createFakeElectron({ userData, packaged = false, singleInstance = true,
     getVersion: () => '0.8.0',
     disableHardwareAcceleration: jest.fn(),
     setBadgeCount: jest.fn(),
+    setAboutPanelOptions: jest.fn(),
     whenReady: () => Promise.resolve(),
   })
   const menus = []

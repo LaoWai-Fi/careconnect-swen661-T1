@@ -34,7 +34,8 @@ function clickMenuItem(app: ElectronApplication, label: string) {
   return app.evaluate(({ Menu }, wanted) => {
     const find = (items: Electron.MenuItem[]): Electron.MenuItem | undefined => {
       for (const item of items) {
-        if (item.label.replace(/&/g, '') === wanted) return item
+        // "Settings" is "Settings…" in the macOS app menu.
+        if (item.label.replace(/&/g, '').replace(/…$/, '') === wanted) return item
         if (item.submenu) {
           const hit = find(item.submenu.items)
           if (hit) return hit

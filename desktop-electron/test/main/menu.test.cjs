@@ -29,6 +29,29 @@ describe('native menu template', () => {
     expect(find(file, 'Settings')).toBeUndefined()
   })
 
+  test('macOS Help menu uses the help role so the system adds its search field', () => {
+    const mac = build({ isMac: true }).template.find((m) => m.role === 'help')
+    expect(mac.label).toBe('&Help')
+    expect(mac.submenu.some((i) => i.role === 'about')).toBe(false)
+    expect(build().template.some((m) => m.role === 'help')).toBe(false)
+  })
+
+  test('About: native role in the macOS app menu, custom dialog on Windows and Linux', () => {
+    const mac = build({ isMac: true, appName: 'CareConnect' })
+    const about = mac.template[0].submenu[0]
+    expect(about).toEqual({ role: 'about', label: 'About CareConnect' })
+    expect(about.click).toBeUndefined()
+    expect(mac.template[0].submenu.some((i) => i.label === 'Settings…' && i.accelerator === 'CmdOrCtrl+,')).toBe(true)
+    const win = build()
+    const custom = find(find(win.template, 'Help').submenu, 'About CareConnect')
+    custom.click()
+    expect(win.onAbout).toHaveBeenCalled()
+  })
+
+  test('app menu label follows the app name', () => {
+    expect(build({ isMac: true, appName: 'Acme' }).template[0].label).toBe('Acme')
+  })
+
   test('every keyboard shortcut from the design is a menu accelerator', () => {
     const { template } = build()
     const accelerators = listShortcuts(template).map((row) => row.accelerator)

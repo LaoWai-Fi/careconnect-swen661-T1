@@ -20,17 +20,17 @@ npm run typecheck        # tsc --noEmit
 |---|---|
 | `npx tsc --noEmit` | Pass, no errors |
 | `npm run lint` | Pass, zero warnings |
-| `npx jest --coverage` | 18 suites, 204 tests, all passed |
+| `npx jest --coverage` | 19 suites, 211 tests, all passed |
 | `xvfb-run -a npm run test:e2e` | 5 of 5 passed (real Electron) |
 
 ### Coverage totals
 
 | Metric | Percent | Covered / total |
 |---|---|---|
-| Statements | 97.52% | 1538 / 1577 |
-| Branches | 92.54% | 1006 / 1087 |
+| Statements | 97.53% | 1541 / 1580 |
+| Branches | 92.70% | 1017 / 1097 |
 | Functions | 96.86% | 556 / 574 |
-| Lines | 98.35% | 1318 / 1340 |
+| Lines | 98.36% | 1321 / 1343 |
 
 The coverage target for the assignment is 75%. `src/types.ts` (type declarations only) is excluded from coverage. The e2e tests run the real Electron app and are not included in the Jest coverage numbers.
 
@@ -40,12 +40,12 @@ The coverage target for the assignment is 75%. `src/types.ts` (type declarations
 
 | File | Stmts | Branch | Funcs | Lines | Uncovered lines |
 |---|---|---|---|---|---|
-| electron (folder) | 98.13 | 92.24 | 95.28 | 98.89 | |
+| electron (folder) | 98.14 | 92.5 | 95.28 | 98.9 | |
 | careStore.cjs | 97.56 | 100 | 83.33 | 100 | |
 | channels.cjs | 100 | 100 | 100 | 100 | |
 | ipc.cjs | 100 | 100 | 100 | 100 | |
-| main.cjs | 96.21 | 83.09 | 92.3 | 97.34 | 184-185, 238 |
-| menu.cjs | 100 | 95 | 100 | 100 | 130 |
+| main.cjs | 96.26 | 83.56 | 92.3 | 97.39 | 193-194, 247 |
+| menu.cjs | 100 | 96.15 | 100 | 100 | 136 |
 | preload.cjs | 95.65 | 83.33 | 91.66 | 100 | 54 |
 | security.cjs | 100 | 95.83 | 100 | 100 | 43 |
 | tray.cjs | 100 | 100 | 100 | 100 | |
@@ -55,8 +55,8 @@ The coverage target for the assignment is 75%. `src/types.ts` (type declarations
 | App.tsx | 97.68 | 86.17 | 100 | 99.24 | 34 |
 | useFocusTrap.ts | 95.34 | 72.72 | 100 | 100 | 30, 37, 48, 52-62 |
 | useTapRipple.ts | 100 | 100 | 100 | 100 | |
-| src/components (folder) | 96.61 | 93.9 | 95.38 | 97.1 | |
-| AppShell.tsx | 96.56 | 95.25 | 94.49 | 97.11 | 268, 389, 632-634, 945, 985, 1203 |
+| src/components (folder) | 96.61 | 93.95 | 95.38 | 97.1 | |
+| AppShell.tsx | 96.56 | 95.68 | 94.49 | 97.11 | 268, 389, 632-634, 945, 985, 1203 |
 | ConfirmDialog.tsx | 100 | 100 | 100 | 100 | |
 | FormField.tsx | 88.88 | 89.47 | 100 | 88.88 | 20 |
 | Logo.tsx | 100 | 0 | 100 | 100 | 1 |
@@ -82,15 +82,16 @@ The coverage target for the assignment is 75%. `src/types.ts` (type declarations
 | Layer | Files | Tests | What it covers |
 |---|---|---|---|
 | Unit: pure logic | `test/renderer/careLogic.test.ts` | 34 | Care plan logic: sign in, medications, appointments, messages, check-in, unread count, import/export parsing |
-| Unit: main process modules | `test/main/menu`, `ipc`, `careStore`, `tray`, `security`, `updater`, `preload` | 59 | Menu template and accelerators, IPC handlers (sender check, validation, errors), atomic store, tray menu, security helpers, updater, preload bridge and channel sync |
-| Main process bootstrap | `test/main/main.test.cjs` | 16 | Whole main process against a fake Electron: window options, single instance, session updates, title and badge, menu commands |
+| Unit: main process modules | `test/main/menu`, `ipc`, `careStore`, `tray`, `security`, `updater`, `preload` | 62 | Menu template and accelerators (including the macOS app menu, About role and Help role), IPC handlers (sender check, validation, errors), atomic store, tray menu, security helpers, updater, preload bridge and channel sync |
+| Main process bootstrap | `test/main/main.test.cjs` | 19 | Whole main process against a fake Electron: window options, single instance, session updates, title and badge, menu commands, macOS About panel, menu bar template icon, macOS lifecycle |
 | IPC integration | `test/main/ipc.integration.test.cjs` | 6 | Real preload bridge talking to the real main-process IPC handlers |
 | Window management integration | `test/main/windowState.test.cjs` | 12 | Saving and restoring bounds, off-screen correction, maximized state, debounce and close handling |
 | Component and workflow | `App`, `appShell`, `pages`, `dashboard`, `messages`, `workflows` under `test/renderer/` | 69 | React Testing Library: every page, dialog, menu, settings, native menu commands, autosave, import and export, keyboard handling |
+| macOS renderer variant | `test/renderer/macPlatform.test.tsx` | 1 | `navigator.platform` set to MacIntel before the app is loaded in an isolated module registry: the sidebar shows the Command symbol and the F1 dialog shows the macOS "Move to the menu bar" row |
 | Accessibility (axe) | `test/renderer/accessibility.test.tsx` | 8 | jest-axe on every screen and dialog (landing, sign in, dashboard and pages, settings, shortcuts, emergency, forms) |
 | End to end (real Electron) | `test/e2e/desktop.spec.ts` | 5 | Launch and native menu, security flags, sign in and menu navigation, autosave file, relaunch persistence |
 
-Jest totals by project: main process 93 tests, renderer 111 tests, 204 in total (per-file counts: careLogic 34, App 21, pages 18, careStore 12, windowState 12, appShell 12, main 16, ipc 15, menu 9, dashboard 8, messages 8, accessibility 8, preload 7, ipc.integration 6, security 6, tray 5, updater 5, workflows 2).
+Jest totals by project: main process 99 tests, renderer 112 tests, 211 in total (per-file counts: careLogic 34, App 21, pages 18, careStore 12, windowState 12, appShell 12, main 19, ipc 15, menu 12, macPlatform 1, dashboard 8, messages 8, accessibility 8, preload 7, ipc.integration 6, security 6, tray 5, updater 5, workflows 2).
 
 End-to-end tests (Playwright `_electron`, run under xvfb):
 
@@ -119,5 +120,7 @@ End-to-end tests (Playwright `_electron`, run under xvfb):
 ## Known gaps
 
 - Real keyboard accelerators and the native tray cannot be exercised under xvfb; they are tested through the menu and tray templates and by invoking menu item handlers.
-- The Windows installer, NVDA and Windows contrast themes are not tested in the cloud container; see [ACCESSIBILITY_TESTING.md](ACCESSIBILITY_TESTING.md).
+- The tests run on Linux in the cloud container. The macOS installer, VoiceOver, the macOS menu bar, Dock badge and the Increase contrast setting are checked by hand on an Intel Mac; see [MAC_TEST_CHECKLIST.md](MAC_TEST_CHECKLIST.md) and [ACCESSIBILITY_TESTING.md](ACCESSIBILITY_TESTING.md). Windows (NVDA, contrast themes, installer) is a secondary manual check.
+- The macOS app folder was assembled from Linux with `electron-builder --mac dir --x64` to validate the packaging config. The `.dmg` itself needs a Mac or the GitHub macOS runners.
+- The e2e tests are written to run on macOS too (the menu helper accepts "Settings…"); CI runs them on the macOS runners before packaging.
 - Uncovered lines are mostly defensive branches (listed in the table above).

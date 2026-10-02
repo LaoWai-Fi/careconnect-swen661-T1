@@ -152,6 +152,32 @@ describe('main process bootstrap', () => {
     expect(mac.currentMenu().template[0].label).toBe('CareConnect')
   })
 
+  test('macOS configures the native About panel; Windows and Linux do not', async () => {
+    const mac = await start({ platform: 'darwin' })
+    expect(mac.electron.app.setAboutPanelOptions).toHaveBeenCalledWith({
+      applicationName: 'CareConnect',
+      applicationVersion: '0.8.0',
+      copyright: 'Copyright 2026 SWEN 661 Team 1',
+      credits: expect.stringContaining('cannot place emergency calls'),
+    })
+    const win = await start({ platform: 'win32' })
+    expect(win.electron.app.setAboutPanelOptions).not.toHaveBeenCalled()
+    const linux = await start({ platform: 'linux' })
+    expect(linux.electron.app.setAboutPanelOptions).not.toHaveBeenCalled()
+  })
+
+  test('the tray uses the template (menu bar) icon on macOS and the colour icon elsewhere', async () => {
+    const mac = await start({ platform: 'darwin' })
+    expect(mac.ctx.tray.tray.icon.path).toMatch(/trayTemplate\.png$/)
+    const win = await start({ platform: 'win32' })
+    expect(win.ctx.tray.tray.icon.path).toMatch(/[\\/]tray\.png$/)
+  })
+
+  test('macOS app menu starts with the native About role', async () => {
+    const mac = await start({ platform: 'darwin' })
+    expect(mac.currentMenu().template[0].submenu[0]).toMatchObject({ role: 'about' })
+  })
+
   test('showWindow re-creates the window if it was closed', async () => {
     const { win, ctx, windows } = await start()
     win.close()
