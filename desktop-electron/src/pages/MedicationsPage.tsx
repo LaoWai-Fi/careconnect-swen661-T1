@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import TapButton from '../components/TapButton';
+import { useFocusTrap } from '../useFocusTrap';
+import ConfirmDialog from '../components/ConfirmDialog';
 import FormField, { Input } from '../components/FormField';
 import type { AppState, Medication } from '../types';
 
@@ -33,13 +35,14 @@ function MedCard({
     <div className={`bg-[var(--card)] rounded-2xl border-2 p-4 space-y-3 ${med.taken ? 'border-[var(--success-border)]' : 'border-[var(--border)]'}`}>
       <div className="flex items-start gap-2 justify-between">
         <div>
-          <h3 className="font-bold text-lg text-[var(--foreground)]">{med.name}</h3>
+          <h2 className="font-bold text-lg text-[var(--foreground)]">{med.name}</h2>
           <p className="text-sm text-[var(--muted-foreground)]">{med.dose}</p>
         </div>
         <button
           onClick={handleToggle}
           className={`text-2xl mt-0.5 active:scale-90 transition-transform focus-visible:outline-2 focus-visible:outline-[var(--ring)]`}
-          aria-label={med.taken ? 'Mark as not taken' : 'Mark as taken'}
+          aria-label={`${med.name}: ${med.taken ? 'mark as not taken' : 'mark as taken'}`}
+          aria-pressed={med.taken}
         >
           {med.taken ? '✅' : '⭕'}
         </button>
@@ -62,10 +65,10 @@ function MedCard({
       )}
 
       <div className="flex gap-2 pt-1">
-        <TapButton variant="outline" size="sm" onClick={onEdit} className="flex-1">
+        <TapButton variant="outline" size="sm" onClick={onEdit} className="flex-1" aria-label={`Edit ${med.name}`}>
           ✎ Edit
         </TapButton>
-        <TapButton variant="destructive" size="sm" onClick={onDelete} className="flex-1">
+        <TapButton variant="destructive" size="sm" onClick={onDelete} className="flex-1" aria-label={`Delete ${med.name}`}>
           🗑 Delete
         </TapButton>
       </div>
@@ -94,6 +97,7 @@ function MedForm({
   );
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [saved, setSaved] = useState(false);
+  const dialogRef = useFocusTrap(true, onCancel);
 
   function set(k: keyof FormState, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -114,12 +118,18 @@ function MedForm({
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="med-form-title"
         className="relative bg-[var(--card)] w-full max-w-lg rounded-t-3xl md:rounded-2xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">{initial ? 'Edit medication' : 'Add new medication'}</h2>
+          <h2 id="med-form-title" className="text-xl font-bold">{initial ? 'Edit medication' : 'Add new medication'}</h2>
           <button
+            type="button"
+            aria-label="Close"
             onClick={onCancel}
             className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-[var(--muted)] font-bold text-[var(--muted-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--ring)]"
           >
@@ -233,18 +243,15 @@ export default function MedicationsPage({ state, onAdd, onDelete, onToggleTaken 
 
       {/* Delete confirm dialog */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setDeleteConfirm(null)} />
-          <div className="relative bg-[var(--card)] w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4">
-            <h2 className="text-lg font-bold">Delete medication?</h2>
-            <p className="text-[var(--muted-foreground)] text-sm">This will remove the medication from Margaret's plan. This cannot be undone.</p>
-            <div className="flex gap-3">
-              <TapButton variant="outline" size="lg" onClick={() => setDeleteConfirm(null)} className="flex-1">Cancel</TapButton>
-              <TapButton variant="destructive" size="lg" onClick={() => { onDelete(deleteConfirm); setDeleteConfirm(null); }} className="flex-1">Delete</TapButton>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="Delete medication?"
+          body="This will remove the medication from Margaret's plan. This cannot be undone."
+          confirmLabel="Delete"
+          onCancel={() => setDeleteConfirm(null)}
+          onConfirm={() => { onDelete(deleteConfirm); setDeleteConfirm(null); }}
+        />
       )}
     </div>
   );
 }
+

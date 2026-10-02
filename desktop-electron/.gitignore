@@ -24,3 +24,8 @@ release/
 
 # Editor
 *.swp
+
+# Test and packaging output
+test-results/
+playwright-report/
+coverage/

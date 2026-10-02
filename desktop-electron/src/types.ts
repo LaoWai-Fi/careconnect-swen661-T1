@@ -30,7 +30,7 @@ export interface Appointment {
 
 export interface ActivityEntry {
   id: string;
-  type: 'medication_taken' | 'medication_unmarked' | 'task_completed' | 'checked_in';
+  type: 'medication_taken' | 'medication_unmarked' | 'task_completed' | 'checked_in' | 'check_in_undone';
   description: string;
   timestamp: string;
 }

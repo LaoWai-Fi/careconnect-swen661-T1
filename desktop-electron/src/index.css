@@ -114,8 +114,9 @@
 /* ─── Base ─── */
 html, body, #root {
   height: 100%;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: 16px;
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  /* rem so body text scales with View > Zoom and the Text size setting */
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--foreground);
   background-color: var(--background);
@@ -259,9 +260,6 @@ body.one-handed-right .ohe-panel { transform: translateX(10%); }
 }
 
 .window-control-close { background: var(--window-close); }
-.window-control { cursor: pointer; -webkit-app-region: no-drag; }
-.window-control:hover { filter: brightness(0.82); }
-.window-control:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
 
 .desktop-menubar {
   min-height: 2rem;
@@ -788,24 +786,96 @@ kbd {
   flex: none;
 }
 
+/* Emergency prompt: matches the Flutter / React Native SOS dialog (red header,
+   full-width SOS call button, Cancel). Demo only: no call is placed. */
 .emergency-dialog {
   width: min(25rem, 90vw);
+  border-radius: 1.25rem;
+}
+
+.emergency-header {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 0.6rem;
+  padding: 1.75rem 1.5rem;
+  background: #b91c1c;
+  color: #ffffff;
+  text-align: center;
+}
+
+.emergency-siren { font-size: 3rem; line-height: 1; }
+.emergency-title { font-size: 1.4rem; font-weight: 800; }
+.emergency-body { font-size: 0.9rem; color: #fecaca; }
+
+.emergency-header-calling .emergency-siren {
+  animation: emergency-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes emergency-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergency-header-calling .emergency-siren { animation: none; }
+}
+
+.emergency-actions {
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
-.emergency-icon {
-  width: 3rem;
-  height: 3rem;
-  display: grid;
-  place-items: center;
-  border-radius: 9999px;
-  background: var(--destructive);
-  color: var(--destructive-foreground);
+/* Care recipient switcher in the sidebar */
+.recipient-area { position: relative; }
+
+.recipient-button {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.emergency-icon svg { width: 1.5rem; height: 1.5rem; }
+.recipient-button:hover { background: var(--desktop-hover); }
+.recipient-button:focus-visible { outline: 3px solid var(--ring); outline-offset: -3px; }
+
+/* Doubled class so this wins over .account-menu's right/min-width. */
+.account-menu.recipient-menu {
+  left: 0.5rem;
+  right: 0.5rem;
+  min-width: 0;
+  top: calc(100% + 0.25rem);
+}
+
+.recipient-menu-label {
+  padding: 0.35rem 0.5rem 0.45rem;
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.recipient-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--desktop-hover);
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.recipient-option:focus-visible { outline: 3px solid var(--ring); outline-offset: 1px; }
+.recipient-check { color: var(--primary); font-weight: 800; }
 
 .high-contrast,
 .high-contrast.dark {
@@ -1015,6 +1085,11 @@ min-width: 0;
   grid-template-rows: 2.25rem 2rem minmax(0, 1fr) 1.5rem;
   overflow: hidden;
   background: var(--background);
+}
+
+/* In Electron the real OS menu bar replaces the in-page one, so drop its row. */
+.welcome-window-native {
+  grid-template-rows: 2.25rem minmax(0, 1fr) 1.5rem;
 }
 
 .welcome-menubar {
@@ -1319,3 +1394,81 @@ min-width: 0;
   .welcome-preview { padding-right: 9vw; }
   .preview-shell { min-height: 34rem; }
 }
+
+
+/* ---- Signed-in user (title bar account menu) ---- */
+.account-area { position: relative; }
+
+.account-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.75rem;
+  padding: 0.1rem 0.5rem 0.1rem 0.15rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-button:hover { background: var(--desktop-hover); }
+.account-button:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
+.account-button svg { width: 0.8rem; height: 0.8rem; flex: none; }
+
+.account-avatar {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.account-avatar-lg { width: 2.2rem; height: 2.2rem; font-size: 0.8rem; }
+
+.account-name {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  min-width: 16rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+  box-shadow: 0 0.75rem 2rem var(--shadow-color);
+  z-index: 90;
+}
+
+.account-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem 0.65rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+html.app-compact .account-name { display: none; }
+
+@media (forced-colors: active) {
+  .account-menu,
+  .account-button { border: 1px solid CanvasText; }
+}
+
+/* ---- Electron native shell (native frame + native menu bar) ---- */
+html.native-shell .window-drag { -webkit-app-region: no-drag; }
+html.native-shell .window-titlebar { min-height: 2.25rem; }

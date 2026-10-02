@@ -34,11 +34,13 @@ export default function SignInPage({ navigate, onSignIn }: Props) {
 
   return (
     <div className="min-h-full flex flex-col bg-[var(--background)]">
-      <header className="flex items-center gap-2 px-4 pb-3 bg-[var(--card)] border-b border-[var(--border)]" style={{ paddingTop: 'max(env(safe-area-inset-top), 72px)' }}>
-        <Logo size={32} />
-        <span className="font-bold text-lg">
-          <span className="text-[var(--primary)]">Care</span>Connect
-        </span>
+      {/* Same compact header strip as the landing page (no mobile notch padding). */}
+      <header className="window-titlebar window-drag">
+        <div className="flex items-center gap-2">
+          <Logo size={24} />
+          <span className="font-semibold text-sm">CareConnect</span>
+        </div>
+        <span className="text-xs text-[var(--muted-foreground)]">Secure care workspace</span>
       </header>
 
       <main className="flex-1 flex items-start justify-center px-4 py-10">
