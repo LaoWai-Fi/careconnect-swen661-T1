@@ -24,6 +24,7 @@ interface Props {
   navigate: (page: Page) => void
   initialMessageId?: string | null
   handLeft: boolean
+  currentUser: string
 }
 
 function fileIcon(type: string) {
@@ -41,9 +42,9 @@ export default function MessagesPage({
   onArchive,
   onUnarchive,
   onSend,
-  navigate: _navigate,
   initialMessageId,
   handLeft,
+  currentUser,
 }: Props) {
   const [view, setView] = useState<"list" | "detail" | "compose">(() =>
     initialMessageId ? "detail" : "list",
@@ -83,6 +84,8 @@ export default function MessagesPage({
       const msg = messages.find((m) => m.id === selectedId)
       if (msg && !msg.read) onMarkRead(selectedId)
     }
+  // Intentionally keyed on selectedId only: re-running when messages change would re-mark on every update.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId])
 
   const selectedMessage = selectedId
@@ -125,7 +128,7 @@ export default function MessagesPage({
   function handleSend() {
     if (!canSend) return
     onSend({
-      from: "Maria Thompson",
+      from: currentUser || "Caregiver",
       to: to
         .split(",")
         .map((s) => s.trim())

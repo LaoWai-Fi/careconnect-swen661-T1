@@ -18,7 +18,9 @@ function getFocusable(el: HTMLElement): HTMLElement[] {
 export function useFocusTrap(open: boolean, onClose: () => void) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -28,7 +30,9 @@ export function useFocusTrap(open: boolean, onClose: () => void) {
     if (!container) return;
 
     // Focus first focusable element after the browser has painted
+    // (unless a field inside already took focus, e.g. via autoFocus).
     requestAnimationFrame(() => {
+      if (container.contains(document.activeElement)) return;
       const els = getFocusable(container);
       (els[0] ?? container).focus();
     });

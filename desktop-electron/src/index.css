@@ -114,8 +114,9 @@
 /* ─── Base ─── */
 html, body, #root {
   height: 100%;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: 16px;
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  /* rem so body text scales with View > Zoom and the Text size setting */
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--foreground);
   background-color: var(--background);
@@ -259,9 +260,6 @@ body.one-handed-right .ohe-panel { transform: translateX(10%); }
 }
 
 .window-control-close { background: var(--window-close); }
-.window-control { cursor: pointer; -webkit-app-region: no-drag; }
-.window-control:hover { filter: brightness(0.82); }
-.window-control:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
 
 .desktop-menubar {
   min-height: 2rem;
@@ -1319,3 +1317,81 @@ min-width: 0;
   .welcome-preview { padding-right: 9vw; }
   .preview-shell { min-height: 34rem; }
 }
+
+
+/* ---- Signed-in user (title bar account menu) ---- */
+.account-area { position: relative; }
+
+.account-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.75rem;
+  padding: 0.1rem 0.5rem 0.1rem 0.15rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-button:hover { background: var(--desktop-hover); }
+.account-button:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
+.account-button svg { width: 0.8rem; height: 0.8rem; flex: none; }
+
+.account-avatar {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.account-avatar-lg { width: 2.2rem; height: 2.2rem; font-size: 0.8rem; }
+
+.account-name {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  min-width: 16rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+  box-shadow: 0 0.75rem 2rem var(--shadow-color);
+  z-index: 90;
+}
+
+.account-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem 0.65rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+html.app-compact .account-name { display: none; }
+
+@media (forced-colors: active) {
+  .account-menu,
+  .account-button { border: 1px solid CanvasText; }
+}
+
+/* ---- Electron native shell (native frame + native menu bar) ---- */
+html.native-shell .window-drag { -webkit-app-region: no-drag; }
+html.native-shell .window-titlebar { min-height: 2.25rem; }

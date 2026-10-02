@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import TapButton from "../components/TapButton";
 import Logo from "../components/Logo";
-import WindowControls from "../components/WindowControls";
 import { Input } from "../components/FormField";
 import {
   ActivityIcon,
@@ -12,12 +11,14 @@ import {
   MedicineIcon,
 } from "../components/icons";
 import type { Page } from "../types";
+import { isDesktop } from "../lib/desktop";
 
 interface Props {
   navigate: (p: Page) => void;
 }
 
 export default function LandingPage({ navigate }: Props) {
+  const desktop = isDesktop();
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState([
@@ -47,16 +48,24 @@ export default function LandingPage({ navigate }: Props) {
           <Logo size={24} />
           <span className="font-semibold text-sm">CareConnect</span>
         </div>
-        <span className="text-xs text-[var(--muted-foreground)]">Desktop design prototype</span>
-        <WindowControls />
+        <span className="text-xs text-[var(--muted-foreground)]">Secure care workspace</span>
+        {!desktop && (
+          <div className="flex items-center gap-1 window-no-drag" aria-hidden="true">
+            <span className="window-control" />
+            <span className="window-control" />
+            <span className="window-control window-control-close" />
+          </div>
+        )}
       </div>
 
-      <div className="welcome-menubar">
-        <span>File</span>
-        <span>Edit</span>
-        <span>View</span>
-        <span>Help</span>
-      </div>
+      {!desktop && (
+        <div className="welcome-menubar" aria-hidden="true">
+          <span>File</span>
+          <span>Edit</span>
+          <span>View</span>
+          <span>Help</span>
+        </div>
+      )}
 
       <main className="welcome-main">
         <section className="welcome-copy" aria-labelledby="welcome-title">
@@ -66,7 +75,7 @@ export default function LandingPage({ navigate }: Props) {
             One calm workspace for every detail of care.
           </p>
           <p className="welcome-description">
-            Explore medication planning, appointments, daily activity, and care-team messages in one workspace.
+            Plan medication, coordinate appointments, track daily activity, and keep the whole care team in sync.
           </p>
           <div className="welcome-actions">
             <TapButton size="md" variant="primary" onClick={() => navigate("signin")}>
@@ -126,7 +135,7 @@ export default function LandingPage({ navigate }: Props) {
       </main>
 
       <footer className="desktop-statusbar">
-        <span className="flex items-center gap-2"><span className="presence-dot" /> Prototype preview</span>
+        <span className="flex items-center gap-2"><span className="presence-dot" /> Services available</span>
         <span className="ml-auto">CareConnect Desktop</span>
       </footer>
 
