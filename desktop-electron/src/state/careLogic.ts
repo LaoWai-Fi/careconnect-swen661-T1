@@ -19,6 +19,7 @@ import {
   DEFAULT_WIDGETS,
   DEMO_USER_PLACEHOLDER,
 } from "./seed"
+import { BUILD_ID } from "../lib/buildInfo"
 
 export const SIGNED_IN_PAGES: Page[] = [
   "dashboard",
@@ -328,6 +329,8 @@ export interface CareData {
   version: 1
   /** Name the records are currently attributed to (see relabelUser). */
   ownerName: string
+  /** Build that wrote this file (see lib/buildInfo). Missing in older files. */
+  buildId?: string
   medications: Medication[]
   appointments: Appointment[]
   activity: ActivityEntry[]
@@ -338,10 +341,11 @@ export interface CareData {
   fontSize: AppState["fontSize"]
 }
 
-export function toCareData(s: AppState, ownerName: string): CareData {
+export function toCareData(s: AppState, ownerName: string, buildId: string = BUILD_ID): CareData {
   return {
     version: 1,
     ownerName,
+    buildId,
     medications: s.medications,
     appointments: s.appointments,
     activity: s.activity,
@@ -431,6 +435,7 @@ function validWidget(v: unknown): boolean {
 export function parseCareData(input: unknown): CareData | null {
   if (!isObj(input) || input.version !== 1) return null
   if (input.ownerName !== undefined && !isStr(input.ownerName)) return null
+  if (input.buildId !== undefined && !isStr(input.buildId)) return null
   const {
     medications,
     appointments,

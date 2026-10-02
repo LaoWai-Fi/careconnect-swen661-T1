@@ -20,6 +20,7 @@ import AppShell from "./components/AppShell"
 import * as care from "./state/careLogic"
 import { DEMO_USER_PLACEHOLDER } from "./state/seed"
 import { baseName, getDesktop } from "./lib/desktop"
+import { isFromOtherBuild } from "./lib/buildInfo"
 
 type Theme = AppState["theme"]
 
@@ -106,7 +107,11 @@ export default function App() {
         if (cancelled) return
         if (result.ok && result.data) {
           const data = care.parseCareData(result.data)
-          if (data) {
+          if (data && isFromOtherBuild(data.buildId)) {
+            // Saved by an earlier build: start this build from the stock plan.
+            // The next autosave replaces the old file.
+            announce("New build: starting from the sample care plan")
+          } else if (data) {
             labeledAs.current = data.ownerName
             setState((s) => care.applyCareData(s, data))
           } else {

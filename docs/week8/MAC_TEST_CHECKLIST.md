@@ -31,7 +31,8 @@ Record: date ______  macOS version ______  Mac model ______  Node version ______
 | 16 | Close the window with the red button | The app keeps running (menu bar and Dock); clicking the Dock icon or Open CareConnect in the menu bar icon brings the window back | |
 | 17 | Dock badge | Receive or mark messages unread so the unread count changes | The Dock icon badge shows the unread count and clears at zero | |
 | 18 | Notifications | System Settings > Notifications > CareConnect > Allow. Record a check-in or export the care plan | A native notification appears | |
-| 19 | Persistence | Move and resize the window, add a medication, then quit with Cmd+Q and relaunch with `npm start` | Window opens at the same position and size; the medication is still there | |
+| 19 | Persistence | Move and resize the window, add a medication, then quit with Cmd+Q and relaunch with `npm run desktop` (same build, no rebuild) | Window opens at the same position and size; the medication is still there | |
+| 19b | Fresh plan per build | Quit, then run `npm start` (rebuilds) | The window keeps its position and size, but the care plan is back to the stock sample (the added medication is gone) | |
 | 20 | Dark mode | Switch System Settings > Appearance between Light and Dark | The app follows the system appearance | |
 
 ## C. Build and install the Intel installer

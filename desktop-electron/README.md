@@ -177,6 +177,7 @@ Full details, the IPC channel table and data flows: [docs/week8/ARCHITECTURE.md]
 - IPC calls are accepted only from the main window's own page, payloads are validated, and care plan data is limited to 5 MB.
 - Electron fuses: `runAsNode` off, embedded ASAR integrity validation on, `onlyLoadAppFromAsar` on.
 - The care plan is stored in `care-data.json` in the userData folder (written atomically; an unreadable file is set aside as `.corrupt`). The theme preference is kept in localStorage.
+- Each production build starts from the stock sample care plan. Every `vite build` stamps a unique build id into the bundle and into `care-data.json`; on launch, a care plan saved by a different build is ignored and replaced at the next autosave. Relaunching the same build (`npm run desktop`, or the installed app) keeps the care plan. `npm start` rebuilds, so it always starts fresh. Export and Import still move a care plan between builds. Under `npm run dev` saved data is always kept.
 
 ## Desktop features
 

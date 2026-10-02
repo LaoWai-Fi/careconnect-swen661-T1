@@ -16,9 +16,15 @@ function devCsp(): Plugin {
   }
 }
 
-export default defineConfig({
+// Every production build gets a unique id. The app saves it in care-data.json
+// and ignores a care plan saved by a different build, so each new build starts
+// from the stock sample care plan (see src/lib/buildInfo.ts).
+export default defineConfig(({ command }) => ({
   base: './',
   plugins: [react(), tailwindcss(), devCsp()],
+  define: {
+    __CARECONNECT_BUILD_ID__: JSON.stringify(command === 'build' ? new Date().toISOString() : 'dev'),
+  },
   server: { host: '127.0.0.1', port: 5173, strictPort: true },
   build: { outDir: 'dist', emptyOutDir: true },
-})
+}))
