@@ -160,8 +160,19 @@ test('window bounds and care plan persist across relaunch', async () => {
   const file = path.join(userData, 'care-data.json')
   await expect.poll(() => fs.existsSync(file) && fs.readFileSync(file, 'utf8')).toMatch(/"taken":\s*true/)
 
-  await first.app.evaluate(({ BrowserWindow }) => {
-    BrowserWindow.getAllWindows()[0].setBounds({ x: 60, y: 50, width: 1100, height: 720 })
+  // Pick a size that fits the screen: macOS caps a window at the display size, and
+  // CI runners can have a small virtual display (macos-latest arm64 is 1024 px wide).
+  const target = await first.app.evaluate(({ BrowserWindow, screen }) => {
+    const area = screen.getPrimaryDisplay().workArea
+    const wanted = {
+      x: area.x + 20,
+      y: area.y + 20,
+      width: Math.max(900, Math.min(1100, area.width - 40)),
+      height: Math.max(600, Math.min(720, area.height - 40)),
+    }
+    const win = BrowserWindow.getAllWindows()[0]
+    win.setBounds(wanted)
+    return win.getBounds()
   })
   // Window state saves are debounced; give them time before closing.
   await first.page.waitForTimeout(800)
@@ -170,8 +181,8 @@ test('window bounds and care plan persist across relaunch', async () => {
   const second = await launch(userData)
   app = second.app
   const bounds = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds())
-  expect(Math.abs(bounds.width - 1100)).toBeLessThanOrEqual(20)
-  expect(Math.abs(bounds.height - 720)).toBeLessThanOrEqual(20)
+  expect(Math.abs(bounds.width - target.width)).toBeLessThanOrEqual(20)
+  expect(Math.abs(bounds.height - target.height)).toBeLessThanOrEqual(20)
 
   await signIn(second.page)
   await clickMenuItem(app, 'Medications')
