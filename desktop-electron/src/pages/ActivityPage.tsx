@@ -7,6 +7,7 @@ const TYPE_COLORS: Record<ActivityEntry['type'], { dot: string; label: string; b
   medication_unmarked:{ dot: 'bg-amber-400', label: 'Medication unmarked', bg: 'bg-[var(--warning-bg)] border-[var(--warning-border)]' },
   task_completed:     { dot: 'bg-[var(--primary)]', label: 'Task completed', bg: 'bg-[var(--info-bg)] border-[var(--info-border)]' },
   checked_in:         { dot: 'bg-green-500', label: 'Checked in',          bg: 'bg-[var(--success-bg)] border-[var(--success-border)]' },
+  check_in_undone:    { dot: 'bg-amber-400', label: 'Check-in undone',     bg: 'bg-[var(--warning-bg)] border-[var(--warning-border)]' },
 };
 
 interface Props {
@@ -38,6 +39,7 @@ export default function ActivityPage({ state, onAddEntry }: Props) {
     { id: 'medication_unmarked' as const, label: 'Medication unmarked', dot: 'bg-amber-400' },
     { id: 'task_completed' as const,     label: 'Task completed',       dot: 'bg-[var(--primary)]' },
     { id: 'checked_in' as const,         label: 'Checked in',           dot: 'bg-green-500' },
+    { id: 'check_in_undone' as const,    label: 'Check-in undone',      dot: 'bg-amber-400' },
   ];
 
   const pillBase = 'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-[var(--ring)]';

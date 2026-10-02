@@ -61,7 +61,7 @@ function buildMenuTemplate({ send, signedIn, isMac, isDev, onAbout, onReportIssu
   template.push({
     label: '&File',
     submenu: [
-      cmd('&New message', 'compose', 'CmdOrCtrl+N'),
+      cmd('&Messages Menu', 'compose', 'CmdOrCtrl+N'),
       { type: 'separator' },
       cmd('&Save care plan', 'save', 'CmdOrCtrl+S'),
       cmd('&Export care plan…', 'export', 'CmdOrCtrl+E'),

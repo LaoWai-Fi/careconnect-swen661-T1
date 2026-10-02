@@ -11,6 +11,7 @@ interface Props {
   onReorderWidgets: (widgets: DashboardWidget[]) => void
   onToggleMedTaken: (id: string) => void
   onCheckIn: () => void
+  onUndoCheckIn?: () => void
   handLeft?: boolean
   onViewMessage: (id: string) => void
 }
@@ -22,6 +23,7 @@ function StatCard({
   sub,
   accent,
   onClick,
+  ariaLabel,
 }: {
   icon: string
   label: string
@@ -29,11 +31,13 @@ function StatCard({
   sub: string
   accent: string
   onClick?: () => void
+  ariaLabel?: string
 }) {
   const ripple = useTapRipple()
   return (
     <button
       onClick={onClick}
+      aria-label={ariaLabel}
       onPointerDown={ripple}
       className={`text-left rounded-2xl border-2 p-4 flex flex-col gap-1 transition-all active:scale-[0.98] focus-visible:outline-[3px] focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2 ${accent}`}
     >
@@ -274,6 +278,7 @@ export default function DashboardPage({
   onReorderWidgets,
   onToggleMedTaken,
   onCheckIn,
+  onUndoCheckIn,
   handLeft,
   onViewMessage,
 }: Props) {
@@ -306,9 +311,14 @@ export default function DashboardPage({
   }
 
   function handleCheckIn() {
-    if (checkedIn) return
-    onCheckIn()
-    setCheckInFeedback("✓ Check-in recorded!")
+    if (checkedIn) {
+      // Pressing the card again undoes the check-in (no drag-only or hidden undo).
+      onUndoCheckIn?.()
+      setCheckInFeedback("↩ Check-in undone")
+    } else {
+      onCheckIn()
+      setCheckInFeedback("✓ Check-in recorded!")
+    }
     setTimeout(() => setCheckInFeedback(""), 3000)
   }
 
@@ -429,7 +439,12 @@ export default function DashboardPage({
                   icon="👤"
                   label="Check-in"
                   value={checkedIn ? "Done" : "Not yet"}
-                  sub={checkedIn ? "Completed" : "Awaiting check-in"}
+                  sub={checkedIn ? "Completed · press to undo" : "Awaiting check-in"}
+                  ariaLabel={
+                    checkedIn
+                      ? "Check-in done. Press to undo the check-in"
+                      : "Check-in not yet recorded. Press to record Margaret's check-in"
+                  }
                   accent={
                     checkedIn
                       ? "bg-[var(--success-bg)] border-[var(--success-border)]"

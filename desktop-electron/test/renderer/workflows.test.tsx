@@ -100,3 +100,32 @@ test("dialogs trap keyboard focus (Tab and Shift+Tab wrap)", async () => {
   await user.tab({ shift: true })
   expect(focusable[focusable.length - 1]).toHaveFocus()
 })
+
+test("dashboard check-in and undo both appear in the Activity log", async () => {
+  installBridge()
+  const { user } = setup()
+  await signIn(user)
+  await user.click(screen.getByRole("button", { name: /press to record margaret's check-in/i }))
+  await user.click(screen.getByRole("button", { name: /press to undo the check-in/i }))
+  await goTo(user, "Activity")
+  expect(screen.getByText("Margaret checked in")).toBeInTheDocument()
+  expect(screen.getByText("Margaret's check-in was undone")).toBeInTheDocument()
+  await user.click(screen.getByRole("button", { name: "Check-in undone" }))
+  expect(screen.queryByText("Margaret checked in")).not.toBeInTheDocument()
+})
+
+test("toolbar New message opens a blank compose form, also when Messages is already open", async () => {
+  installBridge()
+  const { user } = setup()
+  await signIn(user)
+  const toolbar = screen.getByRole("toolbar", { name: "Primary actions" })
+  await user.click(within(toolbar).getByRole("button", { name: /new message/i }))
+  expect(await screen.findByRole("heading", { name: "New Message" })).toBeInTheDocument()
+  expect(screen.queryByRole("button", { name: /compose new message/i })).not.toBeInTheDocument()
+
+  // From the Messages list itself
+  await user.click(screen.getByRole("button", { name: /back to messages|← back/i }))
+  expect(screen.getByRole("button", { name: /compose new message/i })).toBeInTheDocument()
+  await user.click(within(toolbar).getByRole("button", { name: /new message/i }))
+  expect(await screen.findByRole("heading", { name: "New Message" })).toBeInTheDocument()
+})

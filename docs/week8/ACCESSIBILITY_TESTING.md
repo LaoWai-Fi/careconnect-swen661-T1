@@ -70,7 +70,7 @@ The team records the video (QuickTime Player > File > New Screen Recording, with
 2. (0:15) Launch the app. With VoiceOver speaking, press VO+Right Arrow through the landing page, activate Sign in with VO+Space, type an email and any password, press Return.
 3. (0:45) On the dashboard press Ctrl+F2 (or VO+M) to reach the menu bar, open the View menu and choose Medications (or press Cmd+2). Show VoiceOver reading the page heading.
 4. (1:10) Move to a medication, press VO+Space on Mark as taken and let VoiceOver read the status message.
-5. (1:30) Press Cmd+N to open a new message, type a short message, press Escape to cancel. Show focus returning.
+5. (1:30) Press Cmd+N to open the Messages page, choose New Message, type a short message, press Escape to cancel. Show focus returning.
 6. (1:50) Press Cmd+, to open Settings. Toggle High contrast (Shift+Cmd+H) and Left-Hand Mode (Shift+Cmd+L). Show the visible focus ring. Optionally open VO+U to show headings and landmarks.
 7. (2:25) Press F1 to show the shortcuts list. Close it with Escape. Say what was demonstrated, press Cmd+F5 to stop VoiceOver and end.
 

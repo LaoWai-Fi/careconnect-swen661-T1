@@ -15,6 +15,7 @@ function Harness({ initial, navigate, onView }: { initial: AppState; navigate: (
       onReorderWidgets={(widgets) => setState((s) => ({ ...s, dashboardWidgets: widgets }))}
       onToggleMedTaken={(id) => setState((s) => care.toggleMedTaken(s, id))}
       onCheckIn={() => setState((s) => care.checkIn(s))}
+      onUndoCheckIn={() => setState((s) => care.undoCheckIn(s))}
       onViewMessage={onView}
     />
   )
@@ -40,15 +41,16 @@ describe("DashboardPage", () => {
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuemax")
   })
 
-  test("check-in from the status card records it once", async () => {
+  test("check-in from the status card records it, and pressing again undoes it", async () => {
     const { user } = renderDashboard()
-    const checkIn = screen.getByRole("button", { name: /check-in/i })
-    await user.click(checkIn)
+    await user.click(screen.getByRole("button", { name: /press to record margaret's check-in/i }))
     expect(screen.getByText(/check-in recorded/i)).toBeInTheDocument()
     expect(screen.getByText("Done")).toBeInTheDocument()
-    await user.click(checkIn)
+    await user.click(screen.getByRole("button", { name: /press to undo the check-in/i }))
+    expect(screen.getByText(/check-in undone/i)).toBeInTheDocument()
+    expect(screen.getByText("Not yet")).toBeInTheDocument()
     act(() => jest.advanceTimersByTime(3100))
-    expect(screen.queryByText(/check-in recorded/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/check-in undone/i)).not.toBeInTheDocument()
   })
 
   test("medication quick toggle marks taken and unmarks", async () => {

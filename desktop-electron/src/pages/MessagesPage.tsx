@@ -23,6 +23,9 @@ interface Props {
   }) => void
   navigate: (page: Page) => void
   initialMessageId?: string | null
+  /** When true, open a blank compose form, then call onComposeStarted. */
+  startCompose?: boolean
+  onComposeStarted?: () => void
   handLeft: boolean
   currentUser: string
 }
@@ -43,11 +46,13 @@ export default function MessagesPage({
   onUnarchive,
   onSend,
   initialMessageId,
+  startCompose,
+  onComposeStarted,
   handLeft,
   currentUser,
 }: Props) {
   const [view, setView] = useState<"list" | "detail" | "compose">(() =>
-    initialMessageId ? "detail" : "list",
+    startCompose ? "compose" : initialMessageId ? "detail" : "list",
   )
   const [selectedId, setSelectedId] = useState<string | null>(
     () => initialMessageId ?? null,
@@ -124,6 +129,17 @@ export default function MessagesPage({
     setAttachments([])
     setView("compose")
   }
+
+  // Toolbar "New message": open a blank compose form, whether this page was
+  // just opened for it or was already showing (state adjusted during render).
+  const [composeSeen, setComposeSeen] = useState(!!startCompose)
+  if (!!startCompose !== composeSeen) {
+    setComposeSeen(!!startCompose)
+    if (startCompose) openCompose()
+  }
+  useEffect(() => {
+    if (startCompose) onComposeStarted?.()
+  }, [startCompose, onComposeStarted])
 
   function handleSend() {
     if (!canSend) return

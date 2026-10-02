@@ -60,6 +60,8 @@ export default function App() {
   // so autosave never overwrites the file with seed data on startup.
   const [loaded, setLoaded] = useState(!desktop)
   const [notice, setNotice] = useState<Notice | null>(null)
+  // Set by the toolbar's "New message" button; MessagesPage opens compose and clears it.
+  const [composePending, setComposePending] = useState(false)
   const noticeId = useRef(0)
 
   const announce = useCallback((text: string) => {
@@ -201,6 +203,15 @@ export default function App() {
     )
   }
 
+  function handleNewMessage() {
+    setComposePending(true)
+    navigate("messages")
+  }
+
+  function handleUndoCheckIn() {
+    update((s) => care.undoCheckIn(s, new Date()))
+  }
+
   async function handleExport() {
     if (!desktop) return
     const result = await desktop.exportCareData(careData)
@@ -255,6 +266,7 @@ export default function App() {
       onExport={desktop ? () => void handleExport() : undefined}
       onImport={desktop ? () => void handleImport() : undefined}
       onCheckIn={handleCheckIn}
+      onNewMessage={handleNewMessage}
       notice={notice}
     >
       {page === "dashboard" && (
@@ -267,6 +279,7 @@ export default function App() {
           }
           onToggleMedTaken={(id) => update((s) => care.toggleMedTaken(s, id))}
           onCheckIn={handleCheckIn}
+          onUndoCheckIn={handleUndoCheckIn}
           handLeft={state.handMode === "left"}
           onViewMessage={(id) => update((s) => care.viewMessage(s, id))}
         />
@@ -311,6 +324,8 @@ export default function App() {
           onSend={(data) => update((s) => care.sendMessage(s, data))}
           navigate={navigate}
           initialMessageId={state.viewingMessageId}
+          startCompose={composePending}
+          onComposeStarted={() => setComposePending(false)}
           handLeft={state.handMode === "left"}
         />
       )}

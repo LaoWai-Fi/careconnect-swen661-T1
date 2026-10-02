@@ -202,7 +202,7 @@ On Mac the Command key is used. On Windows and Linux the same shortcuts use Ctrl
 | Mac | Windows / Linux | Action |
 |---|---|---|
 | ⌘1 to ⌘5 | Ctrl+1 to Ctrl+5 | Overview, Medications, Appointments, Activity, Messages |
-| ⌘N | Ctrl+N | New message |
+| ⌘N | Ctrl+N | Messages Menu (opens Messages) |
 | ⌘S | Ctrl+S | Save care plan |
 | ⌘E | Ctrl+E | Export care plan |
 | ⌘O | Ctrl+O | Import care plan |

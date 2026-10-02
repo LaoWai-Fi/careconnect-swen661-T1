@@ -106,7 +106,7 @@ End-to-end tests (Playwright `_electron`, run under xvfb):
 | Test plan theme | Where it is tested |
 |---|---|
 | Sign in | `App.test.tsx` (landing to sign in to dashboard, required field validation), `pages.test.tsx` (sign in, sign up validation), e2e test 3 |
-| Dashboard check-in | `dashboard.test.tsx` (check-in recorded once, widgets, alerts, customize), `careLogic.test.ts` |
+| Dashboard check-in | `dashboard.test.tsx` (check-in recorded and undone, widgets, alerts, customize), `careLogic.test.ts` |
 | Medications: add, edit, delete, mark taken | `pages.test.tsx` (add with validation, edit, delete with confirmation, mark taken), `dashboard.test.tsx` (quick toggle), `workflows.test.tsx` |
 | Appointments: add, edit, delete | `pages.test.tsx`, `workflows.test.tsx` |
 | Activity filter | `pages.test.tsx` (filters entries and refreshes), `workflows.test.tsx` |

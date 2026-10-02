@@ -145,10 +145,18 @@ describe("appointments, activity and dashboard", () => {
     expect(s.appointments).toHaveLength(DEFAULT_APPTS.length)
   })
 
-  test("checkIn records the check-in", () => {
+  test("checkIn records the check-in once", () => {
     const s = care.checkIn(fresh(), NOON)
     expect(s.checkedIn).toBe(true)
     expect(s.activity[0]).toMatchObject({ type: "checked_in", timestamp: "12:00 PM" })
+    expect(care.checkIn(s, NOON)).toBe(s)
+  })
+
+  test("undoCheckIn clears the check-in and logs it", () => {
+    const s = care.undoCheckIn(care.checkIn(fresh(), NOON), NOON)
+    expect(s.checkedIn).toBe(false)
+    expect(s.activity.map((a) => a.type)).toEqual(["check_in_undone", "checked_in"])
+    expect(care.undoCheckIn(s, NOON)).toBe(s)
   })
 
   test("addActivity and toggleWidget", () => {

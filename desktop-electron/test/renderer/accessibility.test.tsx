@@ -42,6 +42,11 @@ test("settings, shortcuts and emergency dialogs", async () => {
   await user.keyboard("{Escape}")
   await user.click(screen.getByRole("button", { name: /emergency/i }))
   await expectNoViolations()
+  await user.click(screen.getByRole("button", { name: /sos emergency call/i }))
+  await expectNoViolations()
+  await user.click(screen.getByRole("button", { name: "End call" }))
+  await user.click(screen.getByRole("button", { name: /switch care recipient/i }))
+  await expectNoViolations()
 })
 
 test("medication and appointment forms", async () => {

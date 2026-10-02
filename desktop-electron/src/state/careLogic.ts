@@ -282,10 +282,22 @@ export function deleteAppointment(s: AppState, id: string): AppState {
 // ── Activity / dashboard ─────────────────────────────────────────────────
 
 export function checkIn(s: AppState, now: Date = new Date()): AppState {
+  // Already checked in (e.g. the tray item pressed twice): nothing new to log.
+  if (s.checkedIn) return s
   return {
     ...s,
     checkedIn: true,
     activity: logActivity(s, "checked_in", "Margaret checked in", now),
+  }
+}
+
+/** Reverses today's check-in and records that in the activity log. */
+export function undoCheckIn(s: AppState, now: Date = new Date()): AppState {
+  if (!s.checkedIn) return s
+  return {
+    ...s,
+    checkedIn: false,
+    activity: logActivity(s, "check_in_undone", "Margaret's check-in was undone", now),
   }
 }
 
@@ -374,6 +386,7 @@ const ACTIVITY_TYPES = [
   "medication_unmarked",
   "task_completed",
   "checked_in",
+  "check_in_undone",
 ]
 
 function validActivity(v: unknown): v is ActivityEntry {

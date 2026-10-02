@@ -22,7 +22,7 @@ Record: date ______  macOS version ______  Mac model ______  Node version ______
 | 7 | `npm start` | CareConnect opens with the landing page; the menu bar shows CareConnect, File, Edit, View, Window, Help | |
 | 8 | Sign in with any password | Dashboard appears; the File, Edit and View care plan items become enabled | |
 | 9 | CareConnect menu | About CareConnect shows the native About panel (version 0.8.0, copyright, sample data note); Settings... (Cmd+,) opens Settings; Hide, Hide Others and Quit work | |
-| 10 | File menu | New message (Cmd+N), Save care plan (Cmd+S), Export (Cmd+E, native save dialog), Import (Cmd+O, native open dialog), Print (Cmd+P), Sign out, Close Window (Cmd+W) | |
+| 10 | File menu | Messages Menu (Cmd+N), Save care plan (Cmd+S), Export (Cmd+E, native save dialog), Import (Cmd+O, native open dialog), Print (Cmd+P), Sign out, Close Window (Cmd+W) | |
 | 11 | Edit menu | Undo, Redo, Cut, Copy, Paste, Select All in a text field; Find in CareConnect (Cmd+F) | |
 | 12 | View menu | Overview to Messages with Cmd+1 to Cmd+5; zoom with Cmd+=, Cmd+- and Cmd+0; Left-hand mode (Shift+Cmd+L); High contrast (Shift+Cmd+H); full screen with Ctrl+Cmd+F | |
 | 13 | Window menu | Minimize (Cmd+M), Zoom, Bring All to Front | |

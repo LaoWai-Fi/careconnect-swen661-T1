@@ -97,6 +97,8 @@ interface Props {
   onExport?: () => void
   onImport?: () => void
   onCheckIn?: () => void
+  /** Toolbar "New message": open Messages straight into a blank compose form. */
+  onNewMessage?: () => void
   /** Latest status message from App (save results, import/export, errors). */
   notice?: { id: number; text: string } | null
   children: React.ReactNode
@@ -118,6 +120,7 @@ export default function AppShell({
   onExport,
   onImport,
   onCheckIn,
+  onNewMessage,
   notice,
   children,
 }: Props) {
@@ -128,6 +131,9 @@ export default function AppShell({
     useState<"general" | "accessibility" | "sync">("general")
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [sosOpen, setSosOpen] = useState(false)
+  // Demo emergency call: the UI shows a call in progress, but nothing is dialed.
+  const [sosCalling, setSosCalling] = useState(false)
+  const [recipientOpen, setRecipientOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [highContrast, setHighContrast] = useState(
@@ -153,7 +159,11 @@ export default function AppShell({
   const shortcutsRef = useFocusTrap(shortcutsOpen, () =>
     setShortcutsOpen(false),
   )
-  const sosRef = useFocusTrap(sosOpen, () => setSosOpen(false))
+  const closeSos = () => {
+    setSosOpen(false)
+    setSosCalling(false)
+  }
+  const sosRef = useFocusTrap(sosOpen, closeSos)
 
   const unreadMessages = state.messages.filter(
     (message) => !message.read && !message.archived,
@@ -280,6 +290,16 @@ export default function AppShell({
     window.addEventListener("mousedown", closeAccount)
     return () => window.removeEventListener("mousedown", closeAccount)
   }, [accountOpen])
+
+  useEffect(() => {
+    if (!recipientOpen) return
+    function closeRecipient(event: MouseEvent) {
+      if (!(event.target as HTMLElement).closest("[data-recipient-menu]"))
+        setRecipientOpen(false)
+    }
+    window.addEventListener("mousedown", closeRecipient)
+    return () => window.removeEventListener("mousedown", closeRecipient)
+  }, [recipientOpen])
 
   function changeZoom(direction: 1 | -1 | 0) {
     setAppZoom((current) => {
@@ -669,7 +689,7 @@ export default function AppShell({
           <TapButton
             size="xs"
             variant="primary"
-            onClick={() => navigate("messages")}
+            onClick={() => (onNewMessage ? onNewMessage() : navigate("messages"))}
           >
             <PlusIcon /> New message
           </TapButton>
@@ -788,19 +808,91 @@ export default function AppShell({
 
       <div className="desktop-workspace">
         <aside className="desktop-sidebar" aria-label="CareConnect navigation">
-          <div className="sidebar-profile">
-            <div className="profile-avatar" aria-hidden="true">
-              MT
-            </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-sm truncate">
-                Margaret Thompson
-              </p>
-              <p className="text-xs text-[var(--muted-foreground)] truncate">
-                Care recipient
-              </p>
-            </div>
-            <ChevronDownIcon />
+          <div className="recipient-area" data-recipient-menu>
+            <button
+              type="button"
+              className="sidebar-profile recipient-button"
+              aria-haspopup="menu"
+              aria-expanded={recipientOpen}
+              aria-label="Care recipient: Margaret Thompson. Switch care recipient"
+              title="Switch care recipient"
+              onClick={() => setRecipientOpen(!recipientOpen)}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowDown") {
+                  event.preventDefault()
+                  setRecipientOpen(true)
+                  window.setTimeout(
+                    () =>
+                      document
+                        .querySelector<HTMLElement>(
+                          ".recipient-menu [role='menuitemradio']",
+                        )
+                        ?.focus(),
+                    0,
+                  )
+                }
+              }}
+            >
+              <span className="profile-avatar" aria-hidden="true">
+                MT
+              </span>
+              <span className="min-w-0">
+                <span className="block font-semibold text-sm truncate">
+                  Margaret Thompson
+                </span>
+                <span className="block text-xs text-[var(--muted-foreground)] truncate">
+                  Care recipient
+                </span>
+              </span>
+              <ChevronDownIcon />
+            </button>
+            {recipientOpen && (
+              <div
+                className="account-menu recipient-menu"
+                role="menu"
+                aria-label="Care recipients"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" || event.key === "Tab") {
+                    if (event.key === "Escape") event.stopPropagation()
+                    setRecipientOpen(false)
+                    if (event.key === "Escape")
+                      document
+                        .querySelector<HTMLElement>(".recipient-button")
+                        ?.focus()
+                  }
+                }}
+              >
+                <p className="recipient-menu-label">Care recipients</p>
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked="true"
+                  className="desktop-menu-item recipient-option"
+                  onClick={() => {
+                    setRecipientOpen(false)
+                    setStatus("Viewing Margaret Thompson's care plan")
+                    document
+                      .querySelector<HTMLElement>(".recipient-button")
+                      ?.focus()
+                  }}
+                >
+                  <span className="profile-avatar" aria-hidden="true">
+                    MT
+                  </span>
+                  <span className="min-w-0 flex-1 text-left">
+                    <span className="block font-semibold text-sm leading-tight">
+                      Margaret Thompson
+                    </span>
+                    <span className="block text-xs text-[var(--muted-foreground)]">
+                      Currently viewing
+                    </span>
+                  </span>
+                  <span className="recipient-check" aria-hidden="true">
+                    ✓
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
           <nav className="flex-1 p-2" aria-label="Main navigation">
             <p className="sidebar-label">Workspace</p>
@@ -1237,7 +1329,7 @@ export default function AppShell({
                 />
                 <Shortcut label="Navigate menus" keys="Arrow keys" />
                 <Shortcut
-                  label="Overview through Messages"
+                  label="Navigate to Page (Overview through Messages)"
                   keys="Ctrl/Cmd 1–5"
                 />
                 <Shortcut label="Close menu or dialog" keys="Esc" />
@@ -1255,7 +1347,7 @@ export default function AppShell({
               </div>
               <div>
                 <p className="settings-heading">Actions</p>
-                <Shortcut label="New message" keys="Ctrl/Cmd N" />
+                <Shortcut label="Messages Menu" keys="Ctrl/Cmd N" />
                 <Shortcut label="Save care plan" keys="Ctrl/Cmd S" />
                 <Shortcut label="Export care plan" keys="Ctrl/Cmd E" />
                 <Shortcut label="Import care plan" keys="Ctrl/Cmd O" />
@@ -1314,35 +1406,64 @@ export default function AppShell({
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="emergency-title"
+            aria-describedby="emergency-description"
           >
-            <div className="emergency-icon">
-              <EmergencyIcon />
+            <div
+              className={`emergency-header ${sosCalling ? "emergency-header-calling" : ""}`}
+            >
+              <span className="emergency-siren" aria-hidden="true">
+                {sosCalling ? "📞" : "🚨"}
+              </span>
+              <p id="emergency-title" className="emergency-title">
+                {sosCalling ? "Calling 911…" : "Emergency"}
+              </p>
+              <p
+                id="emergency-description"
+                className="emergency-body"
+                aria-live="assertive"
+              >
+                {sosCalling
+                  ? "Connecting to emergency services. Stay with Margaret and keep this window open."
+                  : "Press the button below to call emergency services immediately."}
+              </p>
             </div>
-            <p id="emergency-title" className="text-xl font-bold">
-              Emergency assistance
-            </p>
-            <p className="text-sm text-[var(--muted-foreground)] text-center">
-              CareConnect cannot place phone calls. If Margaret needs urgent
-              help, call 911 from your phone now. Her care plan stays open here.
-            </p>
-            <div className="flex justify-end gap-2 w-full">
-              <TapButton
-                size="xs"
-                variant="outline"
-                onClick={() => setSosOpen(false)}
-              >
-                Cancel
-              </TapButton>
-              <TapButton
-                size="xs"
-                variant="destructive"
-                onClick={() => {
-                  setSosOpen(false)
-                  setStatus("Emergency reminder shown: call 911 from your phone")
-                }}
-              >
-                I understand
-              </TapButton>
+            <div className="emergency-actions">
+              {sosCalling ? (
+                <TapButton
+                  size="lg"
+                  variant="destructive"
+                  fullWidth
+                  autoFocus
+                  onClick={() => {
+                    closeSos()
+                    setStatus("Emergency call ended")
+                  }}
+                >
+                  End call
+                </TapButton>
+              ) : (
+                <>
+                  <TapButton
+                    size="lg"
+                    variant="destructive"
+                    fullWidth
+                    onClick={() => {
+                      setSosCalling(true)
+                      setStatus("Emergency call in progress")
+                    }}
+                  >
+                    📞 SOS Emergency Call
+                  </TapButton>
+                  <TapButton
+                    size="md"
+                    variant="ghost"
+                    fullWidth
+                    onClick={closeSos}
+                  >
+                    Cancel
+                  </TapButton>
+                </>
+              )}
             </div>
           </div>
         </div>
