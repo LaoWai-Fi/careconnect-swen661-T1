@@ -11,7 +11,7 @@ Record: date ______  macOS version ______  Mac model ______  Node version ______
 | 1 | Get the branch | `git pull` on `feat/electron-buiild-wk8` (or `git clone`, then `git checkout feat/electron-buiild-wk8`), then `cd desktop-electron` | Branch is up to date | |
 | 2 | Install | `npm ci` | Finishes without errors | |
 | 3 | Lint | `npm run lint` | Zero warnings | |
-| 4 | Unit and component tests | `npm run test:coverage` | 211 tests pass, coverage above 75 percent (about 97 percent statements) | |
+| 4 | Unit and component tests | `npm run test:coverage` | 222 tests pass, coverage above 75 percent (about 97.6 percent statements) | |
 | 5 | Coverage screenshot | Open `coverage/lcov-report/index.html` in a browser and take a screenshot (Shift+Cmd+4). Save it as `docs/week8/evidence/coverage-summary.png` | Screenshot shows the totals | |
 | 6 | End to end tests | `npm run test:e2e` | 5 pass (a real Electron window flashes on screen) | |
 

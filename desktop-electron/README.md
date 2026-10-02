@@ -63,7 +63,7 @@ npm run typecheck        # tsc --noEmit
 
 - The HTML coverage report is written to `coverage/lcov-report/index.html`.
 - On Linux without a display, run the end-to-end tests as `xvfb-run -a npm run test:e2e`.
-- Current results: 211 Jest tests pass (19 suites), 97.53% statements / 92.70% branches / 96.86% functions / 98.36% lines, and 5 Electron end-to-end tests pass. See [docs/week8/TEST_REPORT.md](../docs/week8/TEST_REPORT.md).
+- Current results: 222 Jest tests pass (20 suites), 97.61% statements / 92.57% branches / 97.11% functions / 98.42% lines, and 5 Electron end-to-end tests pass (also on an Intel Mac). See [docs/week8/TEST_REPORT.md](../docs/week8/TEST_REPORT.md).
 
 ## Packaging
 

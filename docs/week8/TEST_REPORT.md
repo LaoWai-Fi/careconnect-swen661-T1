@@ -20,17 +20,18 @@ npm run typecheck        # tsc --noEmit
 |---|---|
 | `npx tsc --noEmit` | Pass, no errors |
 | `npm run lint` | Pass, zero warnings |
-| `npx jest --coverage` | 19 suites, 211 tests, all passed |
+| `npx jest --coverage` | 20 suites, 222 tests, all passed |
 | `xvfb-run -a npm run test:e2e` | 5 of 5 passed (real Electron) |
+| `npm run test:e2e` on an Intel Mac | 5 of 5 passed (real Electron, macOS) |
 
 ### Coverage totals
 
 | Metric | Percent | Covered / total |
 |---|---|---|
-| Statements | 97.53% | 1541 / 1580 |
-| Branches | 92.70% | 1017 / 1097 |
-| Functions | 96.86% | 556 / 574 |
-| Lines | 98.36% | 1321 / 1343 |
+| Statements | 97.61% | 1599 / 1638 |
+| Branches | 92.57% | 1073 / 1159 |
+| Functions | 97.11% | 572 / 589 |
+| Lines | 98.42% | 1372 / 1394 |
 
 The coverage target for the assignment is 75%. `src/types.ts` (type declarations only) is excluded from coverage. The e2e tests run the real Electron app and are not included in the Jest coverage numbers.
 
@@ -40,58 +41,60 @@ The coverage target for the assignment is 75%. `src/types.ts` (type declarations
 
 | File | Stmts | Branch | Funcs | Lines | Uncovered lines |
 |---|---|---|---|---|---|
-| electron (folder) | 98.14 | 92.5 | 95.28 | 98.9 | |
+| electron (folder) | 98.15 | 93 | 95.28 | 98.91 | |
 | careStore.cjs | 97.56 | 100 | 83.33 | 100 | |
 | channels.cjs | 100 | 100 | 100 | 100 | |
 | ipc.cjs | 100 | 100 | 100 | 100 | |
-| main.cjs | 96.26 | 83.56 | 92.3 | 97.39 | 193-194, 247 |
+| main.cjs | 96.32 | 85.52 | 92.3 | 97.45 | 202-203, 255 |
 | menu.cjs | 100 | 96.15 | 100 | 100 | 136 |
 | preload.cjs | 95.65 | 83.33 | 91.66 | 100 | 54 |
 | security.cjs | 100 | 95.83 | 100 | 100 | 43 |
 | tray.cjs | 100 | 100 | 100 | 100 | |
 | updater.cjs | 93.75 | 81.81 | 80 | 92.85 | 8 |
 | windowState.cjs | 100 | 96.55 | 100 | 100 | 92 |
-| src (folder) | 97.36 | 83.62 | 100 | 99.43 | |
-| App.tsx | 97.68 | 86.17 | 100 | 99.24 | 34 |
+| src (folder) | 97.45 | 84.16 | 100 | 99.45 | |
+| App.tsx | 97.79 | 86.73 | 100 | 99.28 | 35 |
 | useFocusTrap.ts | 95.34 | 72.72 | 100 | 100 | 30, 37, 48, 52-62 |
 | useTapRipple.ts | 100 | 100 | 100 | 100 | |
-| src/components (folder) | 96.61 | 93.95 | 95.38 | 97.1 | |
-| AppShell.tsx | 96.56 | 95.68 | 94.49 | 97.11 | 268, 389, 632-634, 945, 985, 1203 |
+| src/components (folder) | 97.12 | 93.2 | 96.37 | 97.32 | |
+| AppShell.tsx | 97.12 | 94.34 | 95.72 | 97.35 | 278, 409, 652-654, 1037, 1077, 1295 |
 | ConfirmDialog.tsx | 100 | 100 | 100 | 100 | |
 | FormField.tsx | 88.88 | 89.47 | 100 | 88.88 | 20 |
 | Logo.tsx | 100 | 0 | 100 | 100 | 1 |
 | TapButton.tsx | 100 | 60 | 100 | 100 | 11-12 |
 | icons.tsx | 100 | 100 | 100 | 100 | |
-| src/lib (folder) | 83.33 | 66.66 | 100 | 100 | |
+| src/lib (folder) | 90 | 72.72 | 100 | 100 | |
+| buildInfo.ts | 100 | 80 | 100 | 100 | 4 |
 | desktop.ts | 83.33 | 66.66 | 100 | 100 | 48, 59 |
-| src/pages (folder) | 97.27 | 93.35 | 96.33 | 97.93 | |
+| src/pages (folder) | 97.32 | 93.58 | 96.35 | 97.97 | |
 | ActivityPage.tsx | 100 | 100 | 100 | 100 | |
 | AppointmentsPage.tsx | 98.14 | 100 | 95.65 | 98.03 | 328 |
-| DashboardPage.tsx | 96.42 | 94.04 | 96.07 | 96.96 | 557, 591, 632 |
+| DashboardPage.tsx | 96.46 | 94.18 | 96.07 | 97.02 | 572, 606, 647 |
 | LandingPage.tsx | 100 | 100 | 100 | 100 | |
 | MedicationsPage.tsx | 94.23 | 94.44 | 92 | 95.12 | 161, 240 |
-| MessagesPage.tsx | 96.96 | 89.6 | 96.42 | 98.34 | 64, 532 |
+| MessagesPage.tsx | 97.14 | 90.22 | 96.49 | 98.42 | 69, 548 |
 | SignInPage.tsx | 100 | 90 | 100 | 100 | 31 |
 | SignUpPage.tsx | 100 | 92.85 | 100 | 100 | 34 |
-| src/state (folder) | 100 | 97.56 | 100 | 100 | |
-| careLogic.ts | 100 | 97.5 | 100 | 100 | 36-42, 113 |
+| src/state (folder) | 99.21 | 96.99 | 100 | 100 | |
+| careLogic.ts | 99.1 | 96.92 | 100 | 100 | 37-43, 114, 438 |
 | seed.ts | 100 | 100 | 100 | 100 | |
 
 ## Test inventory by layer
 
 | Layer | Files | Tests | What it covers |
 |---|---|---|---|
-| Unit: pure logic | `test/renderer/careLogic.test.ts` | 34 | Care plan logic: sign in, medications, appointments, messages, check-in, unread count, import/export parsing |
+| Unit: pure logic | `test/renderer/careLogic.test.ts` | 35 | Care plan logic: sign in, medications, appointments, messages, check-in and undo, unread count, import/export parsing |
 | Unit: main process modules | `test/main/menu`, `ipc`, `careStore`, `tray`, `security`, `updater`, `preload` | 62 | Menu template and accelerators (including the macOS app menu, About role and Help role), IPC handlers (sender check, validation, errors), atomic store, tray menu, security helpers, updater, preload bridge and channel sync |
-| Main process bootstrap | `test/main/main.test.cjs` | 19 | Whole main process against a fake Electron: window options, single instance, session updates, title and badge, menu commands, macOS About panel, menu bar template icon, macOS lifecycle |
+| Main process bootstrap | `test/main/main.test.cjs` | 21 | Whole main process against a fake Electron: window options, single instance, session updates, title and badge, menu commands, macOS About panel, menu bar template icon, macOS lifecycle (close hides the window and keeps the session; quit really closes) |
 | IPC integration | `test/main/ipc.integration.test.cjs` | 6 | Real preload bridge talking to the real main-process IPC handlers |
 | Window management integration | `test/main/windowState.test.cjs` | 12 | Saving and restoring bounds, off-screen correction, maximized state, debounce and close handling |
-| Component and workflow | `App`, `appShell`, `pages`, `dashboard`, `messages`, `workflows` under `test/renderer/` | 69 | React Testing Library: every page, dialog, menu, settings, native menu commands, autosave, import and export, keyboard handling |
+| Component and workflow | `App`, `appShell`, `pages`, `dashboard`, `messages`, `workflows` under `test/renderer/` | 72 | React Testing Library: every page, dialog, menu, settings, native menu commands, autosave, import and export, keyboard handling, emergency SOS prompt, check-in undo in the Activity log, care recipient menu, toolbar New message |
+| Fresh plan per build | `test/renderer/buildReset.test.tsx` | 5 | A care plan saved by a different build (or with no build id) is ignored at startup; one saved by the same build is restored; dev runs always keep data |
 | macOS renderer variant | `test/renderer/macPlatform.test.tsx` | 1 | `navigator.platform` set to MacIntel before the app is loaded in an isolated module registry: the sidebar shows the Command symbol and the F1 dialog shows the macOS "Move to the menu bar" row |
 | Accessibility (axe) | `test/renderer/accessibility.test.tsx` | 8 | jest-axe on every screen and dialog (landing, sign in, dashboard and pages, settings, shortcuts, emergency, forms) |
 | End to end (real Electron) | `test/e2e/desktop.spec.ts` | 5 | Launch and native menu, security flags, sign in and menu navigation, autosave file, relaunch persistence |
 
-Jest totals by project: main process 99 tests, renderer 112 tests, 211 in total (per-file counts: careLogic 34, App 21, pages 18, careStore 12, windowState 12, appShell 12, main 19, ipc 15, menu 12, macPlatform 1, dashboard 8, messages 8, accessibility 8, preload 7, ipc.integration 6, security 6, tray 5, updater 5, workflows 2).
+Jest totals by project: main process 101 tests, renderer 121 tests, 222 in total (per-file counts: careLogic 35, App 21, main 21, pages 18, ipc 15, appShell 13, careStore 12, windowState 12, menu 12, dashboard 8, messages 8, accessibility 8, preload 7, ipc.integration 6, security 6, tray 5, updater 5, buildReset 5, workflows 4, macPlatform 1).
 
 End-to-end tests (Playwright `_electron`, run under xvfb):
 
