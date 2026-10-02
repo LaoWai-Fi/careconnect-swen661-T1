@@ -42,7 +42,7 @@ export default function LandingPage({ navigate }: Props) {
   }
 
   return (
-    <div className="welcome-window">
+    <div className={desktop ? "welcome-window welcome-window-native" : "welcome-window"}>
       <div className="window-titlebar window-drag">
         <div className="flex items-center gap-2">
           <Logo size={24} />

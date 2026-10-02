@@ -85,6 +85,9 @@ test('window opens with landing page and native menu', async () => {
 
   await expect(page).toHaveTitle(/^CareConnect/)
   await expect(page.getByRole('button', { name: 'Sign in to your workspace' })).toBeVisible()
+  // The welcome content must fill the window, not collapse into a thin strip.
+  const mainHeight = await page.locator('.welcome-main').evaluate((el) => el.getBoundingClientRect().height)
+  expect(mainHeight).toBeGreaterThan(300)
 
   const labels = await app.evaluate(({ Menu }) => Menu.getApplicationMenu()!.items.map((i) => i.label))
   expect(labels.map(strip)).toEqual(expect.arrayContaining(['File', 'Edit', 'View', 'Help']))

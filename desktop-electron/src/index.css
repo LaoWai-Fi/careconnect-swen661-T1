@@ -1015,6 +1015,11 @@ min-width: 0;
   background: var(--background);
 }
 
+/* In Electron the real OS menu bar replaces the in-page one, so drop its row. */
+.welcome-window-native {
+  grid-template-rows: 2.25rem minmax(0, 1fr) 1.5rem;
+}
+
 .welcome-menubar {
   display: flex;
   align-items: center;
