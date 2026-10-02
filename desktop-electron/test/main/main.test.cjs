@@ -144,12 +144,37 @@ describe('main process bootstrap', () => {
     expect(win32.electron.app.quit).toHaveBeenCalled()
 
     const mac = await start({ platform: 'darwin' })
+    mac.win.show()
     mac.win.close()
+    // macOS keeps the same window (and signed-in session): close only hides it.
+    expect(mac.win.isDestroyed()).toBe(false)
+    expect(mac.win.isVisible()).toBe(false)
     mac.electron.app.emit('window-all-closed')
     expect(mac.electron.app.quit).not.toHaveBeenCalled()
     mac.electron.app.emit('activate')
     expect(mac.windows).toHaveLength(1)
+    expect(mac.win.isVisible()).toBe(true)
     expect(mac.currentMenu().template[0].label).toBe('CareConnect')
+  })
+
+  test('macOS: quitting really closes the window; Windows close destroys it', async () => {
+    const mac = await start({ platform: 'darwin' })
+    mac.electron.app.emit('before-quit')
+    mac.win.close()
+    expect(mac.win.isDestroyed()).toBe(true)
+    const win = await start({ platform: 'win32' })
+    win.win.close()
+    expect(win.win.isDestroyed()).toBe(true)
+  })
+
+  test('macOS: activate re-creates the window if it was destroyed', async () => {
+    const mac = await start({ platform: 'darwin' })
+    mac.electron.app.emit('before-quit')
+    mac.win.close()
+    mac.ctx.quitting = false
+    mac.electron.app.emit('activate')
+    expect(mac.windows).toHaveLength(1)
+    expect(mac.windows[0]).not.toBe(mac.win)
   })
 
   test('macOS configures the native About panel; Windows and Linux do not', async () => {

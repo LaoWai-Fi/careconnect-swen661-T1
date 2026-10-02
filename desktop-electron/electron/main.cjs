@@ -165,6 +165,15 @@ function bootstrap(electron, { env = process.env, platform = process.platform, l
     win.webContents.on('render-process-gone', (_event, details) => {
       logger.error('[main] renderer exited:', details && details.reason)
     })
+    // macOS: the red close button and Cmd+W hide the window instead of
+    // destroying it, so the Dock icon, the menu bar icon or a second launch
+    // brings back the same signed-in session. Quit (Cmd+Q) still closes it.
+    win.on('close', (event) => {
+      if (isMac && !ctx.quitting && event) {
+        event.preventDefault()
+        win.hide()
+      }
+    })
     win.on('closed', () => {
       if (ctx.mainWindow === win) ctx.mainWindow = null
     })
@@ -202,9 +211,8 @@ function bootstrap(electron, { env = process.env, platform = process.platform, l
   app.on('window-all-closed', () => {
     if (!isMac) app.quit()
   })
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+  // Dock icon click: show the hidden window, or create one if none exists.
+  app.on('activate', showWindow)
   app.on('before-quit', () => {
     ctx.quitting = true
   })

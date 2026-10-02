@@ -72,11 +72,19 @@ class FakeWindow extends EventEmitter {
   restore() { this.minimized = false }
   isDestroyed() { return this.destroyed }
   show() { this.visible = true }
+  hide() { this.visible = false }
+  isVisible() { return this.visible }
   focus() { this.focused = true }
   setTitle(t) { this.title = t }
   loadFile(file) { this.loaded = { file }; this.webContents.url = pathToFileURL(file).href; return Promise.resolve() }
   loadURL(url) { this.loaded = { url }; this.webContents.url = url; return Promise.resolve() }
-  close() { this.emit('close'); this.destroyed = true; this.emit('closed') }
+  close() {
+    let prevented = false
+    this.emit('close', { preventDefault: () => { prevented = true } })
+    if (prevented) return
+    this.destroyed = true
+    this.emit('closed')
+  }
 }
 
 function trustedEvent(win) {
