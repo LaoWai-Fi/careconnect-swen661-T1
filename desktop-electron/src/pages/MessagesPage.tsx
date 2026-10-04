@@ -23,7 +23,11 @@ interface Props {
   }) => void
   navigate: (page: Page) => void
   initialMessageId?: string | null
+  /** When true, open a blank compose form, then call onComposeStarted. */
+  startCompose?: boolean
+  onComposeStarted?: () => void
   handLeft: boolean
+  currentUser: string
 }
 
 function fileIcon(type: string) {
@@ -41,12 +45,14 @@ export default function MessagesPage({
   onArchive,
   onUnarchive,
   onSend,
-  navigate: _navigate,
   initialMessageId,
+  startCompose,
+  onComposeStarted,
   handLeft,
+  currentUser,
 }: Props) {
   const [view, setView] = useState<"list" | "detail" | "compose">(() =>
-    initialMessageId ? "detail" : "list",
+    startCompose ? "compose" : initialMessageId ? "detail" : "list",
   )
   const [selectedId, setSelectedId] = useState<string | null>(
     () => initialMessageId ?? null,
@@ -83,6 +89,8 @@ export default function MessagesPage({
       const msg = messages.find((m) => m.id === selectedId)
       if (msg && !msg.read) onMarkRead(selectedId)
     }
+  // Intentionally keyed on selectedId only: re-running when messages change would re-mark on every update.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId])
 
   const selectedMessage = selectedId
@@ -122,10 +130,21 @@ export default function MessagesPage({
     setView("compose")
   }
 
+  // Toolbar "New message": open a blank compose form, whether this page was
+  // just opened for it or was already showing (state adjusted during render).
+  const [composeSeen, setComposeSeen] = useState(!!startCompose)
+  if (!!startCompose !== composeSeen) {
+    setComposeSeen(!!startCompose)
+    if (startCompose) openCompose()
+  }
+  useEffect(() => {
+    if (startCompose) onComposeStarted?.()
+  }, [startCompose, onComposeStarted])
+
   function handleSend() {
     if (!canSend) return
     onSend({
-      from: "Maria Thompson",
+      from: currentUser || "Caregiver",
       to: to
         .split(",")
         .map((s) => s.trim())

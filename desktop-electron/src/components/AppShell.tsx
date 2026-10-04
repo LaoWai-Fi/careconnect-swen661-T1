@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
 import Logo from "./Logo"
-import WindowControls from "./WindowControls"
 import TapButton from "./TapButton"
 import { Input } from "./FormField"
 import {
@@ -20,6 +19,8 @@ import {
 } from "./icons"
 import type { AppState, HandMode, Page } from "../types"
 import { useFocusTrap } from "../useFocusTrap"
+import { getDesktop } from "../lib/desktop"
+import { initialsOf } from "../state/careLogic"
 
 interface NavItem {
   id: Page
@@ -53,7 +54,7 @@ const NAV_ITEMS: NavItem[] = [
 
 const MENUS = {
   File: [
-    { label: "Save current view", shortcut: "⌘/Ctrl S", action: "save" },
+    { label: "Save care plan", shortcut: "⌘/Ctrl S", action: "save" },
     { label: "Print", shortcut: "⌘/Ctrl P", action: "print" },
     { label: "Settings", shortcut: "⌘/Ctrl ,", action: "settings" },
     { label: "Sign out", shortcut: "", action: "signout" },
@@ -90,8 +91,23 @@ interface Props {
   onFontSize: (s: "normal" | "large" | "xlarge") => void
   onTheme: (t: "light" | "dark" | "system") => void
   onSignOut: () => void
+  /** Save care data now (Ctrl+S, toolbar save button). */
+  onSave?: () => void
+  /** Desktop only: export / import the care plan through native file dialogs. */
+  onExport?: () => void
+  onImport?: () => void
+  onCheckIn?: () => void
+  /** Toolbar "New message": open Messages straight into a blank compose form. */
+  onNewMessage?: () => void
+  /** Latest status message from App (save results, import/export, errors). */
+  notice?: { id: number; text: string } | null
   children: React.ReactNode
 }
+
+// Shortcuts that the native Electron menu owns. When the app runs inside
+// Electron the menu accelerators fire these, so the renderer must not handle
+// them a second time.
+const NATIVE_MENU_KEYS = ["1", "2", "3", "4", "5", "=", "-", "0", ",", "f", "s", "n", "p", "e", "o", "l"]
 
 export default function AppShell({
   state,
@@ -100,14 +116,24 @@ export default function AppShell({
   onFontSize,
   onTheme,
   onSignOut,
+  onSave,
+  onExport,
+  onImport,
+  onCheckIn,
+  onNewMessage,
+  notice,
   children,
 }: Props) {
+  const desktop = getDesktop()
   const [openMenu, setOpenMenu] = useState<keyof typeof MENUS | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsSection, setSettingsSection] =
     useState<"general" | "accessibility" | "sync">("general")
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [sosOpen, setSosOpen] = useState(false)
+  // Demo emergency call: the UI shows a call in progress, but nothing is dialed.
+  const [sosCalling, setSosCalling] = useState(false)
+  const [recipientOpen, setRecipientOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [highContrast, setHighContrast] = useState(
@@ -115,12 +141,15 @@ export default function AppShell({
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-contrast: more)").matches,
   )
-  const [status, setStatus] = useState("Demo workspace — changes are temporary")
+  const [status, setStatus] = useState(
+    desktop ? "All changes saved" : "Browser preview — changes are not saved",
+  )
   const baseDpr = useRef(
     typeof window !== "undefined" ? window.devicePixelRatio : 1,
   )
   const [zoom, setZoom] = useState(100)
   const [appZoom, setAppZoom] = useState(1)
+  const [accountOpen, setAccountOpen] = useState(false)
   const [contextMenu, setContextMenu] = useState<{
     x: number
     y: number
@@ -130,7 +159,11 @@ export default function AppShell({
   const shortcutsRef = useFocusTrap(shortcutsOpen, () =>
     setShortcutsOpen(false),
   )
-  const sosRef = useFocusTrap(sosOpen, () => setSosOpen(false))
+  const closeSos = () => {
+    setSosOpen(false)
+    setSosCalling(false)
+  }
+  const sosRef = useFocusTrap(sosOpen, closeSos)
 
   const unreadMessages = state.messages.filter(
     (message) => !message.read && !message.archived,
@@ -141,11 +174,17 @@ export default function AppShell({
   const currentLabel =
     NAV_ITEMS.find((item) => item.id === state.page)?.label ?? "CareConnect"
   const handLeft = state.handMode === "left"
-
-  function saveCurrentView() {
-    localStorage.setItem("cc-saved-view", state.page)
-    setStatus("Workspace view saved on this device; care data is temporary")
-  }
+  const userName = state.userName || "Caregiver"
+  const firstName = userName.split(" ")[0]
+  const initials = initialsOf(userName)
+  const hour = new Date().getHours()
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  })
 
   useEffect(() => {
     document.documentElement.classList.toggle("high-contrast", highContrast)
@@ -155,21 +194,18 @@ export default function AppShell({
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       const command = event.ctrlKey || event.metaKey
-      if (event.altKey && !command && !event.shiftKey) {
-        const menu = ({ f: "File", e: "Edit", v: "View", h: "Help" } as const)[
-          event.key.toLowerCase() as "f" | "e" | "v" | "h"
-        ]
-        if (menu) {
-          event.preventDefault()
-          setOpenMenu(menu)
-          window.setTimeout(() => focusMenuButton(menu), 0)
-        }
-      }
       if (event.key === "Escape") {
         setOpenMenu(null)
         setContextMenu(null)
         setSearchOpen(false)
+        setAccountOpen(false)
       }
+      if (
+        desktop &&
+        (event.key === "F1" ||
+          (command && NATIVE_MENU_KEYS.includes(event.key.toLowerCase())))
+      )
+        return
       if (event.key === "F1") {
         event.preventDefault()
         setShortcutsOpen(true)
@@ -201,7 +237,7 @@ export default function AppShell({
       }
       if (command && event.key.toLowerCase() === "s") {
         event.preventDefault()
-        saveCurrentView()
+        runActionRef.current("save")
       }
       if (command && event.key.toLowerCase() === "n") {
         event.preventDefault()
@@ -211,7 +247,21 @@ export default function AppShell({
     }
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
-  }, [navigate])
+  }, [navigate, desktop])
+
+  // Status messages coming from App (autosave, import/export results).
+  useEffect(() => {
+    // Intentional: mirrors a one-shot message from App into the status bar text.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (notice) setStatus(notice.text)
+  }, [notice])
+
+  // Native menu and tray commands arrive from the main process over IPC.
+  const runActionRef = useRef<(action: string) => void>(() => undefined)
+  useEffect(() => {
+    if (!desktop) return
+    return desktop.onMenuCommand((action) => runActionRef.current(action))
+  }, [desktop])
 
   useEffect(() => {
     if (!openMenu) return
@@ -230,6 +280,26 @@ export default function AppShell({
     window.addEventListener("resize", updateZoom)
     return () => window.removeEventListener("resize", updateZoom)
   }, [])
+
+  useEffect(() => {
+    if (!accountOpen) return
+    function closeAccount(event: MouseEvent) {
+      if (!(event.target as HTMLElement).closest("[data-account-menu]"))
+        setAccountOpen(false)
+    }
+    window.addEventListener("mousedown", closeAccount)
+    return () => window.removeEventListener("mousedown", closeAccount)
+  }, [accountOpen])
+
+  useEffect(() => {
+    if (!recipientOpen) return
+    function closeRecipient(event: MouseEvent) {
+      if (!(event.target as HTMLElement).closest("[data-recipient-menu]"))
+        setRecipientOpen(false)
+    }
+    window.addEventListener("mousedown", closeRecipient)
+    return () => window.removeEventListener("mousedown", closeRecipient)
+  }, [recipientOpen])
 
   function changeZoom(direction: 1 | -1 | 0) {
     setAppZoom((current) => {
@@ -334,7 +404,16 @@ export default function AppShell({
     setOpenMenu(null)
     if (NAV_ITEMS.some((item) => item.id === action)) navigate(action as Page)
     if (action === "compose") navigate("messages")
-    if (action === "save") saveCurrentView()
+    if (action === "save") {
+      if (onSave) onSave()
+      else setStatus("Saved just now")
+    }
+    if (action === "export") onExport?.()
+    if (action === "import") onImport?.()
+    if (action === "checkin") onCheckIn?.()
+    if (action === "toggleHandMode") onHandMode(handLeft ? "off" : "left")
+    if (action === "highContrast") setHighContrast((value) => !value)
+    if (action === "emergency") setSosOpen(true)
     if (action === "print") window.print()
     if (action === "signout") onSignOut()
     if (action === "settings") setSettingsOpen(true)
@@ -347,6 +426,7 @@ export default function AppShell({
     }
     if (action === "shortcuts" || action === "help") setShortcutsOpen(true)
   }
+  runActionRef.current = runAction
 
   function handleMenuKey(event: React.KeyboardEvent, menu: keyof typeof MENUS) {
     const menuNames = Object.keys(MENUS) as (keyof typeof MENUS)[]
@@ -427,9 +507,113 @@ export default function AppShell({
         <div className="text-xs text-[var(--muted-foreground)]">
           Margaret Thompson · {currentLabel}
         </div>
-        <WindowControls />
+        <div className="flex items-center gap-3">
+          <div className="account-area window-no-drag" data-account-menu>
+            <button
+              type="button"
+              className="account-button"
+              aria-haspopup="menu"
+              aria-expanded={accountOpen}
+              aria-label={"Account menu, signed in as " + userName}
+              title={"Signed in as " + userName}
+              onClick={() => setAccountOpen(!accountOpen)}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowDown") {
+                  event.preventDefault()
+                  setAccountOpen(true)
+                  window.setTimeout(
+                    () =>
+                      document
+                        .querySelector<HTMLElement>(
+                          ".account-menu [role='menuitem']",
+                        )
+                        ?.focus(),
+                    0,
+                  )
+                }
+              }}
+            >
+              <span className="account-avatar" aria-hidden="true">
+                {initials}
+              </span>
+              <span className="account-name">{userName}</span>
+              <ChevronDownIcon />
+            </button>
+            {accountOpen && (
+              <div
+                className="account-menu"
+                role="menu"
+                aria-label="Account"
+                onKeyDown={(event) => {
+                  handleMenuListKey(event)
+                  if (event.key === "Escape") {
+                    event.stopPropagation()
+                    setAccountOpen(false)
+                    document
+                      .querySelector<HTMLElement>(".account-button")
+                      ?.focus()
+                  }
+                  if (event.key === "Tab") setAccountOpen(false)
+                }}
+              >
+                <div className="account-menu-header">
+                  <span
+                    className="account-avatar account-avatar-lg"
+                    aria-hidden="true"
+                  >
+                    {initials}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm truncate">{userName}</p>
+                    <p className="text-xs text-[var(--muted-foreground)]">
+                      Caregiver · Margaret Thompson&apos;s care team
+                    </p>
+                  </div>
+                </div>
+                <TapButton
+                  size="xs"
+                  variant="ghost"
+                  role="menuitem"
+                  className="desktop-menu-item"
+                  onClick={() => {
+                    setAccountOpen(false)
+                    setSettingsOpen(true)
+                  }}
+                >
+                  <span>Settings</span>
+                  <kbd>{MOD},</kbd>
+                </TapButton>
+                <TapButton
+                  size="xs"
+                  variant="ghost"
+                  role="menuitem"
+                  className="desktop-menu-item"
+                  onClick={() => {
+                    setAccountOpen(false)
+                    onSignOut()
+                  }}
+                >
+                  <span>Sign out</span>
+                </TapButton>
+              </div>
+            )}
+          </div>
+          {!desktop && (
+            <div
+              className="flex items-center gap-1 window-no-drag"
+              aria-hidden="true"
+            >
+              <span className="window-control" />
+              <span className="window-control" />
+              <span className="window-control window-control-close" />
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Inside Electron the native File/Edit/View/Help menu replaces this
+          in-app menu bar (see electron/menu.cjs). */}
+      {!desktop && (
       <div
         className="desktop-menubar"
         role="menubar"
@@ -494,6 +678,7 @@ export default function AppShell({
           </div>
         ))}
       </div>
+      )}
 
       <div
         className="desktop-toolbar"
@@ -504,7 +689,7 @@ export default function AppShell({
           <TapButton
             size="xs"
             variant="primary"
-            onClick={() => navigate("messages")}
+            onClick={() => (onNewMessage ? onNewMessage() : navigate("messages"))}
           >
             <PlusIcon /> New message
           </TapButton>
@@ -530,9 +715,9 @@ export default function AppShell({
           <TapButton
             size="xs"
             variant="ghost"
-            onClick={() => setStatus("Sync is not connected in this demo")}
-            aria-label="Sync care plan"
-            title="Sync care plan"
+            onClick={() => runAction("save")}
+            aria-label="Save care plan"
+            title={"Save care plan (" + MOD + "S)"}
           >
             <SyncIcon />
           </TapButton>
@@ -623,19 +808,91 @@ export default function AppShell({
 
       <div className="desktop-workspace">
         <aside className="desktop-sidebar" aria-label="CareConnect navigation">
-          <div className="sidebar-profile">
-            <div className="profile-avatar" aria-hidden="true">
-              MT
-            </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-sm truncate">
-                Margaret Thompson
-              </p>
-              <p className="text-xs text-[var(--muted-foreground)] truncate">
-                Primary care plan
-              </p>
-            </div>
-            <ChevronDownIcon />
+          <div className="recipient-area" data-recipient-menu>
+            <button
+              type="button"
+              className="sidebar-profile recipient-button"
+              aria-haspopup="menu"
+              aria-expanded={recipientOpen}
+              aria-label="Care recipient: Margaret Thompson. Switch care recipient"
+              title="Switch care recipient"
+              onClick={() => setRecipientOpen(!recipientOpen)}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowDown") {
+                  event.preventDefault()
+                  setRecipientOpen(true)
+                  window.setTimeout(
+                    () =>
+                      document
+                        .querySelector<HTMLElement>(
+                          ".recipient-menu [role='menuitemradio']",
+                        )
+                        ?.focus(),
+                    0,
+                  )
+                }
+              }}
+            >
+              <span className="profile-avatar" aria-hidden="true">
+                MT
+              </span>
+              <span className="min-w-0">
+                <span className="block font-semibold text-sm truncate">
+                  Margaret Thompson
+                </span>
+                <span className="block text-xs text-[var(--muted-foreground)] truncate">
+                  Care recipient
+                </span>
+              </span>
+              <ChevronDownIcon />
+            </button>
+            {recipientOpen && (
+              <div
+                className="account-menu recipient-menu"
+                role="menu"
+                aria-label="Care recipients"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" || event.key === "Tab") {
+                    if (event.key === "Escape") event.stopPropagation()
+                    setRecipientOpen(false)
+                    if (event.key === "Escape")
+                      document
+                        .querySelector<HTMLElement>(".recipient-button")
+                        ?.focus()
+                  }
+                }}
+              >
+                <p className="recipient-menu-label">Care recipients</p>
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked="true"
+                  className="desktop-menu-item recipient-option"
+                  onClick={() => {
+                    setRecipientOpen(false)
+                    setStatus("Viewing Margaret Thompson's care plan")
+                    document
+                      .querySelector<HTMLElement>(".recipient-button")
+                      ?.focus()
+                  }}
+                >
+                  <span className="profile-avatar" aria-hidden="true">
+                    MT
+                  </span>
+                  <span className="min-w-0 flex-1 text-left">
+                    <span className="block font-semibold text-sm leading-tight">
+                      Margaret Thompson
+                    </span>
+                    <span className="block text-xs text-[var(--muted-foreground)]">
+                      Currently viewing
+                    </span>
+                  </span>
+                  <span className="recipient-check" aria-hidden="true">
+                    ✓
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
           <nav className="flex-1 p-2" aria-label="Main navigation">
             <p className="sidebar-label">Workspace</p>
@@ -701,24 +958,28 @@ export default function AppShell({
             <div>
               <p className="text-lg font-bold">{currentLabel}</p>
               <p className="text-xs text-[var(--muted-foreground)]">
-                Margaret Thompson · Thursday, 4 June
+                {greeting}, {firstName} · Viewing Margaret Thompson&apos;s care
+                plan · {today}
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
-              <span className="presence-dot" /> Sample care plan
+              <span className="presence-dot" />{" "}
+              {desktop ? "Saved on this computer" : "Browser preview"}
             </div>
           </div>
           <div className="desktop-content-scroll">{children}</div>
         </main>
       </div>
 
-      <footer className="desktop-statusbar" role="status" aria-live="polite">
-        <span className="flex items-center gap-2">
-          <span className="presence-dot" /> {status}
+      <footer className="desktop-statusbar">
+        <span className="flex items-center gap-2" role="status" aria-live="polite">
+          <span className="presence-dot" aria-hidden="true" /> {status}
         </span>
-        <span className="ml-auto">No live sync</span>
+        <span className="ml-auto">
+          {desktop ? "Stored locally" : "Not saved"}
+        </span>
         <span>Zoom {Math.round(appZoom * zoom)}%</span>
-        <span>Prototype</span>
+        <span>{desktop ? "Desktop app" : "Browser"}</span>
       </footer>
 
       {contextMenu && (
@@ -841,7 +1102,7 @@ export default function AppShell({
                   aria-current={settingsSection === "sync" ? "true" : undefined}
                   onClick={() => setSettingsSection("sync")}
                 >
-                  <SyncIcon /> Data & sync
+                  <SyncIcon /> Data &amp; storage
                 </button>
               </div>
               <div className="settings-content">
@@ -972,23 +1233,35 @@ export default function AppShell({
                 {settingsSection === "sync" && (
                   <section aria-labelledby="sync-title">
                     <p id="sync-title" className="settings-heading">
-                      Data & sync
+                      Data &amp; storage
                     </p>
                     <p className="settings-description">
-                      Live sync is not connected in this Week 7 prototype.
+                      {desktop
+                        ? "CareConnect saves the care plan on this computer automatically. Use File > Export to move it to another computer."
+                        : "The browser preview does not save changes."}
                     </p>
                     <div className="preference-row">
                       <div>
-                        <p className="font-semibold text-sm">Sync status</p>
+                        <p className="font-semibold text-sm">Save status</p>
                         <p className="settings-description">{status}</p>
                       </div>
                       <TapButton
                         size="xs"
                         variant="outline"
-                        onClick={() => setStatus("Sync is not connected in this demo")}
+                        onClick={() => runAction("save")}
                       >
-                        Check status{" "}
+                        Save now
                       </TapButton>
+                      {onExport && (
+                        <TapButton size="xs" variant="outline" onClick={onExport}>
+                          Export…
+                        </TapButton>
+                      )}
+                      {onImport && (
+                        <TapButton size="xs" variant="outline" onClick={onImport}>
+                          Import…
+                        </TapButton>
+                      )}
                     </div>
                   </section>
                 )}
@@ -1056,15 +1329,28 @@ export default function AppShell({
                 />
                 <Shortcut label="Navigate menus" keys="Arrow keys" />
                 <Shortcut
-                  label="Overview through Messages"
+                  label="Navigate to Page (Overview through Messages)"
                   keys="Ctrl/Cmd 1–5"
                 />
                 <Shortcut label="Close menu or dialog" keys="Esc" />
+                {IS_MAC ? (
+                  <Shortcut
+                    label="Move to the menu bar"
+                    keys="Ctrl+F2 (VoiceOver: VO+M)"
+                  />
+                ) : (
+                  <Shortcut
+                    label="Open File / Edit / View / Help menu"
+                    keys="Alt+F / E / V / H"
+                  />
+                )}
               </div>
               <div>
                 <p className="settings-heading">Actions</p>
-                <Shortcut label="New message" keys="Ctrl/Cmd N" />
-                <Shortcut label="Save current view" keys="Ctrl/Cmd S" />
+                <Shortcut label="Messages Menu" keys="Ctrl/Cmd N" />
+                <Shortcut label="Save care plan" keys="Ctrl/Cmd S" />
+                <Shortcut label="Export care plan" keys="Ctrl/Cmd E" />
+                <Shortcut label="Import care plan" keys="Ctrl/Cmd O" />
                 <Shortcut label="Find" keys="Ctrl/Cmd F" />
                 <Shortcut label="Settings" keys="Ctrl/Cmd ," />
               </div>
@@ -1076,6 +1362,8 @@ export default function AppShell({
                   label="Zoom in / out / actual size"
                   keys="Ctrl/Cmd = / - / 0"
                 />
+                <Shortcut label="Left-hand mode" keys="Ctrl/Cmd Shift L" />
+                <Shortcut label="High contrast" keys="Ctrl/Cmd Shift H" />
               </div>
               <div className="screen-reader-note">
                 <HelpIcon />
@@ -1118,36 +1406,64 @@ export default function AppShell({
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="emergency-title"
+            aria-describedby="emergency-description"
           >
-            <div className="emergency-icon">
-              <EmergencyIcon />
+            <div
+              className={`emergency-header ${sosCalling ? "emergency-header-calling" : ""}`}
+            >
+              <span className="emergency-siren" aria-hidden="true">
+                {sosCalling ? "📞" : "🚨"}
+              </span>
+              <p id="emergency-title" className="emergency-title">
+                {sosCalling ? "Calling 911…" : "Emergency"}
+              </p>
+              <p
+                id="emergency-description"
+                className="emergency-body"
+                aria-live="assertive"
+              >
+                {sosCalling
+                  ? "Connecting to emergency services. Stay with Margaret and keep this window open."
+                  : "Press the button below to call emergency services immediately."}
+              </p>
             </div>
-            <p id="emergency-title" className="text-xl font-bold">
-              Emergency assistance
-            </p>
-            <p className="text-sm text-[var(--muted-foreground)] text-center">
-              This is a design prototype. It cannot place calls or notify a
-              care team. In a real emergency, use your phone to contact local
-              emergency services.
-            </p>
-            <div className="flex justify-end gap-2 w-full">
-              <TapButton
-                size="xs"
-                variant="outline"
-                onClick={() => setSosOpen(false)}
-              >
-                Cancel
-              </TapButton>
-              <TapButton
-                size="xs"
-                variant="destructive"
-                onClick={() => {
-                  setSosOpen(false)
-                  setStatus("No call placed — prototype only")
-                }}
-              >
-                I understand
-              </TapButton>
+            <div className="emergency-actions">
+              {sosCalling ? (
+                <TapButton
+                  size="lg"
+                  variant="destructive"
+                  fullWidth
+                  autoFocus
+                  onClick={() => {
+                    closeSos()
+                    setStatus("Emergency call ended")
+                  }}
+                >
+                  End call
+                </TapButton>
+              ) : (
+                <>
+                  <TapButton
+                    size="lg"
+                    variant="destructive"
+                    fullWidth
+                    onClick={() => {
+                      setSosCalling(true)
+                      setStatus("Emergency call in progress")
+                    }}
+                  >
+                    📞 SOS Emergency Call
+                  </TapButton>
+                  <TapButton
+                    size="md"
+                    variant="ghost"
+                    fullWidth
+                    onClick={closeSos}
+                  >
+                    Cancel
+                  </TapButton>
+                </>
+              )}
             </div>
           </div>
         </div>
