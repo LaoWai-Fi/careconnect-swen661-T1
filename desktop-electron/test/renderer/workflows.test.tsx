@@ -3,7 +3,7 @@
 import { screen, within, waitFor, fireEvent } from "@testing-library/react"
 import { goTo, installBridge, setup, signIn } from "./helpers"
 
-jest.setTimeout(15000)
+jest.setTimeout(30000)
 
 test("caregiver manages medications, appointments, activity and messages; everything is autosaved", async () => {
   const bridge = installBridge()

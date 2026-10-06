@@ -8,6 +8,7 @@ interface TapButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function TapButton({
+  type = 'button',
   variant = 'primary',
   size = 'md',
   fullWidth,
@@ -46,6 +47,8 @@ export default function TapButton({
   return (
     <button
       {...props}
+      // Ordinary button by default, so Return in a form never triggers Cancel.
+      type={type}
       onPointerDown={ripple}
       className={`${base} ${sizeClass} ${variantClass} ${fullWidth ? 'w-full' : ''} ${className}`}
     >

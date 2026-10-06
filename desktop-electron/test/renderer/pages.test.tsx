@@ -1,6 +1,6 @@
 import { render, screen, within, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import MedicationsPage from "../../src/pages/MedicationsPage"
+import MedicationsPage, { TIME_OPTIONS, timeOptions } from "../../src/pages/MedicationsPage"
 import AppointmentsPage from "../../src/pages/AppointmentsPage"
 import ActivityPage from "../../src/pages/ActivityPage"
 import LandingPage from "../../src/pages/LandingPage"
@@ -123,8 +123,41 @@ describe("MedicationsPage", () => {
     await user.type(within(dialog).getByLabelText(/notes/i), "With food")
     await user.click(within(dialog).getByRole("button", { name: "Add medication" }))
     act(() => jest.advanceTimersByTime(700))
-    expect(onAdd).toHaveBeenCalledWith({ name: "Aspirin", dose: "75 mg", time: "08:30", notes: "With food" })
+    expect(onAdd).toHaveBeenCalledWith({ name: "Aspirin", dose: "75 mg", time: "8:30 am", notes: "With food" })
     jest.useRealTimers()
+  })
+
+  test("schedule time is a keyboard-operable list, and Return saves instead of cancelling", async () => {
+    jest.useFakeTimers()
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+    const onAdd = jest.fn()
+    render(<MedicationsPage state={base()} onAdd={onAdd} onDelete={jest.fn()} onToggleTaken={jest.fn()} />)
+    await user.click(screen.getByRole("button", { name: "+ Add" }))
+    const dialog = screen.getByRole("dialog", { name: /add new medication/i })
+    await user.type(within(dialog).getByLabelText(/medication name/i), "Aspirin")
+    await user.type(within(dialog).getByLabelText(/^dose/i), "75 mg")
+    const time = within(dialog).getByRole("combobox", { name: /schedule time/i })
+    await user.selectOptions(time, "9:15 pm")
+    // Tab leaves the time list and reaches Notes, Cancel, then Add medication.
+    time.focus()
+    await user.tab()
+    expect(within(dialog).getByLabelText(/notes/i)).toHaveFocus()
+    await user.tab()
+    expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus()
+    await user.tab()
+    expect(within(dialog).getByRole("button", { name: "Add medication" })).toHaveFocus()
+    // Return in a text field submits the form (it used to trigger Cancel).
+    await user.type(within(dialog).getByLabelText(/medication name/i), "{Enter}")
+    act(() => jest.advanceTimersByTime(700))
+    expect(onAdd).toHaveBeenCalledWith({ name: "Aspirin", dose: "75 mg", time: "9:15 pm", notes: "" })
+    jest.useRealTimers()
+  })
+
+  test("editing keeps an existing time that is not on the 15 minute list", () => {
+    expect(timeOptions("8:30 am")).toHaveLength(96)
+    expect(timeOptions("08:30")[0]).toBe("08:30")
+    expect(TIME_OPTIONS[0]).toBe("12:00 am")
+    expect(TIME_OPTIONS[95]).toBe("11:45 pm")
   })
 
   test("add form closes with Escape, Cancel and the Close button", async () => {

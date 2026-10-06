@@ -5,6 +5,21 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import FormField, { Input } from '../components/FormField';
 import type { AppState, Medication } from '../types';
 
+/** Medication times every 15 minutes, in the care plan's "8:30 am" format. */
+export const TIME_OPTIONS: string[] = Array.from({ length: 96 }, (_, i) => {
+  const h24 = Math.floor(i / 4);
+  const m = (i % 4) * 15;
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${h24 < 12 ? 'am' : 'pm'}`;
+});
+const DEFAULT_TIME = '8:30 am';
+
+/** The list, plus the current value if it is not on the 15 minute grid. */
+export function timeOptions(current: string): string[] {
+  return current && !TIME_OPTIONS.includes(current) ? [current, ...TIME_OPTIONS] : TIME_OPTIONS;
+}
+
+
 interface Props {
   state: AppState;
   onAdd: (med: Omit<Medication, 'id' | 'taken'>) => void;
@@ -93,7 +108,7 @@ function MedForm({
   onCancel: () => void;
 }) {
   const [form, setForm] = useState<FormState>(
-    initial ?? { name: '', dose: '', time: '08:30', notes: '' }
+    initial ?? { name: '', dose: '', time: DEFAULT_TIME, notes: '' }
   );
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [saved, setSaved] = useState(false);
@@ -155,12 +170,19 @@ function MedForm({
             />
           </FormField>
           <FormField label="Schedule time" required error={errors.time}>
-            <Input
-              type="time"
+            {/* A plain list instead of the native time field: fully keyboard and
+                screen reader operable, no picker popup, same "8:30 am" format
+                as the rest of the care plan. */}
+            <select
               value={form.time}
               onChange={(e) => set('time', e.target.value)}
-              error={!!errors.time}
-            />
+              aria-invalid={errors.time ? true : undefined}
+              className={`w-full px-4 py-3 text-base rounded-xl border-2 bg-[var(--card)] text-[var(--foreground)] min-h-[52px] focus:outline-none focus-visible:outline-[3px] focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2 ${errors.time ? 'border-[var(--destructive)]' : 'border-[var(--border)] focus:border-[var(--primary)]'}`}
+            >
+              {timeOptions(form.time).map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
           </FormField>
           <FormField label="Notes (optional)">
             <textarea
