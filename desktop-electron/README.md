@@ -63,7 +63,7 @@ npm run typecheck        # tsc --noEmit
 
 - The HTML coverage report is written to `coverage/lcov-report/index.html`.
 - On Linux without a display, run the end-to-end tests as `xvfb-run -a npm run test:e2e`.
-- Current results: 222 Jest tests pass (20 suites), 97.61% statements / 92.57% branches / 97.11% functions / 98.42% lines, and 5 Electron end-to-end tests pass (also on an Intel Mac). See [docs/week8/TEST_REPORT.md](../docs/week8/TEST_REPORT.md).
+- Current results: 224 Jest tests pass (20 suites), 97.69% statements / 92.57% branches / 97.29% functions / 98.50% lines, and 5 Electron end-to-end tests pass (also on an Intel Mac). See [docs/week8/TEST_REPORT.md](../docs/week8/TEST_REPORT.md).
 
 ## Packaging
 
@@ -187,14 +187,14 @@ Full details, the IPC channel table and data flows: [docs/week8/ARCHITECTURE.md]
 - Window menu (minimize, zoom, bring all to front) and a Help menu that gets the standard macOS search field.
 - Menu bar icon (a template image that adapts to light and dark menu bars) with next medication, unread count and quick actions.
 - Dock badge showing the unread message count.
-- Native notifications (allow them in System Settings > Notifications).
+- Native notifications for check-ins and care plan export. These are implemented, but macOS only displays notifications from a code-signed app; this build is not signed with an Apple Developer ID, so they do not appear on macOS.
 - Command-key shortcuts throughout, and native full screen with Ctrl+Cmd+F.
 - The app stays open after the last window is closed; click the Dock icon or choose Open CareConnect from the menu bar icon to bring the window back.
 - Dark mode support follows the system appearance.
 
 ### All platforms
 
-Native menu, keyboard shortcuts, window size/position/maximized persistence, autosave plus Export and Import through native file dialogs, system tray (Windows and Linux) or menu bar icon (macOS), native notifications, single-instance lock, and the unread count in the window title and app badge.
+Native menu, keyboard shortcuts, window size/position/maximized persistence, autosave plus Export and Import through native file dialogs, system tray (Windows and Linux) or menu bar icon (macOS), native notifications (on macOS these require a code-signed build), single-instance lock, and the unread count in the window title and app badge.
 
 ## Keyboard shortcuts
 
