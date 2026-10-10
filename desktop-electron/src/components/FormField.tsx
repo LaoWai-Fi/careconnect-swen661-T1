@@ -10,12 +10,30 @@ interface FormFieldProps {
 
 export default function FormField({ label, required, hint, error, children }: FormFieldProps) {
   const id = useId();
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
 
   // Inject a matching `id` into the first child element (the input/select/textarea)
   // so the <label htmlFor> association is programmatic and screen-reader-accessible.
   const labelledChild = React.Children.map(children, (child, i) => {
     if (i === 0 && React.isValidElement(child)) {
-      return React.cloneElement(child as React.ReactElement<{ id?: string }>, { id });
+      const element = child as React.ReactElement<{
+        id?: string;
+        "aria-describedby"?: string;
+        "aria-invalid"?: boolean | "true" | "false";
+      }>;
+      const describedBy = [
+        element.props["aria-describedby"],
+        error ? errorId : hint ? hintId : undefined,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      return React.cloneElement(element, {
+        id: element.props.id ?? id,
+        "aria-invalid": error ? true : element.props["aria-invalid"],
+        "aria-describedby": describedBy || undefined,
+      });
     }
     return child;
   });
@@ -28,8 +46,8 @@ export default function FormField({ label, required, hint, error, children }: Fo
         {required && <span className="sr-only">(required)</span>}
       </label>
       {labelledChild}
-      {hint && !error && <p className="text-sm text-[var(--muted-foreground)]">{hint}</p>}
-      {error && <p className="text-sm text-[var(--destructive)] font-medium" role="alert">{error}</p>}
+      {hint && !error && <p id={hintId} className="text-sm text-[var(--muted-foreground)]">{hint}</p>}
+      {error && <p id={errorId} className="text-sm text-[var(--destructive)] font-medium" role="alert">{error}</p>}
     </div>
   );
 }

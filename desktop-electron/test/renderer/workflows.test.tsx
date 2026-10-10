@@ -18,7 +18,7 @@ test("caregiver manages medications, appointments, activity and messages; everyt
   await user.type(within(medDialog).getByLabelText(/^dose/i), "1000 IU")
   await user.click(within(medDialog).getByRole("button", { name: "Add medication" }))
   expect(await screen.findByRole("heading", { name: "Vitamin D" }, { timeout: 2000 })).toBeInTheDocument()
-  await user.click(screen.getByRole("button", { name: /^Vitamin D: mark as taken/ }))
+  await user.click(screen.getByRole("button", { name: /^Vitamin D, not taken\. Activate to mark as taken/ }))
   await user.click(screen.getByRole("button", { name: "Delete Vitamin D" }))
   await user.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Delete" }))
   expect(screen.queryByRole("heading", { name: "Vitamin D" })).not.toBeInTheDocument()
@@ -40,10 +40,11 @@ test("caregiver manages medications, appointments, activity and messages; everyt
   await user.click(screen.getByRole("button", { name: "Delete Podiatry" }))
   await user.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Delete" }))
 
-  // Activity: refresh adds a check-in entry
+    // Activity: refresh announces completion without inventing a check-in.
   await goTo(user, "Activity")
   await user.click(screen.getByRole("button", { name: /refresh/i }))
-  expect(screen.getAllByText(/checked in via dashboard/).length).toBe(1)
+    expect(screen.queryByText(/checked in via dashboard/)).not.toBeInTheDocument()
+    expect(screen.getByText("Activity log refreshed.")).toBeInTheDocument()
 
   // Dashboard: customize, toggle med, open unread message
   await goTo(user, "Overview")

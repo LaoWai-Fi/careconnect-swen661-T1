@@ -1,14 +1,13 @@
 // Automated accessibility checks (axe-core) for every major screen and dialog.
-// These catch missing names, roles, labels and ARIA misuse. Colour contrast is
-// not checked here because jsdom does not compute styles; it is covered by the
-// manual high-contrast checks in docs/week8/ACCESSIBILITY_TESTING.md.
+// These catch missing names, roles, labels, landmarks and ARIA misuse. Colour
+// contrast is not checked here because jsdom does not compute rendered styles.
 import { screen } from "@testing-library/react"
 import { axe } from "jest-axe"
 import { goTo, installBridge, setup, signIn } from "./helpers"
 
 jest.setTimeout(20000)
 
-const options = { rules: { "color-contrast": { enabled: false }, region: { enabled: false } } }
+const options = { rules: { "color-contrast": { enabled: false } } }
 
 async function expectNoViolations() {
   const results = await axe(document.body, options)

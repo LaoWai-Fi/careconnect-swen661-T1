@@ -245,6 +245,7 @@ export default function MessagesPage({
         <div className="space-y-4">
           <FormField label="To" required>
             <Input
+              autoFocus
               value={to}
               onChange={(e) => setTo(e.target.value)}
               placeholder="Recipient name or email"
@@ -317,10 +318,9 @@ export default function MessagesPage({
               ref={fileInputRef}
               type="file"
               multiple
-              className="sr-only"
+              className="hidden"
               aria-labelledby="attach-label"
               onChange={handleFileChange}
-              tabIndex={-1}
             />
             <button
               onClick={() => fileInputRef.current?.click()}
@@ -627,7 +627,7 @@ export default function MessagesPage({
             onClick={() => setFolder("inbox")}
           >
             Inbox{" "}
-            <span className="text-[0.68rem] opacity-80">
+            <span className="text-[0.68rem]">
               {activeMessages.length}
             </span>
           </TapButton>
@@ -638,7 +638,7 @@ export default function MessagesPage({
             onClick={() => setFolder("archive")}
           >
             Archive{" "}
-            <span className="text-[0.68rem] opacity-80">
+            <span className="text-[0.68rem]">
               {archivedMessages.length}
             </span>
           </TapButton>

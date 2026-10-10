@@ -13,7 +13,25 @@ Dialogs: add medication, add appointment, compose message, settings (also with H
 
 To repeat: run `cd desktop-electron && npm ci && npm run dev`, open `http://127.0.0.1:5173/` in Chrome, sign in with any email and password, and run the axe DevTools extension on each screen and dialog.
 
-Result before fixes: sign up, sign in and the dashboard have no issues. The findings are in section 4 (items 1 to 6). Final zero-violation screenshots are added after the Part 2 fixes.
+Result before fixes: sign up, sign in and the dashboard have no issues. The findings are in section 4 (items 1 to 6). The Part 2 code fixes and test results are documented in `PART2_FIXES.md`. The post-fix Chrome axe DevTools screenshots and their exact scope are recorded below; Jest axe checks do not replace the required DevTools evidence or rendered color-contrast scan.
+
+### Post-fix Chrome axe DevTools evidence
+
+Run on 2026-10-11 in Chrome against `http://127.0.0.1:5173/`, using axe DevTools 4.13.0 Page Scan. WCAG 2.1 AA was selected and Best Practices was off. With DevTools docked, the CareConnect viewport was approximately 431 × 730 CSS px. Every scan below completed and showed **Total Issues: 0**. The dark-theme pass covered all seven primary screens; light-theme scans specifically rechecked the dashboard, appointment-assignee contrast, message count badges, and emergency description contrast. This records the actual scan scope; it does not claim every screen/dialog was scanned in both themes.
+
+| Rendered screen/state | Theme | Result | Evidence |
+|---|---|---|---|
+| Landing | Dark | 0 issues | [`axe-landing-dark-zero-violations.jpg`](evidence/axe-landing-dark-zero-violations.jpg) |
+| Sign in | Dark | 0 issues | [`axe-signin-dark-zero-violations.jpg`](evidence/axe-signin-dark-zero-violations.jpg) |
+| Dashboard | Dark | 0 issues | [`axe-dashboard-dark-zero-violations.jpg`](evidence/axe-dashboard-dark-zero-violations.jpg) |
+| Medications | Dark | 0 issues | [`axe-medications-dark-zero-violations.jpg`](evidence/axe-medications-dark-zero-violations.jpg) |
+| Appointments, including assigned-care banner | Dark | 0 issues | [`axe-appointments-dark-zero-violations.jpg`](evidence/axe-appointments-dark-zero-violations.jpg) |
+| Activity | Dark | 0 issues | [`axe-activity-dark-zero-violations.jpg`](evidence/axe-activity-dark-zero-violations.jpg) |
+| Messages | Dark | 0 issues | [`axe-messages-dark-zero-violations.jpg`](evidence/axe-messages-dark-zero-violations.jpg) |
+| Dashboard | Light | 0 issues | [`axe-dashboard-light-zero-violations.jpg`](evidence/axe-dashboard-light-zero-violations.jpg) |
+| Appointments, including assigned-care banner | Light | 0 issues | [`axe-appointments-light-zero-violations.jpg`](evidence/axe-appointments-light-zero-violations.jpg) |
+| Messages, including inbox/archive counts | Light | 0 issues | [`axe-messages-light-zero-violations.jpg`](evidence/axe-messages-light-zero-violations.jpg) |
+| Emergency dialog (SOS not activated) | Light | 0 issues | [`axe-emergency-dialog-light-zero-violations.jpg`](evidence/axe-emergency-dialog-light-zero-violations.jpg) |
 
 ## 2. Keyboard-only testing (macOS)
 

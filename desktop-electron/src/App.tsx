@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import type {
-  ActivityEntry,
   Appointment,
   AppState,
   DashboardWidget,
@@ -310,12 +309,7 @@ export default function App() {
         />
       )}
       {page === "activity" && (
-        <ActivityPage
-          state={state}
-          onAddEntry={(entry: Omit<ActivityEntry, "id">) =>
-            update((s) => care.addActivity(s, entry))
-          }
-        />
+        <ActivityPage state={state} />
       )}
       {page === "messages" && (
         <MessagesPage

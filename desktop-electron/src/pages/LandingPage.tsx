@@ -43,7 +43,7 @@ export default function LandingPage({ navigate }: Props) {
 
   return (
     <div className={desktop ? "welcome-window welcome-window-native" : "welcome-window"}>
-      <div className="window-titlebar window-drag">
+      <header className="window-titlebar window-drag" role="banner" aria-label="CareConnect application header">
         <div className="flex items-center gap-2">
           <Logo size={24} />
           <span className="font-semibold text-sm">CareConnect</span>
@@ -56,7 +56,7 @@ export default function LandingPage({ navigate }: Props) {
             <span className="window-control window-control-close" />
           </div>
         )}
-      </div>
+      </header>
 
       {!desktop && (
         <div className="welcome-menubar" aria-hidden="true">
@@ -71,9 +71,9 @@ export default function LandingPage({ navigate }: Props) {
         <section className="welcome-copy" aria-labelledby="welcome-title">
           <div className="welcome-brandmark"><CareIcon /></div>
           <p className="welcome-eyebrow">Care coordination, made clearer</p>
-          <p id="welcome-title" className="welcome-title">
+          <h1 id="welcome-title" className="welcome-title">
             One calm workspace for every detail of care.
-          </p>
+          </h1>
           <p className="welcome-description">
             Plan medication, coordinate appointments, track daily activity, and keep the whole care team in sync.
           </p>
