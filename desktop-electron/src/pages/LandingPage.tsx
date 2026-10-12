@@ -140,15 +140,17 @@ export default function LandingPage({ navigate }: Props) {
       </footer>
 
       {!chatOpen && (
-        <TapButton
-          size="sm"
-          variant="primary"
-          onClick={() => setChatOpen(true)}
-          className="welcome-help"
-          aria-label="Open CareConnect help"
-        >
-          <HelpIcon /> Help
-        </TapButton>
+        <aside aria-label="CareConnect help">
+          <TapButton
+            size="sm"
+            variant="primary"
+            onClick={() => setChatOpen(true)}
+            className="welcome-help"
+            aria-label="Open CareConnect help"
+          >
+            <HelpIcon /> Help
+          </TapButton>
+        </aside>
       )}
 
       {chatOpen && (

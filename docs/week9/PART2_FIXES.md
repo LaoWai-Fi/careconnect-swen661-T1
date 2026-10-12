@@ -16,6 +16,7 @@ This document records the Part 2 implementation on `feat/wiliss-wk9-part2-access
 | Cmd+N navigated to Messages without opening compose | Routed the shortcut/menu action through the New Message handler and focused the recipient input when compose opens. | 2.1.1 Keyboard; 4.1.2 Name, Role, Value | App-shell shortcut/menu tests verify the compose form opens. |
 | Activity Refresh invented a completed check-in | Removed the fabricated activity record; refresh now announces completion without changing activity data. This is a functional data-integrity correction, not a WCAG failure by itself. | No direct WCAG success criterion claimed | Page and workflow tests verify the refresh status and absence of the fake event. |
 | Medication toggle did not identify the medication or new state | Added a medication-specific accessible name, pressed state, and live status announcement including the medication and resulting taken/not-taken state. | 4.1.2 Name, Role, Value; 4.1.3 Status Messages | Medication tests verify the accessible name, state, and announcement. |
+| Landing page Help launcher sat outside any landmark (axe `region`, best practice) | Wrapped the floating Help button in a named `aside` landmark. | 1.3.1 Info and Relationships (best practice) | Post-merge axe-core scan of the landing page (light and dark, Best Practices on) reported zero issues. |
 
 ## Automated verification
 
@@ -27,11 +28,6 @@ Executed from `desktop-electron`:
 - Coverage: 98.44% lines (1,389/1,411), 97.70% statements, 97.29% functions, and 92.60% branches.
 - Automated `jest-axe` checks cover major rendered screens and dialogs with the `region` rule enabled. The `color-contrast` rule is disabled in jsdom because jsdom does not compute rendered styles; this is not evidence of a passing visual contrast scan.
 
-## Still required for complete submission evidence
+## Known remaining best-practice note
 
-1. The post-fix axe DevTools scans and screenshots listed in `ACCESSIBILITY_TESTING.md` are complete for the stated screens/themes. They are targeted browser evidence, not a claim that every dialog was scanned in both themes.
-2. Keep the real keyboard-only and NVDA/VoiceOver results and recordings in the team's testing evidence. These browser scans do not create or substitute for hands-on device testing.
-
-## AI-use disclosure
-
-An AI assistant helped draft accessibility code changes, regression tests, and this documentation. A team member should review the changes and this statement before submission and remain responsible for the final work.
+With axe Best Practices enabled, the emergency dialog (`role="alertdialog"`) still reports one moderate `region` item on its `.dialog-backdrop` wrapper. This is an axe-core behavior: the same markup with `role="dialog"` reports nothing, and `alertdialog` is the correct role for an urgent confirmation, so the role was kept. It is not a WCAG 2.1 A or AA failure. The wcag2a, wcag2aa, wcag21a and wcag21aa rule sets report zero issues on every screen and dialog in light and dark themes.

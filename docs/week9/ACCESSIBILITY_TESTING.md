@@ -40,7 +40,7 @@ Run with the mouse not used for the test steps. Full Keyboard Access was on. Ctr
 | # | Area | Result | Notes |
 |---|---|---|---|
 | K1 | Landing | Pass | Tab order is Sign in, Create an account, Help. Focus ring is clear. |
-| K2 | Sign in | Pass | Email, password, Sign in, Sign up link. Empty submit shows an error under each field, but focus stays on the Sign in button (item 7). |
+| K2 | Sign in | Pass | Email, password, Sign in, Sign up link. Retested after the Part 2 fixes: an empty submit shows an error under each field and focus moves to the first invalid field (Email). Before the fixes, focus stayed on the Sign in button (item 7). |
 | K3 | Sign up | Pass | All fields reachable in order. |
 | K4 | Skip link | Pass | First Tab shows "Skip to main content". |
 | K5 | Dashboard | Pass | Customize, cards, alert dismiss buttons and View all are reachable. Customize dialog traps focus and returns it. The Check-in card records a check-in with Return. |
@@ -48,11 +48,11 @@ Run with the mouse not used for the test steps. Full Keyboard Access was on. Ctr
 | K7 | Cmd+1 to Cmd+5 | Pass | Each opens the right page. |
 | K8 | Medications | Pass | Mark taken (Space), Add, Edit and Delete confirmation work. The installed 0.8.0 build showed an empty schedule time in the Edit form; the current build (`npm start`) shows the saved time. |
 | K9 | Appointments | Pass | Add, Edit and Delete confirmation work. Fields, Cancel and Save are reachable, Escape closes and focus returns to the button that opened it. |
-| K10 | Activity | Pass | Refresh and filter chips work with Enter. Refresh adds a "Checked in via dashboard" entry even though no check-in was recorded (item 9). |
+| K10 | Activity | Pass | Refresh and filter chips work with Enter. Retested after the Part 2 fixes: Refresh no longer records a check-in entry. Before the fixes it added a "Checked in via dashboard" entry (item 9). |
 | K11 | Messages | Pass | List, open message, mark read or unread, Reply, Archive, Delete (with confirmation, Escape cancels) and the whole compose form work by keyboard. Send and Reply send. Archive moves the message to the Archive tab and focus is kept. After Send, focus lands on the CareConnect web content group. |
 | K12 | Dialogs | Pass | Settings, Keyboard shortcuts, Emergency, Customize, add and edit forms and delete confirmations trap focus, close with Escape and return focus to the opener. |
 | K13 | Cmd+, and F1 | Pass | Settings and Keyboard shortcuts open. |
-| K14 | Cmd+N and Cmd+F | Partial | Find works. Cmd+N opens Messages but not the compose form (item 8). |
+| K14 | Cmd+N and Cmd+F | Pass | Find works. Retested after the Part 2 fixes: Cmd+N opens the new message compose form. Before the fixes it opened Messages only (item 8). |
 | K15 | Cmd+S, E, O, P | Pass | Save, Export, Import and Print run. |
 | K16 | Cmd+= and Cmd+0 | Pass | Zoom in and reset. |
 | K17 | Cmd+Shift+L and H | Pass | Left-hand mode and High contrast toggle. |
@@ -72,11 +72,11 @@ Tested 10/10/2026 on macOS with VoiceOver and Full Keyboard Access on. Cmd+F5 tu
 | S1 | Launch app, landing page | Window title, a heading, Sign in and Sign up buttons | Pass | Buttons are announced when reached with the keyboard. To read page content, click the page and use VO+Down (interact), then VO+Right to move through items. |
 | S2 | Sign in form | Labels, required, error text | Pass | Field names and "required" are announced. Submitting an empty form announces that the password is required. |
 | S3 | Dashboard | Main navigation and main landmarks, headings, widget names, status line | Pass | "Main" is announced and page headings (Overview, Medications and so on) are announced and selectable. The Overview sidebar item reads only as selectable text. |
-| S4 | Rotor (VO+U) | Headings and landmarks list is sensible, one h1 per page | Pass with note | Headings (dashboard): Dashboard, Margaret's status today, Alerts, Today's medications, Next appointment, Unread messages. Landmarks: CareConnect navigation (complementary), main navigation, main, and regions for status overview, alerts, today's medications, next appointment and unread messages, plus footer. No banner or toolbar landmark: the title bar and toolbar are reachable with VO+Right but are not in the landmarks list (item 6). The sidebar landmark is named "CareConnect navigation" but is a complementary landmark, which is confusing next to the real navigation landmark. |
-| S5 | Medications, mark taken | State change and a status message without moving focus | Fail on Medications page | Dashboard: marking and unmarking a medication announces its name and new status. Medications page: marking a medication taken announces only "Selected", then that it can be marked not taken with the toggle button (item 10). |
+| S4 | Rotor (VO+U) | Headings and landmarks list is sensible, one h1 per page | Pass with note | Headings (dashboard): Dashboard, Margaret's status today, Alerts, Today's medications, Next appointment, Unread messages. Landmarks: CareConnect navigation (complementary), main navigation, main, and regions for status overview, alerts, today's medications, next appointment and unread messages, plus footer. No banner or toolbar landmark: the title bar and toolbar are reachable with VO+Right but are not in the landmarks list (item 6). The sidebar landmark is named "CareConnect navigation" but is a complementary landmark, which is confusing next to the real navigation landmark. Retested after the Part 2 fixes: the sidebar landmark now reads "Care plan controls", and the landing page has a Help region. |
+| S5 | Medications, mark taken | State change and a status message without moving focus | Pass | Dashboard: marking and unmarking a medication announces its name and new status. Medications page, retested after the Part 2 fixes: the control announces the medication name and its selected state, and says it can be activated again to toggle it off. Before the fixes it announced only "Selected" (item 10). |
 | S6 | Add medication dialog | Dialog name, field labels, focus stays inside, closing returns focus | Pass | Dialog and field labels are announced. Closing or saving returns to the Medications page. |
 | S7 | Appointments | Cards read with date, time and status | Pass | Cards are read with VO+Right once Full Keyboard Access is on. |
-| S8 | Messages, compose and attach | Dialog or page name, field labels, Attach button | Pass | All fields and the Attach file button are announced. Attaching a file announces the prompt with correct details. No extra hidden element was read. |
+| S8 | Messages, compose and attach | Dialog or page name, field labels, Attach button | Pass | All fields and the Attach file button are announced. Attaching a file announces the prompt with correct details. No extra hidden element was read. Retested after the Part 2 fixes: Attach still works by keyboard. |
 | S9 | Settings | Switches announce on or off | Pass | Items announce as selected or unselected, and choosing another option announces that it was selected. |
 | S10 | Emergency dialog | Alert dialog name and description | Pass | The dialog is announced when the Emergency button opens it. SOS was not pressed. |
 | S11 | Menu bar (VO+M) | Menus and items with shortcuts | Pass | All menus and items are read aloud. |
@@ -108,5 +108,7 @@ Usability findings from keyboard testing:
 Screen reader finding:
 
 10. **Medications toggle.** On the Medications page the mark-taken control announces only "Selected" and does not say the medication name or the new state, unlike the dashboard. Add an accessible name and state (for example `aria-pressed` with a label naming the medication) and a status message.
+
+Status after Part 2 fixes (retest on `npm start`, macOS 26.6.2, VoiceOver): findings 7 (K2), 8 (K14), 9 (K10), 10 (S5) were retested by hand and pass. The sidebar landmark rename (item 6, S4) and the compose Attach button (S8) were confirmed in VoiceOver. Findings 1 to 5 were rechecked with axe-core and the contrast scan on the merged code and report no issues. With axe Best Practices on, the only remaining item is a `region` note on the emergency dialog backdrop (see `PART2_FIXES.md`).
 
 Contrast check of rendered text: every visible text item on each screen and dialog was measured in light and dark themes (colors composited over their backgrounds, 4.5:1 for normal text and 3:1 for large text). Only the items in findings 1, 2 and 4 fail. The "Signing in..." and "Send" buttons measured 2.3:1 but are disabled controls, which WCAG 1.4.3 exempts.
