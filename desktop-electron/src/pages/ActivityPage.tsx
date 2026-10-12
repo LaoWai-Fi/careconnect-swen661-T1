@@ -12,20 +12,14 @@ const TYPE_COLORS: Record<ActivityEntry['type'], { dot: string; label: string; b
 
 interface Props {
   state: AppState;
-  onAddEntry: (entry: Omit<ActivityEntry, 'id'>) => void;
 }
 
-export default function ActivityPage({ state, onAddEntry }: Props) {
+export default function ActivityPage({ state }: Props) {
   const [activeFilter, setActiveFilter] = useState<ActivityEntry['type'] | 'all'>('all');
   const [refreshed, setRefreshed] = useState(false);
 
   function handleRefresh() {
     setRefreshed(true);
-    onAddEntry({
-      type: 'checked_in',
-      description: 'Margaret checked in via dashboard',
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-    });
     setTimeout(() => setRefreshed(false), 2000);
   }
 
@@ -60,6 +54,7 @@ export default function ActivityPage({ state, onAddEntry }: Props) {
       <TapButton variant="outline" size="md" onClick={handleRefresh} disabled={refreshed}>
         {refreshed ? '✓ Refreshed!' : '↺ Refresh'}
       </TapButton>
+      {refreshed && <p className="sr-only" role="status">Activity log refreshed.</p>}
 
       {/* Filter pills */}
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter activity">

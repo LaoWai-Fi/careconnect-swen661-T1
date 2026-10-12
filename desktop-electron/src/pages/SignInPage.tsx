@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Logo from '../components/Logo';
 import TapButton from '../components/TapButton';
 import FormField, { Input } from '../components/FormField';
@@ -14,6 +14,8 @@ export default function SignInPage({ navigate, onSignIn }: Props) {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   function validate() {
     const e: Record<string, string> = {};
@@ -25,7 +27,11 @@ export default function SignInPage({ navigate, onSignIn }: Props) {
   function handleSubmit(ev: React.FormEvent) {
     ev.preventDefault();
     const e = validate();
-    if (Object.keys(e).length) { setErrors(e); return; }
+    if (Object.keys(e).length) {
+      setErrors(e);
+      window.setTimeout(() => (e.email ? emailRef.current : passwordRef.current)?.focus(), 0);
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       onSignIn(email.split('@')[0] || 'Joyce');
@@ -51,6 +57,7 @@ export default function SignInPage({ navigate, onSignIn }: Props) {
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <FormField label="Email address" required error={errors.email}>
               <Input
+                ref={emailRef}
                 type="email"
                 placeholder="you@example.com"
                 value={email}
@@ -63,6 +70,7 @@ export default function SignInPage({ navigate, onSignIn }: Props) {
 
             <FormField label="Password" required hint="Any password works — this is a demonstration app." error={errors.password}>
               <Input
+                ref={passwordRef}
                 type="password"
                 placeholder=""
                 value={password}
