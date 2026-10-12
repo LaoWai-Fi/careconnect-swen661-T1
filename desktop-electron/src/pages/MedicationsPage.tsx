@@ -42,7 +42,7 @@ function MedCard({
 
   function handleToggle() {
     onToggle();
-    setFeedback(med.taken ? '↩ Marked as not taken' : '✓ Marked as taken!');
+    setFeedback(`${med.name} marked as ${med.taken ? 'not taken' : 'taken'}.`);
     setTimeout(() => setFeedback(''), 2500);
   }
 
@@ -56,10 +56,10 @@ function MedCard({
         <button
           onClick={handleToggle}
           className={`text-2xl mt-0.5 active:scale-90 transition-transform focus-visible:outline-2 focus-visible:outline-[var(--ring)]`}
-          aria-label={`${med.name}: ${med.taken ? 'mark as not taken' : 'mark as taken'}`}
+          aria-label={`${med.name}, ${med.taken ? 'taken' : 'not taken'}. Activate to mark as ${med.taken ? 'not taken' : 'taken'}`}
           aria-pressed={med.taken}
         >
-          {med.taken ? '✅' : '⭕'}
+          <span aria-hidden="true">{med.taken ? '✅' : '⭕'}</span>
         </button>
       </div>
 

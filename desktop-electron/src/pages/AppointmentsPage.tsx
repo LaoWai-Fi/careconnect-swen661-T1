@@ -207,7 +207,7 @@ function ApptCard({
           <span className="font-semibold text-[var(--success-text)]">
             {appt.assignee}
           </span>
-          <span className="text-[var(--success-text)] opacity-80">
+          <span className="text-[var(--success-text)]">
             is assigned
           </span>
         </div>

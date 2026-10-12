@@ -236,6 +236,8 @@ body.one-handed-right .ohe-panel { transform: translateX(10%); }
   overflow: hidden;
 }
 
+.application-header { flex: none; }
+
 .window-titlebar {
   min-height: 2.25rem;
   display: flex;
@@ -806,7 +808,7 @@ kbd {
 
 .emergency-siren { font-size: 3rem; line-height: 1; }
 .emergency-title { font-size: 1.4rem; font-weight: 800; }
-.emergency-body { font-size: 0.9rem; color: #fecaca; }
+.emergency-body { font-size: 0.9rem; color: #ffffff; }
 
 .emergency-header-calling .emergency-siren {
   animation: emergency-pulse 1.2s ease-in-out infinite;

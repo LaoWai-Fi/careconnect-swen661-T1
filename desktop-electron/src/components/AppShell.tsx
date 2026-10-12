@@ -241,8 +241,7 @@ export default function AppShell({
       }
       if (command && event.key.toLowerCase() === "n") {
         event.preventDefault()
-        navigate("messages")
-        setStatus("Messages opened — choose New Message to compose")
+        runActionRef.current("compose")
       }
     }
     window.addEventListener("keydown", onKeyDown)
@@ -403,7 +402,11 @@ export default function AppShell({
   function runAction(action: string) {
     setOpenMenu(null)
     if (NAV_ITEMS.some((item) => item.id === action)) navigate(action as Page)
-    if (action === "compose") navigate("messages")
+    if (action === "compose") {
+      if (onNewMessage) onNewMessage()
+      else navigate("messages")
+      setStatus("New message opened")
+    }
     if (action === "save") {
       if (onSave) onSave()
       else setStatus("Saved just now")
@@ -496,6 +499,7 @@ export default function AppShell({
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
+      <header className="application-header" role="banner" aria-label="CareConnect application header">
       <div className="window-titlebar window-drag">
         <div className="flex items-center gap-2">
           <Logo size={24} />
@@ -805,9 +809,10 @@ export default function AppShell({
           )}
         </div>
       )}
+      </header>
 
       <div className="desktop-workspace">
-        <aside className="desktop-sidebar" aria-label="CareConnect navigation">
+        <aside className="desktop-sidebar" aria-label="Care plan controls">
           <div className="recipient-area" data-recipient-menu>
             <button
               type="button"

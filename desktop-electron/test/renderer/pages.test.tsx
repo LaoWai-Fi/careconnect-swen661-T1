@@ -104,9 +104,11 @@ describe("MedicationsPage", () => {
   test("mark as taken shows feedback and calls back", async () => {
     const med = DEFAULT_MEDS[0]
     const { user, onToggleTaken } = renderPage()
-    await user.click(screen.getByRole("button", { name: new RegExp(`^${med.name}: mark as`) }))
+    const toggle = screen.getByRole("button", { name: new RegExp(`^${med.name}, not taken`) })
+    expect(toggle).toHaveAttribute("aria-pressed", "false")
+    await user.click(toggle)
     expect(onToggleTaken).toHaveBeenCalledWith(med.id)
-    expect(screen.getByRole("status")).toHaveTextContent(/Marked as/)
+    expect(screen.getByRole("status")).toHaveTextContent(`${med.name} marked as taken.`)
   })
 
   test("add form validates, then saves", async () => {
@@ -283,8 +285,7 @@ describe("ActivityPage", () => {
     jest.useFakeTimers()
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
     let state = care.checkIn(care.toggleMedTaken(base(), DEFAULT_MEDS.find((m) => !m.taken)!.id))
-    const onAddEntry = jest.fn()
-    const { rerender } = render(<ActivityPage state={state} onAddEntry={onAddEntry} />)
+    const { rerender } = render(<ActivityPage state={state} />)
     const group = screen.getByRole("group", { name: /filter activity/i })
     await user.click(within(group).getByRole("button", { name: /checked in/i }))
     expect(within(group).getByRole("button", { name: /checked in/i })).toHaveAttribute("aria-pressed", "true")
@@ -295,11 +296,12 @@ describe("ActivityPage", () => {
     await user.click(within(group).getByRole("button", { name: "All" }))
     expect(screen.getByText(/marked as taken/)).toBeInTheDocument()
     await user.click(screen.getByRole("button", { name: /refresh/i }))
-    expect(onAddEntry).toHaveBeenCalledWith(expect.objectContaining({ type: "checked_in" }))
+    expect(screen.queryByText("Margaret checked in via dashboard")).not.toBeInTheDocument()
+    expect(screen.getByRole("status")).toHaveTextContent("Activity log refreshed.")
     expect(screen.getByRole("button", { name: /refreshed/i })).toBeDisabled()
     act(() => jest.advanceTimersByTime(2100))
     state = { ...state, activity: [] }
-    rerender(<ActivityPage state={state} onAddEntry={onAddEntry} />)
+    rerender(<ActivityPage state={state} />)
     expect(screen.getByText("No activity yet")).toBeInTheDocument()
     jest.useRealTimers()
   })
