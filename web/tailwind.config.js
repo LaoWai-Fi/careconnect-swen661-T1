@@ -23,7 +23,7 @@ export default {
       },
 
       // ── Color System ──────────────────────────────────────────────────────────
-      // All text/bg pairs verified ≥4.5:1 WCAG AA; interactive elements ≥3:1
+      // Semantic foreground/background combinations are checked in browser tests.
       colors: {
         // Neutral ramp — backbone grays
         neutral: {
@@ -31,7 +31,7 @@ export default {
           100: '#eef0f4',   // surface / card
           200: '#dde1e8',   // dividers / borders
           300: '#c4cad5',   // muted borders
-          400: '#8f9aaa',   // placeholder / disabled
+          400: '#60697a',   // secondary text; decorative light borders use 200/300
           500: '#60697a',   // secondary text (4.8:1 on white)
           600: '#46505f',   // body text (7.2:1 on white)
           700: '#303845',   // strong body (9.8:1 on white)

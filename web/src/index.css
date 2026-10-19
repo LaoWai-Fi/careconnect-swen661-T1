@@ -1,6 +1,3 @@
-/* ── Google Font Import ──────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,13 +12,8 @@
     scroll-behavior: smooth;
   }
 
-  /* ── Horizontal-overflow guard ───────────────────────────────────────────
-     `clip` (not `hidden`) prevents any stray wide element from causing a
-     horizontal scrollbar at narrow widths (verified down to 320px) WITHOUT
-     establishing a scroll container — so the sticky header keeps working. */
   html,
   body {
-    overflow-x: clip;
     max-width: 100%;
   }
 
@@ -43,6 +35,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  ::selection { background: #d1eaf4; color: #062738; }
+  input, textarea { caret-color: #146488; }
 
   /* ── Global Focus Styles — thick, high-contrast, never removed ───────── */
   /* Applies to every focusable element; override per-component only for shape */
@@ -100,15 +95,14 @@
 @layer components {
   /* ── Skip Link ────────────────────────────────────────────────────────── */
   .skip-link {
-    @apply absolute left-4 top-4 z-50 px-4 py-2 rounded font-semibold;
+    @apply fixed left-4 top-4 z-50 px-4 py-2 rounded font-semibold;
     @apply bg-calm-700 text-white;
     /* Visually hidden until focused */
-    transform: translateY(-150%);
-    transition: transform 150ms ease;
+    clip-path: inset(50%);
   }
 
   .skip-link:focus {
-    transform: translateY(0);
+    clip-path: none;
   }
 
   /* ── Card ─────────────────────────────────────────────────────────────── */
@@ -203,7 +197,86 @@
   }
 
   @keyframes pageEnter {
-    from { opacity: 0; transform: translateY(6px); }
+    from { transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+}
+
+/* Week 10 web shell. Breakpoints are CSS pixels, independent of text scaling. */
+.web-app { min-height: 100dvh; display: flex; flex-direction: column; }
+.web-header { background: #fff; border-bottom: 1px solid #dde1e8; }
+.web-utility { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; padding: .65rem 1rem; border-bottom: 1px solid #eef0f4; }
+.web-brand { display: inline-flex; align-items: center; gap: .6rem; color: #1e2631; font-weight: 700; text-decoration: none; }
+.web-brandmark { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: .6rem; color: #fff; background: #146488; }
+.web-brand-name, .web-control-label, .web-role { display: none; }
+.web-account-actions { display: flex; align-items: center; gap: .35rem; margin-inline-start: auto; }
+.web-icon-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .45rem; min-width: 2.75rem; min-height: 2.75rem; border: 1px solid #dde1e8; border-radius: .5rem; color: #0f5070; background: #fff; font-size: .875rem; font-weight: 600; }
+.web-icon-button:hover { background: #edf6fa; border-color: #146488; }
+.web-tablet-menu { display: none; }
+.web-orientation { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.5rem; padding: .9rem 1rem; }
+.web-greeting { color: #1e2631; font-size: 1.2rem; font-weight: 700; overflow-wrap: anywhere; }
+.web-plan, .web-date { color: #46505f; font-size: .875rem; }
+.web-date { margin-inline-start: auto; }
+.web-call { display: inline-flex; gap: .5rem; align-items: center; color: #075c3f; font-size: .875rem; min-height: 2.75rem; }
+.web-workspace { flex: 1; min-width: 0; }
+.web-sidebar { display: none; }
+.web-main { min-width: 0; padding: 1.5rem 1rem; container-type: inline-size; container-name: care-content; }
+.medication-grid, .web-summary-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.web-dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+@container care-content (min-width: 54rem) { .web-dashboard-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+.web-main p { overflow-wrap: anywhere; }
+@container care-content (min-width: 30rem) { .web-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container care-content (min-width: 35rem) { .medication-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container care-content (min-width: 52rem) { .web-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.web-main > div { max-width: 78rem; }
+.web-main h1 { font-size: clamp(1.6rem, 3vw, 2.25rem); overflow-wrap: anywhere; }
+.web-main h2 { overflow-wrap: anywhere; }
+.web-main input[type="time"] { min-width: 0; max-width: 100%; }
+.web-nav-list { display: flex; flex-direction: column; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.web-nav-link { display: flex; align-items: center; gap: .75rem; min-height: 2.75rem; padding: .75rem; color: #46505f; text-decoration: none; border-radius: .5rem; }
+.web-nav-link svg { flex-shrink: 0; }
+.web-nav-link:hover { color: #0f5070; background: #edf6fa; }
+.web-nav-current { background: #d1eaf4; color: #0f5070; font-weight: 700; }
+.web-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem; padding: 1rem; border-top: 1px solid #dde1e8; background: #fff; color: #46505f; font-size: .8rem; }
+.web-install-help { flex-basis: 100%; }
+.web-install-help summary { width: fit-content; cursor: pointer; color: #146488; }
+.web-install-help p { max-width: 70ch; padding-block: .5rem; }
+.web-modal { margin: auto; padding: 1.25rem; width: min(32rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; color: #303845; background: #fff; border: 0; border-radius: .75rem; box-shadow: 0 1rem 3rem #11172033; }
+.web-modal::backdrop { background: #11172080; }
+.web-modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.web-modal-header h2 { font-size: 1.35rem; padding-top: .35rem; }
+.web-modal-description { margin-bottom: 1.25rem; }
+.web-nav-dialog { margin: .75rem auto .75rem .75rem; width: min(21rem, calc(100% - 1.5rem)); min-height: min(32rem, calc(100dvh - 1.5rem)); }
+.web-dialog-actions { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: flex-end; }
+.web-danger { background: #a81830; border-color: #a81830; }
+.web-danger:hover { background: #7e1124; border-color: #7e1124; }
+.pwa-status { padding: .7rem 1rem; background: #fef3c7; color: #503800; font-size: .875rem; }
+.pwa-status p { max-width: 75ch; }
+.pwa-update { padding: .75rem 1rem; background: #edf6fa; color: #0b3d56; }
+.pwa-update-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .6rem; }
+.pwa-install { margin: 1rem; padding: 1rem; background: #fff; border: 1px solid #a3d4e9; border-radius: .75rem; }
+
+@media (min-width: 480px) { .web-brand-name { display: inline; } }
+@media (min-width: 768px) {
+  .web-mobile-menu { display: none; }
+  .web-tablet-menu { display: inline-flex; }
+  .web-role { display: inline; font-size: .8rem; font-weight: 600; color: #075c3f; padding: .3rem .65rem; background: #d0f2e5; border-radius: 2rem; }
+  .web-utility, .web-orientation { padding-inline: 1.5rem; }
+  .web-workspace { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  .web-sidebar { display: block; width: 14rem; padding: 1rem .6rem; border-inline-end: 1px solid #dde1e8; background: #fff; }
+  .web-sidebar[data-collapsed="true"] { width: 4.5rem; }
+  .web-sidebar[data-collapsed="true"] .web-nav-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .web-main { padding: 1.75rem 1.5rem; }
+  .web-footer { padding-inline: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .web-tablet-menu { display: none; }
+  .web-control-label { display: inline; }
+  .web-sidebar, .web-sidebar[data-collapsed="true"] { width: 14rem; }
+  .web-sidebar[data-collapsed="true"] .web-nav-label { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal; }
+  .web-main { padding: 2rem; }
+}
+@media (forced-colors: active) {
+  *:focus-visible { outline: 3px solid Highlight; }
+  .web-nav-current { outline: 2px solid Highlight; }
 }

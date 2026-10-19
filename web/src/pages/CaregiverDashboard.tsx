@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   CheckCircle2,
   AlertTriangle,
-  Clock,
   Pill,
   CalendarDays,
   UserCheck,
@@ -76,7 +75,7 @@ function StatusSummaryCard({
 
   return (
     <Card heading="Margaret's status today" headingLevel={2}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="web-summary-grid gap-4">
 
         {/* Medication adherence */}
         <div
@@ -317,6 +316,7 @@ export default function CaregiverDashboard() {
           className="inline-flex items-center gap-2 rounded-pill px-4 py-2 text-sm font-semibold border-2"
           style={{ borderColor: 'transparent' }}
           aria-label={`Schedule: ${schedAdherence.doneCount} of ${schedAdherence.totalCount} tasks done`}
+          role="group"
         >
           <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-pill text-sm font-bold ${
             schedAdherence.doneCount === schedAdherence.totalCount
@@ -350,7 +350,7 @@ export default function CaregiverDashboard() {
             {hasAlerts && (
               <span
                 className="ml-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-alert-100 text-alert-700 text-xs font-bold"
-                aria-label={`${medAdherence.missedMeds.length + upcomingAlerts.length} alerts`}
+              role="img" aria-label={`${medAdherence.missedMeds.length + upcomingAlerts.length} alerts`}
               >
                 {medAdherence.missedMeds.length + upcomingAlerts.length}
               </span>
@@ -395,12 +395,12 @@ export default function CaregiverDashboard() {
       </section>
 
       {/* ── Two-column: Activity + Quick links ───────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="web-dashboard-grid gap-6">
 
         {/* Activity timeline — takes 2/3 of width on desktop */}
         <section
           aria-labelledby="activity-heading"
-          className="lg:col-span-2"
+          className="min-w-0"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 id="activity-heading" className="text-xl font-semibold text-neutral-800 flex items-center gap-2">
@@ -409,6 +409,7 @@ export default function CaregiverDashboard() {
             </h2>
             <Link
               to="/app/activity"
+              aria-label="View all recent activity"
               className="text-sm font-semibold text-calm-600 no-underline hover:underline flex items-center gap-1"
             >
               View all
@@ -451,7 +452,6 @@ export default function CaregiverDashboard() {
             <Link
               to="/app/manage-medications"
               className="flex items-center gap-4 bg-white rounded-xl border-2 border-neutral-300 shadow-card px-5 py-4 no-underline group hover:border-calm-400 hover:shadow-card-hover transition-all"
-              aria-label="Manage medications"
             >
               <span
                 className="w-11 h-11 rounded-xl bg-warm-100 flex items-center justify-center flex-shrink-0 group-hover:bg-warm-200 transition-colors"
@@ -473,7 +473,6 @@ export default function CaregiverDashboard() {
             <Link
               to="/app/manage-appointments"
               className="flex items-center gap-4 bg-white rounded-xl border-2 border-neutral-300 shadow-card px-5 py-4 no-underline group hover:border-calm-400 hover:shadow-card-hover transition-all"
-              aria-label="Manage appointments"
             >
               <span
                 className="w-11 h-11 rounded-xl bg-calm-100 flex items-center justify-center flex-shrink-0 group-hover:bg-calm-200 transition-colors"
@@ -497,7 +496,6 @@ export default function CaregiverDashboard() {
             <Link
               to="/app/caregiver"
               className="flex items-center gap-4 bg-white rounded-xl border-2 border-neutral-300 shadow-card px-5 py-4 no-underline group hover:border-calm-400 hover:shadow-card-hover transition-all"
-              aria-label="View caregiver notes"
             >
               <span
                 className="w-11 h-11 rounded-xl bg-success-100 flex items-center justify-center flex-shrink-0 group-hover:bg-success-200 transition-colors"
@@ -519,7 +517,6 @@ export default function CaregiverDashboard() {
             <Link
               to="/app/activity"
               className="flex items-center gap-4 bg-white rounded-xl border-2 border-neutral-300 shadow-card px-5 py-4 no-underline group hover:border-calm-400 hover:shadow-card-hover transition-all"
-              aria-label="View full activity log"
             >
               <span
                 className="w-11 h-11 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0 group-hover:bg-neutral-200 transition-colors"

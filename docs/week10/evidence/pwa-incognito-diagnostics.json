@@ -1,0 +1,8 @@
+{
+  "installabilityErrors": [
+    {
+      "errorId": "in-incognito",
+      "errorArguments": []
+    }
+  ]
+}

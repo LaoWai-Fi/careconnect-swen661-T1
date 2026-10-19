@@ -191,6 +191,7 @@ function MedForm({
         {/* Name */}
         <Field
           label="Medication name (required)"
+          autoFocus
           required
           placeholder="e.g. Amlodipine"
           value={form.name}
@@ -262,7 +263,7 @@ function MedForm({
             type="button"
             onClick={addTime}
             className="inline-flex items-center gap-2 text-sm font-semibold text-calm-600 hover:text-calm-700 min-h-[2.75rem] transition-colors"
-            aria-label="Add another scheduled time"
+            aria-label="Add another time to the schedule"
           >
             <PlusCircle className="w-4 h-4" aria-hidden="true" />
             Add another time
@@ -306,14 +307,14 @@ function MedRow({
   onDelete: () => void;
 }) {
   return (
-    <li>
+    <li><article aria-label={`${med.name} prescription`}>
       <Card heading={med.name} headingLevel={3}>
         <div className="space-y-3">
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-neutral-600">
             <span className="font-medium">{med.dosage}</span>
           </div>
 
-          <div className="flex flex-wrap gap-2" aria-label="Scheduled times">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Scheduled times">
             {med.times.map((t) => (
               <span
                 key={t}
@@ -353,7 +354,7 @@ function MedRow({
           </div>
         </div>
       </Card>
-    </li>
+    </article></li>
   );
 }
 
@@ -364,6 +365,7 @@ type Mode = 'list' | 'add' | { edit: string };
 export default function ManageMedications() {
   const [meds, setMeds] = useState<Medication[]>(getMedications);
   const [mode, setMode] = useState<Mode>('list');
+  const [message, setMessage] = useState('');
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
   function persist(updated: Medication[]) {
@@ -372,6 +374,7 @@ export default function ManageMedications() {
   }
 
   function handleSave(med: Medication) {
+    setMessage(`${med.name} saved to this device's demo care plan.`);
     if (mode === 'add') {
       persist([...meds, med]);
     } else if (typeof mode === 'object') {
@@ -382,6 +385,8 @@ export default function ManageMedications() {
   }
 
   function handleDelete(id: string) {
+    const removed = meds.find((med) => med.id === id);
+    setMessage(`${removed?.name || 'Medication'} removed from this device's demo care plan.`);
     persist(meds.filter((m) => m.id !== id));
   }
 
@@ -411,12 +416,13 @@ export default function ManageMedications() {
             aria-label="Add new medication"
           >
             <PlusCircle className="w-5 h-5" aria-hidden="true" />
-            Add medication
+            Add new medication
           </button>
         )}
       </div>
 
       {/* ── Add / Edit form ───────────────────────────────────────────────── */}
+      <p role="status" aria-label="Medication updates" aria-live="polite" aria-atomic="true" className={message ? 'text-success-700' : 'sr-only'}>{message}</p>
       {mode !== 'list' && (
         <MedForm
           initial={editingMed}
@@ -450,7 +456,7 @@ export default function ManageMedications() {
               </p>
             </div>
           ) : (
-            <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 list-none p-0 m-0" role="list">
+            <ul className="medication-grid gap-4 list-none p-0 m-0" role="list">
               {meds.map((med) => (
                 <MedRow
                   key={med.id}

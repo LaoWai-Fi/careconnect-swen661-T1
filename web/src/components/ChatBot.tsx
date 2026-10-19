@@ -88,6 +88,7 @@ interface ApiMessage {
 }
 
 async function callAssistantApi(history: ApiMessage[]): Promise<string | null> {
+  if (!navigator.onLine || !import.meta.env.VITE_SUPABASE_URL || !ANON_KEY) return null;
   try {
     const res = await fetch(EDGE_URL, {
       method: 'POST',
@@ -121,6 +122,7 @@ export default function ChatBot() {
   const inputRef     = useRef<HTMLInputElement>(null);
   const listEndRef   = useRef<HTMLDivElement>(null);
   const panelRef     = useRef<HTMLDivElement>(null);
+  const previouslyOpen = useRef(false);
 
   const panelLabelId   = useId();
   const messageLiveId  = useId();
@@ -129,9 +131,10 @@ export default function ChatBot() {
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
-    } else {
+    } else if (previouslyOpen.current) {
       launcherRef.current?.focus();
     }
+    previouslyOpen.current = open;
   }, [open]);
 
   // Scroll to latest message
