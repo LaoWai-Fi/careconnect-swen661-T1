@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState, useId, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, UserPlus } from 'lucide-react';
 import { Field } from '../components';
@@ -8,6 +8,8 @@ export default function SignUp() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
   const errorSummaryId = useId();
+  const formRef = useRef<HTMLFormElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
 
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
@@ -43,7 +45,10 @@ export default function SignUp() {
     setGlobalError('');
     const next = validate();
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      return;
+    }
 
     setSubmitting(true);
     const result = await signUp(name, email, password);
@@ -51,6 +56,7 @@ export default function SignUp() {
 
     if (result.error) {
       setGlobalError(result.error);
+      requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
     navigate('/role');
@@ -77,6 +83,7 @@ export default function SignUp() {
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <main
         id="main-content"
+        tabIndex={-1}
         className="flex-1 flex items-center justify-center px-4 py-12"
         aria-label="Sign up"
       >
@@ -94,6 +101,8 @@ export default function SignUp() {
             {(hasFieldErrors || globalError) && (
               <div
                 id={errorSummaryId}
+                ref={summaryRef}
+                tabIndex={-1}
                 role="alert"
                 aria-live="assertive"
                 aria-atomic="true"
@@ -107,6 +116,7 @@ export default function SignUp() {
 
             {/* Form */}
             <form
+              ref={formRef}
               noValidate
               onSubmit={handleSubmit}
               aria-describedby={hasFieldErrors || globalError ? errorSummaryId : undefined}
@@ -169,7 +179,7 @@ export default function SignUp() {
 
             {/* Privacy assurance */}
             <p className="text-center text-xs text-neutral-400 leading-relaxed">
-              CareConnect never gives medical advice and never shares your information with third parties.
+              Course prototype: use fictional account details. This demo saves account details on this device and does not verify passwords.
             </p>
 
             {/* Switch link */}

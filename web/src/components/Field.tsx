@@ -44,14 +44,14 @@ export type FieldProps = BaseFieldProps &
 
 const inputBase =
   'block w-full rounded-lg border-2 bg-white px-4 py-3 ' +
-  'text-base text-neutral-800 placeholder:text-neutral-400 ' +
+  'text-base text-neutral-800 placeholder:text-neutral-500 ' +
   'min-h-[2.75rem] ' + // 44px touch target
   'transition-colors duration-200 ' +
   'focus:outline-none '; // outline handled globally via *:focus-visible
 
 const inputNormal =
   inputBase +
-  'border-neutral-300 ' +
+  'border-neutral-400 ' +
   'hover:border-neutral-400 ' +
   'focus:border-calm-600 ';
 
@@ -79,14 +79,14 @@ export default function Field(props: FieldProps) {
 
   // Stable unique IDs — no collisions even with multiple instances
   const baseId = useId();
-  const inputId = `${baseId}-input`;
+  const inputId = rest.id || `${baseId}-input`;
   const hintId  = `${baseId}-hint`;
   const errorId = `${baseId}-error`;
 
   const hasError = Boolean(error);
 
   // Build aria-describedby from whichever secondary elements exist
-  const describedBy = [hint && hintId, hasError && errorId]
+  const describedBy = [rest['aria-describedby'], hint && !hasError && hintId, hasError && errorId]
     .filter(Boolean)
     .join(' ') || undefined;
 

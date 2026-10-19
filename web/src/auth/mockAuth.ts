@@ -61,6 +61,7 @@ export async function signUp(
   email: string,
   _password: string,
 ): Promise<AuthResult> {
+  void _password; // Demonstration authentication never stores or verifies passwords.
   const users = getStoredUsers();
   if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
     return { error: 'An account with this email already exists. Try signing in instead.' };
@@ -79,6 +80,7 @@ export async function signIn(
   email: string,
   _password: string,
 ): Promise<AuthResult> {
+  void _password;
   const users = getStoredUsers();
   const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim());
   if (!user) {

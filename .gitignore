@@ -37,3 +37,6 @@ artifacts/
 .gradle/
 local.properties
 coverage/
+
+# Generated submission PDFs and visual QA renders (source reports are in docs/).
+/output/

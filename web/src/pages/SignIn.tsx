@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState, useId, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, LogIn } from 'lucide-react';
 import { Field } from '../components';
@@ -8,6 +8,8 @@ export default function SignIn() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const errorSummaryId = useId();
+  const formRef = useRef<HTMLFormElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
 
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +30,10 @@ export default function SignIn() {
     setGlobalError('');
     const next = validate();
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      return;
+    }
 
     setSubmitting(true);
     const result = await signIn(email, password);
@@ -36,6 +41,7 @@ export default function SignIn() {
 
     if (result.error) {
       setGlobalError(result.error);
+      requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
     navigate('/role');
@@ -64,10 +70,11 @@ export default function SignIn() {
         id="main-content"
         className="flex-1 flex items-center justify-center px-4 py-12"
         aria-label="Sign in"
+        tabIndex={-1}
       >
         <div className="w-full max-w-md">
           {/* Card */}
-          <div className="bg-white rounded-xl border-2 border-neutral-200 shadow-card p-8 space-y-6">
+          <div className="bg-white rounded-xl border-2 border-neutral-200 shadow-card p-5 md:p-8 space-y-6">
             {/* Heading */}
             <div className="text-center">
               <h1 className="text-2xl font-bold text-neutral-800">Welcome back</h1>
@@ -78,6 +85,8 @@ export default function SignIn() {
             {(hasFieldErrors || globalError) && (
               <div
                 id={errorSummaryId}
+                ref={summaryRef}
+                tabIndex={-1}
                 role="alert"
                 aria-live="assertive"
                 aria-atomic="true"
@@ -91,6 +100,7 @@ export default function SignIn() {
 
             {/* Form */}
             <form
+              ref={formRef}
               noValidate
               onSubmit={handleSubmit}
               aria-describedby={hasFieldErrors || globalError ? errorSummaryId : undefined}

@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { getSession } from './auth/mockAuth';
 import { AppProvider } from './context/AppContext';
 import { ProtectedRoute, RoleRoute, AuthRoute } from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import RouteAccessibility, { SkipLink } from './components/RouteAccessibility';
+import PwaStatus from './components/PwaStatus';
 
 // Public pages (do not modify)
 import Landing     from './pages/Landing';
@@ -31,6 +33,7 @@ import type { AppView } from './types';
 
 function AppShell() {
   const { setRole, signOut } = useAuth();
+  const navigate = useNavigate();
 
   // Initialise the view from the PERSISTED role (read synchronously from
   // storage). The auth context's `role` hydrates asynchronously and is null on
@@ -48,6 +51,7 @@ function AppShell() {
     const next: AppView = view === 'patient' ? 'caregiver' : 'patient';
     setView(next);
     setRole(next);           // persists via AuthContext → mockAuth
+    navigate('/app');
   }
 
   return (
@@ -107,8 +111,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <SkipLink />
+      <PwaStatus />
       <AuthProvider>
         <AppProvider>
+          <RouteAccessibility />
           <AppRoutes />
         </AppProvider>
       </AuthProvider>

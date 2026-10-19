@@ -5,7 +5,17 @@ CareConnect
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-success)
 ![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)
-A responsive, accessible medical companion web application for care recipients (patients) living with short-term memory loss and their caregivers. Built React-first as an installable Progressive Web App with WCAG 2.1 Level AA accessibility engineered into every screen.
+A responsive course-prototype companion web application for care recipients and caregivers. Built with React, Vite and React Router, with a PWA foundation and accessibility patterns targeting WCAG 2.1 AA.
+
+## Week 10: Parts 2 and 4
+
+Current deliverables: [web accessibility documentation](../docs/week10/PART2_WEB_ACCESSIBILITY.md), [implementation summary](../docs/week10/PART4_IMPLEMENTATION.md), [PWA behavior and deployment](../docs/week10/PWA_IMPLEMENTATION.md), and [actual test results](../docs/week10/TEST_RESULTS.md).
+
+Use Node.js 22.12+ and run `npm ci`, `npm run build`, and `npm run preview -- --host 127.0.0.1 --port 4173`. The production build generates the service worker; development mode intentionally does not register it. To run the complete browser suite, stop the manual preview server and run `npm run test:e2e`; it starts its own preview. On Windows the tests use installed Edge; `PLAYWRIGHT_CHANNEL=chrome` selects installed Chrome. Screenshots and axe JSON are saved in `docs/week10/evidence/` at the repository root.
+
+Create a fictional demo account, choose Caregiver, then use Dashboard and Medications. Sign-in is local mock authentication: passwords are neither stored nor verified. No backend keys are needed for the core pages. The optional remote assistant has a local scripted fallback.
+
+The older screenshots below illustrate existing features; the Week 10 evidence folder contains the current screenshots and verified test scope. The historical architecture diagram is illustrative; current routing is in `src/App.tsx`, registration in `src/pwa/registerSW.ts`, and the generated worker comes from `public/sw.js` plus `scripts/build-pwa.mjs`.
 
 > Developed as a course artifact for **SWEN 661 — UI Implementation** (Assignment 10: Web Design & Early Implementation).
 
@@ -123,7 +133,7 @@ web/
 │   │   └── tokens.css               # design tokens + global focus styles
 │   ├── App.tsx                      # route definitions
 │   ├── main.tsx                     # app entry
-│   └── serviceWorker.ts             # PWA offline caching
+│   └── pwa/registerSW.ts            # PWA registration and waiting updates
 ├── .env                             # local secrets (gitignored — never commit)
 ├── .env.example                     # placeholder environment variables
 ├── .gitignore
@@ -203,7 +213,11 @@ Script Description
 `npm run dev` Start the Vite dev server
 `npm run build` Production build to `/dist`
 `npm run preview` Preview the production build locally
-`npm test` Run Jest + React Testing Library unit/component tests
+`npm run typecheck` Check TypeScript
+`npm run lint` Run ESLint
+`npm run test:e2e` Run production browser/accessibility/PWA tests
+`npm run verify:responsive` Run responsive browser checks
+`npm run verify:pwa` Run PWA browser checks
 `npm run screenshots` Generate README screenshots via Playwright
 
 ---
@@ -299,16 +313,14 @@ Timestamped log of taken/skipped doses and check-ins.
 ---
 
 Testing
-Unit & component: Jest + React Testing Library (`npm test`), targeting 60–75% coverage per the course milestones.
-End-to-end: Playwright specs for core flows (sign in → take medication → caregiver sees adherence).
-Accessibility: axe DevTools, Lighthouse (target 95+ accessibility), and manual screen-reader testing (NVDA / VoiceOver) plus keyboard-only navigation.
+Browser tests: `npm run test:e2e` verifies the core pages, real demo sign-up/sign-in, medication CRUD, navigation, focus, rendered axe accessibility checks, offline use and waiting-worker updates. See `test/week10.spec.ts` and the current results linked above. No Jest script or Week 10 coverage percentage is claimed. Actual OS-level installs and newly performed manual screen-reader sessions are outside this automated run.
 Deployment
 
 ```bash
 npm run build       # outputs to /dist
 ```
 
-Deploy `/dist` to Netlify or Vercel. Configure the assistant's serverless function and set `ANTHROPIC_API_KEY` in the host's environment settings (never client-side).
+Deploy `/dist` at the origin root on an HTTPS static host with SPA fallback for app routes. Revalidate `sw.js`; allow hashed assets to be immutable. See the PWA deployment document linked above. Backend and clinical synchronization are not implemented in this prototype. The optional assistant's server-side credentials must never be placed in the web bundle.
 Roadmap
 Real backend with Supabase + Row Level Security
 Multi-patient support for caregivers

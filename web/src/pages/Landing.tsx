@@ -43,9 +43,6 @@ export default function Landing() {
   return (
     <>
       {/* ── Skip link — first focusable element ───────────────────────────── */}
-      <a href="#main-content" className="skip-link">
-        Skip to main content
-      </a>
 
       <div className="min-h-screen flex flex-col bg-neutral-50">
 
@@ -301,7 +298,7 @@ export default function Landing() {
                 </span>
                 <span className="font-semibold text-white">CareConnect</span>
               </div>
-              <p className="text-sm text-neutral-400 text-center">
+              <p className="text-sm text-neutral-200 text-center">
                 &copy; {new Date().getFullYear()} CareConnect. For informational use only.
                 CareConnect does not provide medical advice, diagnosis, or treatment.
               </p>

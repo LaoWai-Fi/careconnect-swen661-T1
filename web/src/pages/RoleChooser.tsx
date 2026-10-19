@@ -20,10 +20,6 @@ export default function RoleChooser() {
 
   return (
     <>
-      {/* Skip link */}
-      <a href="#role-chooser-main" className="skip-link">
-        Skip to role selection
-      </a>
 
       <div className="min-h-screen bg-neutral-50 flex flex-col">
         {/* Minimal header — no nav, no orientation bar */}
@@ -44,7 +40,7 @@ export default function RoleChooser() {
         </header>
 
         <main
-          id="role-chooser-main"
+          id="main-content"
           className="flex-1 flex items-center justify-center px-4 py-12"
           tabIndex={-1}
           aria-label="Choose your role"

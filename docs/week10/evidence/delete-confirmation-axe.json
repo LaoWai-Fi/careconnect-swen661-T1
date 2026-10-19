@@ -1,0 +1,87 @@
+{
+  "timestamp": "2026-10-19T20:27:48.810Z",
+  "testEngine": {
+    "name": "axe-core",
+    "version": "4.14.0"
+  },
+  "testEnvironment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
+    "windowWidth": 1440,
+    "windowHeight": 1000,
+    "orientationAngle": 0,
+    "orientationType": "landscape-primary"
+  },
+  "url": "http://127.0.0.1:4173/app/manage-medications",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "violations": [],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "15.2pt (20.25px)",
+                "fontWeight": "normal",
+                "messageKey": "elmPartiallyObscuring",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p id=\":r9:\" class=\"web-modal-description\">Are you sure you want to delete Week 10 demo medicine? This cannot be undone and will remove it from Margaret's medicines list.</p>",
+          "target": [
+            "#\\:r9\\:"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+        }
+      ]
+    }
+  ],
+  "passes": [
+    "aria-allowed-attr",
+    "aria-allowed-role",
+    "aria-conditional-attr",
+    "aria-hidden-body",
+    "aria-hidden-focus",
+    "aria-prohibited-attr",
+    "aria-valid-attr-value",
+    "aria-valid-attr",
+    "button-name",
+    "color-contrast",
+    "duplicate-id-aria",
+    "empty-heading",
+    "heading-order",
+    "meta-viewport-large",
+    "meta-viewport",
+    "nested-interactive",
+    "region"
+  ]
+}
