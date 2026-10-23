@@ -44,7 +44,7 @@ export default function SignIn() {
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
-    navigate('/role');
+    navigate('/app');
   }
 
   const hasFieldErrors = Object.keys(errors).length > 0;

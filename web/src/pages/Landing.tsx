@@ -113,7 +113,7 @@ export default function Landing() {
 
                 {/* Supporting sentence for both audiences */}
                 <p className="text-lg md:text-xl text-calm-100 leading-relaxed mb-8 max-w-xl">
-                  For people who need a little help remembering, and the people who care for them.
+                  For caregivers looking after someone who needs a little help remembering.
                 </p>
 
                 {/* Primary CTAs */}
@@ -184,49 +184,26 @@ export default function Landing() {
                 id="audiences-heading"
                 className="text-2xl md:text-3xl font-bold text-neutral-800 text-center mb-10"
               >
-                Made for two kinds of people
+                Made for caregivers
               </h2>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Care recipient */}
-                <div className="bg-white rounded-xl border-2 border-calm-200 p-8">
-                  <div className="w-14 h-14 rounded-full bg-calm-100 flex items-center justify-center mb-4" aria-hidden="true">
-                    <Heart className="w-7 h-7 text-calm-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-neutral-800 mb-2">For care recipients</h3>
-                  <p className="text-neutral-600 leading-relaxed mb-4">
-                    Large text, simple steps, and a warm, supportive tone.
-                    CareConnect never overwhelms — it just shows you what's next.
-                  </p>
-                  <ul className="space-y-2 list-none p-0 m-0" role="list">
-                    {["Today's schedule at a glance", 'Medication reminders', 'Memory cards for people and places', 'One-tap contact for your carer'].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-neutral-600">
-                        <CheckCircle2 className="w-4 h-4 text-success-600 flex-shrink-0" aria-hidden="true" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+              <div className="max-w-2xl mx-auto bg-white rounded-xl border-2 border-success-200 p-8">
+                <div className="w-14 h-14 rounded-full bg-success-100 flex items-center justify-center mb-4" aria-hidden="true">
+                  <ShieldCheck className="w-7 h-7 text-success-600" />
                 </div>
-
-                {/* Caregiver */}
-                <div className="bg-white rounded-xl border-2 border-success-200 p-8">
-                  <div className="w-14 h-14 rounded-full bg-success-100 flex items-center justify-center mb-4" aria-hidden="true">
-                    <ShieldCheck className="w-7 h-7 text-success-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-neutral-800 mb-2">For caregivers</h3>
-                  <p className="text-neutral-600 leading-relaxed mb-4">
-                    Stay in the loop without being in the room. Log notes, check
-                    what's been done, and keep the care team aligned.
-                  </p>
-                  <ul className="space-y-2 list-none p-0 m-0" role="list">
-                    {['Real-time schedule view', 'Medication tracking', 'Shift notes and priority flags', 'Emergency contact list'].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-neutral-600">
-                        <CheckCircle2 className="w-4 h-4 text-success-600 flex-shrink-0" aria-hidden="true" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <h3 className="text-xl font-bold text-neutral-800 mb-2">Stay in the loop</h3>
+                <p className="text-neutral-600 leading-relaxed mb-4">
+                  Stay in the loop without being in the room. Log notes, check
+                  what's been done, and keep the care team aligned.
+                </p>
+                <ul className="space-y-2 list-none p-0 m-0" role="list">
+                  {['Real-time schedule view', 'Medication tracking', 'Shift notes and priority flags', 'Emergency contact list'].map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-sm text-neutral-600">
+                      <CheckCircle2 className="w-4 h-4 text-success-600 flex-shrink-0" aria-hidden="true" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </section>

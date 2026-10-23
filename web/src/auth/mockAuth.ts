@@ -1,7 +1,5 @@
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-export type UserRole = 'patient' | 'caregiver';
-
 export interface MockUser {
   id: string;
   name: string;
@@ -10,7 +8,6 @@ export interface MockUser {
 
 export interface MockSession {
   user: MockUser;
-  role: UserRole | null;
 }
 
 // ── Storage keys ───────────────────────────────────────────────────────────────
@@ -91,12 +88,4 @@ export async function signIn(
 
 export function signOut() {
   clearSession();
-}
-
-/** Updates the role on the current persisted session. */
-export function persistRole(role: UserRole) {
-  const session = getSession();
-  if (session) {
-    persistSession({ ...session, role });
-  }
 }

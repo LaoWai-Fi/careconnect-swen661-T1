@@ -15,7 +15,7 @@ export function registerServiceWorker(): void {
   });
   const register = async () => {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
+      const registration = await navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, { updateViaCache: 'none' });
       const announce = () => {
         if (registration.waiting && navigator.serviceWorker.controller) {
           waitingRegistration = registration;

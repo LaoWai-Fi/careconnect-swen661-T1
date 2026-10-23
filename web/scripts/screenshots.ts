@@ -8,20 +8,16 @@
  *      with `npm run preview`. If a server is already reachable on PORT it is
  *      reused (and no build is run) so you can iterate quickly.
  *   2. Uses the mock auth by seeding `localStorage` (careconnect_session) so the
- *      protected /app routes load reliably, selecting the right role per screen.
+ *      protected /app routes load reliably.
  *   3. For every screen, navigates, performs any needed interaction (open the
- *      chatbot, mark a dose taken, open the medication form, switch to the
- *      caregiver view), waits for a key selector so we never capture a blank or
- *      loading state, then writes a 1280x800 PNG into docs/screenshots/.
+ *      chatbot, open the medication form), waits for a key selector so we never
+ *      capture a blank or loading state, then writes a 1280x800 PNG into
+ *      docs/screenshots/.
  *   4. Logs which screenshots succeeded and which failed, and exits non-zero if
- *      any of the 14 expected files is missing.
+ *      any expected file is missing.
  *
  * Run with:  npm run screenshots
  *
- * Note on the caregiver view: AppShell derives its initial view from the auth
- * role at mount, but the role hydrates asynchronously, so a fresh page load
- * always lands on the patient view. Caregiver screens are therefore reached the
- * same way a real user would — by clicking the header "Switch role" control.
  */
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { spawn, type ChildProcess } from 'node:child_process';
@@ -43,7 +39,7 @@ const npmCmd = isWin ? 'npm.cmd' : 'npm';
 // context to rehydrate — no need to walk the sign-up form first.
 const USER = { id: 'demo-user', name: 'Joyce Adeyemi', email: 'joyce@example.com' };
 
-type Seed = 'none' | 'no-role' | 'patient';
+type Seed = 'none' | 'signed-in';
 
 interface Shot {
   file: string;
@@ -51,8 +47,6 @@ interface Shot {
   seed: Seed;
   /** Full URL path to open (after the origin) */
   path: string;
-  /** Switch into the caregiver view after load (click the header control) */
-  caregiver?: boolean;
   /** Drive the page after load: open a panel, mark a dose, open a form, etc. */
   prepare?: (page: Page) => Promise<void>;
   /** Selector / text that must be visible before we capture */
@@ -89,15 +83,7 @@ function run(cmd: string, args: string[]): Promise<void> {
   });
 }
 
-/** Switch the app chrome from the (default) patient view into the caregiver view. */
-async function switchToCaregiver(page: Page): Promise<void> {
-  const toggle = page.locator('button[aria-label="Switch to caregiver role"]');
-  await toggle.click();
-  // The caregiver chrome announces whose plan is being viewed.
-  await page.getByText("Viewing Margaret's care plan").waitFor({ state: 'visible', timeout: 10_000 });
-}
-
-// ── The 14 screens ───────────────────────────────────────────────────────────
+// ── The screens ───────────────────────────────────────────────────────────
 
 const shots: Shot[] = [
   {
@@ -128,79 +114,36 @@ const shots: Shot[] = [
     waitFor: (p) => p.getByRole('heading', { level: 1, name: /welcome back/i }).waitFor({ state: 'visible' }),
   },
   {
-    file: '05-role-chooser.png',
-    seed: 'no-role',
-    path: '/role',
-    waitFor: (p) => p.getByText(/how are you using careconnect/i).waitFor({ state: 'visible' }),
-  },
-  {
-    file: '06-patient-today.png',
-    seed: 'patient',
+    file: '05-dashboard.png',
+    seed: 'signed-in',
     path: '/app',
-    waitFor: (p) => p.getByRole('heading', { level: 1, name: /here's your day/i }).waitFor({ state: 'visible' }),
-  },
-  {
-    file: '07-patient-medications.png',
-    seed: 'patient',
-    path: '/app/medications',
-    waitFor: (p) => p.getByRole('heading', { level: 1, name: /^medicines$/i }).waitFor({ state: 'visible' }),
-  },
-  {
-    file: '08-medication-taken.png',
-    seed: 'patient',
-    path: '/app/medications',
-    prepare: async (p) => {
-      // Mark the first medicine as taken to surface the polite confirmation state.
-      const markTaken = p.locator('button[aria-label^="Mark "][aria-label$=" as taken"]').first();
-      await markTaken.click();
-      // Wait until that toggle reports the pressed/taken state.
-      await p.locator('button[aria-label^="Mark "][aria-label$=" as not taken"]').first()
-        .waitFor({ state: 'visible', timeout: 10_000 });
-    },
-    waitFor: (p) => p.locator('[role="status"]').first().waitFor({ state: 'visible' }),
-  },
-  {
-    file: '09-patient-appointments.png',
-    seed: 'patient',
-    path: '/app/appointments',
-    waitFor: (p) => p.getByRole('heading', { level: 1, name: /my appointments/i }).waitFor({ state: 'visible' }),
-  },
-  {
-    file: '10-caregiver-dashboard.png',
-    seed: 'patient',
-    path: '/app',
-    caregiver: true,
     waitFor: (p) => p.getByRole('heading', { level: 1, name: /^dashboard$/i }).waitFor({ state: 'visible' }),
   },
   {
-    file: '11-caregiver-medications.png',
-    seed: 'patient',
+    file: '06-medications.png',
+    seed: 'signed-in',
     path: '/app/manage-medications',
-    caregiver: true,
     waitFor: (p) => p.getByRole('heading', { level: 1, name: /manage medications/i }).waitFor({ state: 'visible' }),
   },
   {
-    file: '12-caregiver-medication-form.png',
-    seed: 'patient',
+    file: '07-medication-form.png',
+    seed: 'signed-in',
     path: '/app/manage-medications',
-    caregiver: true,
     prepare: async (p) => {
       await p.locator('button[aria-label="Add new medication"]').click();
     },
     waitFor: (p) => p.getByRole('heading', { name: /add new medication/i }).waitFor({ state: 'visible' }),
   },
   {
-    file: '13-caregiver-appointments.png',
-    seed: 'patient',
+    file: '08-appointments.png',
+    seed: 'signed-in',
     path: '/app/manage-appointments',
-    caregiver: true,
     waitFor: (p) => p.getByRole('heading', { level: 1, name: /manage appointments/i }).waitFor({ state: 'visible' }),
   },
   {
-    file: '14-caregiver-activity.png',
-    seed: 'patient',
+    file: '09-activity.png',
+    seed: 'signed-in',
     path: '/app/activity',
-    caregiver: true,
     waitFor: (p) => p.getByRole('heading', { level: 1, name: /activity log/i }).waitFor({ state: 'visible' }),
   },
 ];
@@ -215,10 +158,9 @@ async function capture(browser: Browser, origin: string, shot: Shot): Promise<vo
 
   // Seed localStorage before any app script runs.
   if (shot.seed !== 'none') {
-    const role = shot.seed === 'patient' ? 'patient' : null;
     await context.addInitScript(
-      ([u, r]) => localStorage.setItem('careconnect_session', JSON.stringify({ user: u, role: r })),
-      [USER, role] as const,
+      (u) => localStorage.setItem('careconnect_session', JSON.stringify({ user: u })),
+      USER,
     );
   }
 
@@ -226,7 +168,6 @@ async function capture(browser: Browser, origin: string, shot: Shot): Promise<vo
   try {
     await page.goto(`${origin}${shot.path}`, { waitUntil: 'networkidle' });
 
-    if (shot.caregiver) await switchToCaregiver(page);
     if (shot.prepare) await shot.prepare(page);
     await shot.waitFor(page);
 

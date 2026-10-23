@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button, Field, Card } from '../components';
 import { getMedications, saveMedications, pickColour } from '../data/medsStore';
+import { appendActivityEvent } from '../data/caregiverStore';
 import type { Medication } from '../types';
 
 // ── Time helper ────────────────────────────────────────────────────────────────
@@ -275,7 +276,7 @@ function MedForm({
           label="Instructions / notes"
           multiline
           placeholder="e.g. Take with food. Avoid grapefruit juice."
-          hint="Optional — patient-facing instructions shown on the medicines screen."
+          hint="Optional — instructions such as 'take with food'."
           value={form.instructions}
           onChange={set('instructions')}
           error={errors.instructions}
@@ -377,6 +378,11 @@ export default function ManageMedications() {
     setMessage(`${med.name} saved to this device's demo care plan.`);
     if (mode === 'add') {
       persist([...meds, med]);
+      appendActivityEvent({
+        kind: 'task_completed',
+        label: `Added ${med.name} to Margaret's medications`,
+        timestamp: new Date().toISOString(),
+      });
     } else if (typeof mode === 'object') {
       persist(meds.map((m) => (m.id === mode.edit ? med : m)));
     }

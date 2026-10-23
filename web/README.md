@@ -5,7 +5,17 @@ CareConnect
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-success)
 ![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)
-A responsive course-prototype companion web application for care recipients and caregivers. Built with React, Vite and React Router, with a PWA foundation and accessibility patterns targeting WCAG 2.1 AA.
+A responsive course-prototype web application for caregivers. Built with React, Vite and React Router, with a PWA foundation and accessibility patterns targeting WCAG 2.1 AA.
+
+## Project conventions
+
+The web app is a caregiver-only experience and follows the WebUIBuild-Revised design build. Some code in this folder came from the original generated starter and no longer matches that design, so it has been removed to keep the app consistent. Please keep these decisions in place when adding features:
+
+- **One experience: the caregiver.** There is no role selector and no "Switch role" control. Sign-in and sign-up go straight to the caregiver dashboard at `/app`. The `/role` route, the role chooser page and the role stored in the session were removed.
+- **No care recipient (patient) screens.** The recipient-facing pages (Today, Schedule, Medications, Appointments, Memories and the home page) and their navigation were removed. Please do not add functionality that splits the app into caregiver and care recipient views. It would move the app away from the WebUIBuild-Revised design.
+- **Care-plan tracking happens on the caregiver dashboard.** Medications are marked taken (and unmarked) in Today's medications, the daily check-in is recorded from the status card, and each action adds an entry to the activity log. Data lives in `localStorage` through `src/data/caregiverStore.ts`, `medsStore.ts` and `apptStore.ts`.
+- **Deployment.** The build supports serving from a sub-path (`VITE_BASE`) for GitHub Pages. Use `import.meta.env.BASE_URL` and router-relative links instead of hard-coded absolute asset paths. See the GitHub Pages section below.
+- **Remaining design features** (messages, hand mode, dashboard widgets, theme and font size) are to be ported from WebUIBuild-Revised into this structure, not rebuilt as separate views.
 
 ## Week 10: Parts 2 and 4
 
@@ -45,24 +55,15 @@ Disclaimer
 ---
 
 About
-CareConnect lowers the daily cognitive load for people who need help remembering, while giving caregivers clear visibility and control over medications and appointments. The patient experience is built around recognition over recall: a persistent orientation bar (who you are, the day and time, where you are), one primary task per screen, always-visible and timestamped medication status, and an undo path on every action. The caregiver experience is a denser dashboard for managing schedules and monitoring adherence.
-The two experiences share a single accessible component library and design-token system, so behavior and styling stay consistent across the app.
+CareConnect gives caregivers clear visibility and control over the medications and appointments of someone who needs a little help remembering. The caregiver dashboard shows adherence, alerts and recent activity in one place, and every screen is built to be keyboard-operable and screen-reader friendly.
 Who it's for
-Care recipients (patients) with short-term memory loss — calm, low-clutter screens, large targets, plain language, and no time pressure.
-Caregivers — an information-rich dashboard with adherence tracking, alerts, and full schedule management.
+Caregivers (family members or professional carers) who manage a loved one's medications, appointments and daily activity.
 Key features
-Patient
-Today home with a prominent "Next thing to do" card and the day's remaining items.
-Medications with pill images, plain-language doses, always-visible status, and a 10-second undo on every dose.
-Appointments in chronological order with full-word dates, locations, and "who is taking me."
-A persistent "Call my caregiver" action on every patient screen.
-Caregiver
 Dashboard with adherence summary, an alerts region for missed/overdue items, and a recent-activity timeline.
 Manage medications and manage appointments with accessible create/edit forms, inline validation, and delete confirmation.
-All caregiver edits propagate to the patient screens.
-Shared
+Activity log and caregiver notes with priority flags.
 Public landing page with an accessible, scoped AI assistant (explains the app and guides sign in/up; never gives medical advice).
-Installable PWA with offline access to the day's schedule.
+Installable PWA with offline access to the care plan.
 Accessibility
 CareConnect is designed and verified against 21 WCAG 2.1 A/AA success criteria, with full conformance mapping in `ACCESSIBILITY.md`.
 Highlights: 4.5:1 text contrast, full keyboard operability, visible focus indicators, semantic landmarks, ARIA live regions (`role="status"` / `role="alert"`), 44x44px minimum targets, 320px reflow with no horizontal scroll, and `prefers-reduced-motion` support.
@@ -97,17 +98,15 @@ web/
 │   ├── components/                  # Accessible component library
 │   │   ├── Button.tsx
 │   │   ├── Card.tsx
-│   │   ├── BigActionTile.tsx
 │   │   ├── Field.tsx
-│   │   ├── Banner.tsx
 │   │   └── ConfirmDialog.tsx
 │   ├── context/
 │   │   ├── AuthContext.tsx          # mock auth, persisted to localStorage
-│   │   └── RoleContext.tsx          # role + current patient profile
+│   │   └── AppContext.tsx           # current care-plan profile
 │   ├── shell/
 │   │   ├── AppShell.tsx             # layout + semantic landmarks
 │   │   ├── OrientationBar.tsx       # persistent date/time/greeting/"you are here"
-│   │   ├── Navigation.tsx           # bottom nav (patient) / sidebar (caregiver)
+│   │   ├── Navigation.tsx           # sidebar and mobile navigation drawer
 │   │   └── ProtectedRoute.tsx       # redirects unauthenticated users
 │   ├── pages/
 │   │   ├── landing/
@@ -115,11 +114,6 @@ web/
 │   │   │   ├── SignIn.tsx
 │   │   │   ├── SignUp.tsx
 │   │   │   └── Assistant.tsx        # accessible AI chatbot
-│   │   ├── RoleChooser.tsx
-│   │   ├── patient/
-│   │   │   ├── Today.tsx
-│   │   │   ├── Medications.tsx
-│   │   │   └── Appointments.tsx
 │   │   └── caregiver/
 │   │       ├── Dashboard.tsx
 │   │       ├── ManageMedications.tsx
@@ -154,13 +148,7 @@ web/
 flowchart TD
     A[Landing page] -->|Sign up / Sign in| B{Authenticated?}
     B -->|No| A
-    B -->|Yes, first time| C[Role chooser]
-    C -->|Care recipient| D[Patient: Today / Medications / Appointments]
-    C -->|Caregiver| E[Caregiver: Dashboard / Manage / Activity]
-    B -->|Yes, returning| F[Stored role -> straight to home]
-    F --> D
-    F --> E
-    E -. edits schedule .-> D
+    B -->|Yes| C[Dashboard / Manage / Activity]
 ```
 
 ---
@@ -250,66 +238,35 @@ Mock auth with the same accessible form pattern.
 
 ![Sign in form](docs/screenshots/04-signin.png)
 
-### 5. Role chooser
-
-Post sign-in choice between Care Recipient and Caregiver; persists for future logins.
-
-![Role chooser](docs/screenshots/05-role-chooser.png)
-
-### 6. Patient — Today
-
-Calm home with "Next thing to do" and the day's remaining items.
-
-![Patient Today home](docs/screenshots/06-patient-today.png)
-
-### 7. Patient — Medications
-
-Pill images, plain-language doses, always-visible status.
-
-![Patient medications list](docs/screenshots/07-patient-medications.png)
-
-### 8. Medication taken
-
-Polite confirmation plus a 10-second undo.
-
-![Medication marked as taken](docs/screenshots/08-medication-taken.png)
-
-### 9. Patient — Appointments
-
-Chronological appointments with full-word dates and directions.
-
-![Patient appointments](docs/screenshots/09-patient-appointments.png)
-
-### 10. Caregiver — Dashboard
+### 5. Dashboard
 
 Adherence summary, alerts region, recent activity.
 
-![Caregiver dashboard](docs/screenshots/10-caregiver-dashboard.png)
+![Caregiver dashboard](docs/screenshots/05-dashboard.png)
 
-### 11. Caregiver — Manage medications
+### 6. Manage medications
 
 Medication list with edit and confirm-on-delete.
 
-![Caregiver manage medications](docs/screenshots/11-caregiver-medications.png)
+![Manage medications](docs/screenshots/06-medications.png)
 
-### 12. Caregiver — Medication form
+### 7. Add medication
 
-Accessible add/edit form with full validation.
+Accessible form with inline validation.
 
-![Caregiver medication form](docs/screenshots/12-caregiver-medication-form.png)
+![Add medication form](docs/screenshots/07-medication-form.png)
 
-### 13. Caregiver — Appointments
+### 8. Manage appointments
 
-Appointment list and accessible add/edit form.
+Create, edit and remove appointments.
 
-![Caregiver manage appointments](docs/screenshots/13-caregiver-appointments.png)
+![Manage appointments](docs/screenshots/08-appointments.png)
 
-### 14. Caregiver — Activity
+### 9. Activity log
 
-Timestamped log of taken/skipped doses and check-ins.
+Chronological record of care activity.
 
-![Caregiver activity log](docs/screenshots/14-caregiver-activity.png)
-
+![Activity log](docs/screenshots/09-activity.png)
 ---
 
 Testing
@@ -321,6 +278,23 @@ npm run build       # outputs to /dist
 ```
 
 Deploy `/dist` at the origin root on an HTTPS static host with SPA fallback for app routes. Revalidate `sw.js`; allow hashed assets to be immutable. See the PWA deployment document linked above. Backend and clinical synchronization are not implemented in this prototype. The optional assistant's server-side credentials must never be placed in the web bundle.
+
+### GitHub Pages
+
+The workflow `.github/workflows/web-pages.yml` builds `web/` and publishes it to GitHub Pages on every push to `main` that changes `web/`. Project sites are served from a sub-path, so the build sets `VITE_BASE=/<repository-name>/`; without `VITE_BASE` the app is built for the origin root. The router, service worker, manifest and `404.html` fallback all follow that base.
+
+One-time setup (repository owner): **Settings > Pages > Build and deployment > Source: GitHub Actions**. The site is then published at `https://<owner>.github.io/<repository-name>/`.
+
+To check a sub-path build locally, from `web/`:
+
+```sh
+VITE_BASE=/careconnect-swen661-T1/ npm run build
+VITE_BASE=/careconnect-swen661-T1/ npm run preview
+```
+
+Then open `http://localhost:4173/careconnect-swen661-T1/`.
+
+Troubleshooting: a blank page with 404s for `/assets/...` means the build ran without `VITE_BASE`. A direct link to an app route that shows a GitHub 404 page means `404.html` is missing from `dist/`; it is created by `scripts/build-pwa.mjs`. After a deployment, hard-reload once (or close and reopen the installed app) so the new service worker release activates.
 Roadmap
 Real backend with Supabase + Row Level Security
 Multi-patient support for caregivers

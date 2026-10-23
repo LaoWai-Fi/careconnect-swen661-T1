@@ -1,23 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Home, Calendar, CalendarDays, Pill, BookOpen, Phone, ShieldCheck, Heart,
-  LogOut, ArrowLeftRight, PhoneCall, LayoutDashboard, Activity, Menu, PanelLeftClose,
-  PanelLeftOpen } from 'lucide-react';
+import { CalendarDays, Pill, ShieldCheck, Heart, LogOut, LayoutDashboard, Activity,
+  Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { useApp } from '../context/AppContext';
-import type { AppView } from '../types';
 import Modal from './Modal';
 
 interface NavItem { to: string; label: string; Icon: LucideIcon }
-const patientNav: NavItem[] = [
-  { to: '/app', label: 'Home', Icon: Home },
-  { to: '/app/schedule', label: 'My Day', Icon: Calendar },
-  { to: '/app/appointments', label: 'Appointments', Icon: CalendarDays },
-  { to: '/app/medications', label: 'Medicines', Icon: Pill },
-  { to: '/app/memories', label: 'Memories', Icon: BookOpen },
-  { to: '/app/contacts', label: 'Contacts', Icon: Phone },
-];
 const caregiverNav: NavItem[] = [
   { to: '/app', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/app/manage-medications', label: 'Medications', Icon: Pill },
@@ -45,8 +35,8 @@ function Navigation({ items, onNavigate }: { items: NavItem[]; onNavigate?: () =
   );
 }
 
-export default function Layout({ children, view, onSwitchRole, onSignOut }: {
-  children: React.ReactNode; view: AppView; onSwitchRole: () => void; onSignOut: () => void;
+export default function Layout({ children, onSignOut }: {
+  children: React.ReactNode; onSignOut: () => void;
 }) {
   const { user } = useAuth();
   const { patient } = useApp();
@@ -54,8 +44,7 @@ export default function Layout({ children, view, onSwitchRole, onSignOut }: {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [now, setNow] = useState(() => new Date());
-  const isPatient = view === 'patient';
-  const items = isPatient ? patientNav : caregiverNav;
+  const items = caregiverNav;
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
@@ -90,12 +79,8 @@ export default function Layout({ children, view, onSwitchRole, onSignOut }: {
             <span className="web-brandmark"><Heart size={22} aria-hidden="true" /></span>
             <span className="web-brand-name">CareConnect</span>
           </Link>
-          <span className="web-role">{isPatient ? 'Care recipient' : 'Caregiver'}</span>
+          <span className="web-role">Caregiver</span>
           <div className="web-account-actions">
-            <button className="web-icon-button" type="button" onClick={onSwitchRole}
-              aria-label={isPatient ? 'Switch role to caregiver' : 'Switch role to care recipient'}>
-              <ArrowLeftRight size={20} aria-hidden="true" /><span className="web-control-label">Switch role</span>
-            </button>
             <button className="web-icon-button" type="button" onClick={onSignOut} aria-label="Sign out of CareConnect">
               <LogOut size={20} aria-hidden="true" /><span className="web-control-label">Sign out</span>
             </button>
@@ -104,14 +89,11 @@ export default function Layout({ children, view, onSwitchRole, onSignOut }: {
         <div className="web-orientation">
           <div>
             <p className="web-greeting">{greeting}{firstName ? `, ${firstName}` : ''}</p>
-            <p className="web-plan">{isPatient ? 'Your daily care plan' : `Viewing ${patient.name}'s care plan`}</p>
+            <p className="web-plan">{`Viewing ${patient.name}'s care plan`}</p>
           </div>
           <time dateTime={now.toISOString()} className="web-date">
             {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
           </time>
-          {isPatient && <a className="web-call" href="tel:07700900456" aria-label="Call your caregiver Joyce: 07700 900 456">
-            <PhoneCall size={18} aria-hidden="true" /> Call my caregiver
-          </a>}
         </div>
       </header>
       <div className="web-workspace">
