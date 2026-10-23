@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-19T20:27:01.934Z",
+  "timestamp": "2026-10-23T16:13:53.759Z",
   "testEngine": {
     "name": "axe-core",
     "version": "4.14.0"
   },
   "testEnvironment": {
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
     "windowWidth": 320,
     "windowHeight": 960,
     "orientationAngle": 0,

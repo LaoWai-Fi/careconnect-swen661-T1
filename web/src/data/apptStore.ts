@@ -1,6 +1,6 @@
 /**
  * Shared appointment store backed by localStorage.
- * Caregiver management screens write here; patient Appointments screen reads from here.
+ * Caregiver management screens write here; the dashboard reads from here.
  */
 import { appointments as defaultAppts } from './appointmentsData';
 import type { Appointment } from './appointmentsData';

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -12,16 +12,18 @@ import {
   ClipboardList,
   Info,
 } from 'lucide-react';
-import { Card } from '../components';
+import { Button, Card } from '../components';
 import {
   getMedAdherence,
-  getScheduleAdherence,
+  getTodayMedications,
+  setMedicationTaken,
+  recordCheckIn,
   getCheckInStatus,
   getNextAppointment,
   getUpcomingAlerts,
   getActivityLog,
 } from '../data/caregiverStore';
-import type { MedAdherence, CheckInStatus, NextAppointment, UpcomingAlert, ActivityEvent } from '../data/caregiverStore';
+import type { MedAdherence, CheckInStatus, NextAppointment, UpcomingAlert, ActivityEvent, TodayMedication } from '../data/caregiverStore';
 
 // ── Time helpers ───────────────────────────────────────────────────────────────
 
@@ -65,10 +67,12 @@ function StatusSummaryCard({
   medAdherence,
   checkIn,
   nextAppt,
+  onCheckIn,
 }: {
   medAdherence: MedAdherence;
   checkIn: CheckInStatus;
   nextAppt: NextAppointment | null;
+  onCheckIn: () => void;
 }) {
   const { takenCount, totalCount } = medAdherence;
   const allTaken = takenCount === totalCount;
@@ -132,6 +136,14 @@ function StatusSummaryCard({
               <p className="text-sm font-medium text-neutral-500 mt-0.5">
                 Awaiting check-in
               </p>
+              <Button
+                variant="secondary"
+                onClick={onCheckIn}
+                aria-label="Check in now: record Margaret's check-in"
+                className="mt-3"
+              >
+                Check in now
+              </Button>
             </>
           )}
         </div>
@@ -214,11 +226,12 @@ const EVENT_CONFIG: Record<
     iconClass: 'text-success-600',
     rowClass: 'border-success-200',
   },
-  med_skipped: {
+  med_unmarked: {
     label: 'Medication unmarked',
     iconClass: 'text-warm-600',
     rowClass: 'border-warm-200',
-  },  schedule_done: {
+  },
+  task_completed: {
     label: 'Task completed',
     iconClass: 'text-calm-600',
     rowClass: 'border-calm-200',
@@ -232,8 +245,8 @@ const EVENT_CONFIG: Record<
 
 const EVENT_ICON: Record<ActivityEvent['kind'], React.ReactNode> = {
   med_taken:     <Pill className="w-4 h-4" />,
-  med_skipped:   <AlertCircle className="w-4 h-4" />,
-  schedule_done: <CheckCircle2 className="w-4 h-4" />,
+  med_unmarked:   <AlertCircle className="w-4 h-4" />,
+  task_completed: <CheckCircle2 className="w-4 h-4" />,
   check_in:      <UserCheck className="w-4 h-4" />,
 };
 
@@ -268,22 +281,24 @@ function ActivityRow({ event }: { event: ActivityEvent }) {
 
 export default function CaregiverDashboard() {
   const [medAdherence, setMedAdherence] = useState<MedAdherence>(getMedAdherence);
-  const [schedAdherence, setSchedAdherence] = useState(getScheduleAdherence);
+  const [todayMeds, setTodayMeds] = useState<TodayMedication[]>(getTodayMedications);
   const [checkIn, setCheckIn] = useState<CheckInStatus>(getCheckInStatus);
   const [nextAppt, setNextAppt] = useState<NextAppointment | null>(getNextAppointment);
   const [upcomingAlerts, setUpcomingAlerts] = useState<UpcomingAlert[]>(getUpcomingAlerts);
   const [activityLog, setActivityLog] = useState<ActivityEvent[]>(getActivityLog);
+  const [announcement, setAnnouncement] = useState('');
 
-  // Refresh data on focus (caregiver may return after patient has acted)
+  const refresh = useCallback(() => {
+    setMedAdherence(getMedAdherence());
+    setTodayMeds(getTodayMedications());
+    setCheckIn(getCheckInStatus());
+    setNextAppt(getNextAppointment());
+    setUpcomingAlerts(getUpcomingAlerts());
+    setActivityLog(getActivityLog());
+  }, []);
+
+  // Refresh when the caregiver returns to the tab or after other screens change the care plan
   useEffect(() => {
-    function refresh() {
-      setMedAdherence(getMedAdherence());
-      setSchedAdherence(getScheduleAdherence());
-      setCheckIn(getCheckInStatus());
-      setNextAppt(getNextAppointment());
-      setUpcomingAlerts(getUpcomingAlerts());
-      setActivityLog(getActivityLog());
-    }
     window.addEventListener('focus', refresh);
     // Also poll every 30 s for same-tab updates
     const id = setInterval(refresh, 30_000);
@@ -291,7 +306,23 @@ export default function CaregiverDashboard() {
       window.removeEventListener('focus', refresh);
       clearInterval(id);
     };
-  }, []);
+  }, [refresh]);
+
+  function handleToggleMed(med: TodayMedication) {
+    setMedicationTaken(med.id, !med.taken);
+    setAnnouncement(`${med.name} ${med.taken ? 'unmarked' : 'marked as taken'}`);
+    refresh();
+  }
+
+  function handleCheckIn() {
+    recordCheckIn();
+    setAnnouncement("Margaret's check-in recorded");
+    refresh();
+  }
+
+  // Tasks done = medications taken + the daily check-in (same as the web design build)
+  const totalTasks = medAdherence.totalCount + 1;
+  const doneTasks = medAdherence.takenCount + (checkIn.checkedIn ? 1 : 0);
 
   const hasMissedMeds = medAdherence.missedMeds.length > 0;
   const hasAlerts = hasMissedMeds || upcomingAlerts.length > 0;
@@ -315,16 +346,16 @@ export default function CaregiverDashboard() {
         <div
           className="inline-flex items-center gap-2 rounded-pill px-4 py-2 text-sm font-semibold border-2"
           style={{ borderColor: 'transparent' }}
-          aria-label={`Schedule: ${schedAdherence.doneCount} of ${schedAdherence.totalCount} tasks done`}
+          aria-label={`Care plan: ${doneTasks} of ${totalTasks} tasks done`}
           role="group"
         >
           <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-pill text-sm font-bold ${
-            schedAdherence.doneCount === schedAdherence.totalCount
+            doneTasks === totalTasks
               ? 'bg-success-100 text-success-700'
               : 'bg-neutral-100 text-neutral-600'
           }`}>
             <ClipboardList className="w-4 h-4" aria-hidden="true" />
-            {schedAdherence.doneCount}/{schedAdherence.totalCount} tasks done
+            {doneTasks}/{totalTasks} tasks done
           </span>
         </div>
       </div>
@@ -334,7 +365,60 @@ export default function CaregiverDashboard() {
         medAdherence={medAdherence}
         checkIn={checkIn}
         nextAppt={nextAppt}
+        onCheckIn={handleCheckIn}
       />
+
+      {/* Announces medication and check-in changes to screen readers */}
+      <p role="status" className="sr-only">{announcement}</p>
+
+      {/* ── TODAY'S MEDICATIONS ──────────────────────────────────────────── */}
+      <section aria-labelledby="todays-meds-heading">
+        <h2 id="todays-meds-heading" className="text-xl font-semibold text-neutral-800 flex items-center gap-2 mb-4">
+          <Pill className="w-5 h-5 text-calm-600" aria-hidden="true" />
+          Today's medications
+        </h2>
+        {todayMeds.length === 0 ? (
+          <p className="text-neutral-600">
+            No medications yet.{' '}
+            <Link to="/app/manage-medications" className="font-semibold text-calm-600">Add a medication</Link>
+          </p>
+        ) : (
+          <ul className="space-y-3 list-none p-0 m-0" role="list">
+            {todayMeds.map((med) => (
+              <li
+                key={med.id}
+                className={`flex items-center gap-4 flex-wrap rounded-xl border-2 p-4 ${
+                  med.taken ? 'bg-success-50 border-success-200' : 'bg-white border-neutral-300'
+                }`}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-neutral-800">{med.name}</p>
+                  <p className="text-sm text-neutral-600">
+                    {med.dosage}
+                    {med.times.length > 0 && ` · ${med.times.map(fmt12).join(', ')}`}
+                  </p>
+                  {med.instructions && (
+                    <p className="text-sm text-neutral-500 mt-0.5">{med.instructions}</p>
+                  )}
+                </div>
+                {med.taken && (
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-success-700">
+                    <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                    Taken
+                  </span>
+                )}
+                <Button
+                  variant={med.taken ? 'secondary' : 'primary'}
+                  onClick={() => handleToggleMed(med)}
+                  aria-label={med.taken ? `Undo: unmark ${med.name} as taken` : `Mark as taken: ${med.name}`}
+                >
+                  {med.taken ? 'Undo' : 'Mark as taken'}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {/* ── ALERTS ───────────────────────────────────────────────────────── */}
       <section
@@ -423,7 +507,7 @@ export default function CaregiverDashboard() {
                 <Info className="w-8 h-8 text-neutral-300 mx-auto mb-3" aria-hidden="true" />
                 <p className="text-neutral-500 font-medium">No activity recorded yet.</p>
                 <p className="text-sm text-neutral-400 mt-1">
-                  Activity appears here when Margaret takes medications or checks in.
+                  Activity appears here when you mark a medication as taken or record Margaret's check-in.
                 </p>
               </div>
             ) : (

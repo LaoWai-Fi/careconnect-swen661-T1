@@ -3,17 +3,6 @@
 export type Priority = 'low' | 'medium' | 'high';
 export type StatusBadge = 'success' | 'warning' | 'alert' | 'calm' | 'neutral';
 
-// ── Schedule ─────────────────────────────────────────────────────────────
-
-export interface ScheduleItem {
-  id: string;
-  time: string;        // "HH:MM" 24h
-  label: string;
-  description?: string;
-  category: 'meal' | 'medication' | 'activity' | 'appointment' | 'rest';
-  done: boolean;
-}
-
 // ── Medications ──────────────────────────────────────────────────────────
 
 export interface Medication {
@@ -24,17 +13,6 @@ export interface Medication {
   instructions?: string;
   colour: string;      // Tailwind bg class for pill visualisation
   taken: Record<string, boolean>; // date "YYYY-MM-DD" → taken?
-}
-
-// ── Memories ─────────────────────────────────────────────────────────────
-
-export interface MemoryCard {
-  id: string;
-  title: string;
-  body: string;
-  imageUrl?: string;
-  category: 'family' | 'place' | 'event' | 'hobby' | 'pet';
-  pinned: boolean;
 }
 
 // ── Contacts ─────────────────────────────────────────────────────────────
@@ -61,7 +39,3 @@ export interface CaregiverNote {
   note: string;
   priority: Priority;
 }
-
-// ── App user context ──────────────────────────────────────────────────────
-
-export type AppView = 'patient' | 'caregiver';

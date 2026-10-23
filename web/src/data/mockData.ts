@@ -1,27 +1,10 @@
 import type {
-  ScheduleItem,
   Medication,
-  MemoryCard,
   Contact,
   CaregiverNote,
 } from '../types';
 
 const TODAY = new Date().toISOString().split('T')[0];
-
-// ── Daily Schedule ─────────────────────────────────────────────────────────
-
-export const scheduleItems: ScheduleItem[] = [
-  { id: 's1', time: '07:30', label: 'Wake up & stretch', category: 'activity', done: true },
-  { id: 's2', time: '08:00', label: 'Breakfast', description: 'Oatmeal with berries', category: 'meal', done: true },
-  { id: 's3', time: '08:30', label: 'Morning medications', description: 'Take with a full glass of water', category: 'medication', done: true },
-  { id: 's4', time: '10:00', label: 'Walk in the garden', description: '20 minutes of fresh air', category: 'activity', done: false },
-  { id: 's5', time: '12:00', label: 'Lunch', description: 'Chicken soup and bread roll', category: 'meal', done: false },
-  { id: 's6', time: '13:00', label: 'Rest time', description: 'Lie down or read quietly', category: 'rest', done: false },
-  { id: 's7', time: '15:00', label: 'Video call with Maria', description: 'Your daughter — she will call you', category: 'appointment', done: false },
-  { id: 's8', time: '17:30', label: 'Evening medications', category: 'medication', done: false },
-  { id: 's9', time: '18:00', label: 'Dinner', description: 'Pasta with tomato sauce', category: 'meal', done: false },
-  { id: 's10', time: '20:30', label: 'Bedtime', description: 'Lights out, good night!', category: 'rest', done: false },
-];
 
 // ── Medications ────────────────────────────────────────────────────────────
 
@@ -61,59 +44,6 @@ export const medications: Medication[] = [
     instructions: 'Take with breakfast.',
     colour: 'bg-warning-200',
     taken: { [TODAY]: false },
-  },
-];
-
-// ── Memory Cards ────────────────────────────────────────────────────────────
-
-export const memoryCards: MemoryCard[] = [
-  {
-    id: 'mc1',
-    title: 'Maria — Your Daughter',
-    body: 'Maria lives in Bristol with her husband Tom and your two grandchildren, Ella (8) and James (5). She calls every Tuesday and Sunday afternoon.',
-    imageUrl: 'https://images.pexels.com/photos/3807571/pexels-photo-3807571.jpeg?auto=compress&cs=tinysrgb&w=600',
-    category: 'family',
-    pinned: true,
-  },
-  {
-    id: 'mc2',
-    title: 'Your Home',
-    body: 'You live at 14 Meadow Lane. The front door key is hanging on the blue hook by the kitchen. Your bedroom is the first door on the left upstairs.',
-    imageUrl: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=600',
-    category: 'place',
-    pinned: true,
-  },
-  {
-    id: 'mc3',
-    title: 'Your Garden',
-    body: 'You love spending time in your garden. You grow tomatoes, sweet peas, and sunflowers every summer. Your favourite bench is by the rose bush.',
-    imageUrl: 'https://images.pexels.com/photos/1084188/pexels-photo-1084188.jpeg?auto=compress&cs=tinysrgb&w=600',
-    category: 'hobby',
-    pinned: false,
-  },
-  {
-    id: 'mc4',
-    title: 'Buddy — Your Cat',
-    body: 'Buddy is a ginger tabby cat, 4 years old. He eats twice a day — morning and evening. His food is in the blue tin under the kitchen sink.',
-    imageUrl: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=600',
-    category: 'pet',
-    pinned: true,
-  },
-  {
-    id: 'mc5',
-    title: '50th Wedding Anniversary',
-    body: 'You and Robert celebrated your golden anniversary in June 2018 with a party at the village hall. Over 60 friends and family came to celebrate.',
-    imageUrl: 'https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=600',
-    category: 'event',
-    pinned: false,
-  },
-  {
-    id: 'mc6',
-    title: 'Favourite Walk — River Path',
-    body: 'The river path starts at the end of Meadow Lane. It is a flat, 20-minute loop through the meadow and back. You used to walk it every morning.',
-    imageUrl: 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=600',
-    category: 'place',
-    pinned: false,
   },
 ];
 

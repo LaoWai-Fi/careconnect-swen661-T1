@@ -35,27 +35,27 @@ function getScriptedResponse(message: string): string {
     /\b(what is|what'?s|tell me about|explain|describe|how does|how do|what can)\b/.test(msg) ||
     /careconnect/.test(msg)
   ) {
-    return "CareConnect is a daily companion app for people who need a little help remembering their routine, and the caregivers who support them. It includes a daily schedule, medication reminders, memory cards for people and places, and a shared caregiver notes area — all in a calm, easy-to-read design.";
+    return "CareConnect is a companion app for caregivers looking after someone who needs a little help remembering their routine. It lets you track medications, manage appointments, record daily check-ins and review an activity log, all in a calm, easy-to-read design.";
   }
 
   // Who is it for
   if (/\b(who|for whom|target|audience|use|meant)\b/.test(msg)) {
-    return "CareConnect is for two groups: care recipients (people who find it helpful to have their day laid out clearly) and their caregivers (family members or professional carers who want to stay in the loop). You choose your role after signing in, and you can switch at any time.";
+    return "CareConnect is for caregivers: family members or professional carers who want to keep track of a loved one's medications, appointments and daily activity in one place.";
   }
 
   // Sign up
   if (/\b(sign up|signup|register|create account|new account|get started|join)\b/.test(msg)) {
-    return "To sign up, click the 'Sign up' or 'Get started' button on this page. You'll enter your name, email address, and a password. Then you'll choose whether you're a care recipient or a caregiver — and that's it! It takes less than two minutes.";
+    return "To sign up, click the 'Sign up' or 'Get started' button on this page. You'll enter your name, email address, and a password — and that's it! It takes less than two minutes.";
   }
 
   // Sign in
   if (/\b(sign in|signin|log in|login|existing account|already have)\b/.test(msg)) {
-    return "If you already have an account, click 'Sign in' and enter your email and password. If you've forgotten which email you used, try the address you use most often. Once signed in, you'll choose your view and go straight to your dashboard.";
+    return "If you already have an account, click 'Sign in' and enter your email and password. If you've forgotten which email you used, try the address you use most often. Once signed in, you'll go straight to your dashboard.";
   }
 
   // Features / what does it do
   if (/\b(feature|schedule|reminder|memory|contact|medication|appointment)\b/.test(msg)) {
-    return "CareConnect has five main areas: My Day (your full daily schedule), Medicines (a medication checklist), Memories (cards about people, places, and events), Contacts (emergency and family contacts), and Caregiver Notes (a private log for carers). Everything is designed to be calm and simple.";
+    return "CareConnect has a caregiver dashboard with a daily check-in and medication tracking, plus areas to manage medications and appointments, review the activity log, keep caregiver notes and find contacts. Everything is designed to be calm and simple.";
   }
 
   // Cost / free

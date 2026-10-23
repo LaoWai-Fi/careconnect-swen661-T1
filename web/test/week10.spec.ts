@@ -5,10 +5,10 @@ import path from 'node:path';
 
 const evidence = path.resolve('..', 'docs', 'week10', 'evidence');
 const user = { id: 'week10-demo', name: 'Wiliss Demo', email: 'week10@example.com' };
-async function seed(page: Page, role: 'caregiver' | 'patient' = 'caregiver') {
-  await page.addInitScript(({ user, role }) => {
-    if (!localStorage.getItem('careconnect_session')) localStorage.setItem('careconnect_session', JSON.stringify({ user, role }));
-  }, { user, role });
+async function seed(page: Page) {
+  await page.addInitScript(({ user }) => {
+    if (!localStorage.getItem('careconnect_session')) localStorage.setItem('careconnect_session', JSON.stringify({ user }));
+  }, { user });
 }
 async function noOverflow(page: Page) {
   const size = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth,
@@ -148,14 +148,13 @@ test('medication form validation, persisted CRUD and modal focus', async ({ page
   await expect(page.getByRole('heading', { name: 'Week 10 demo medicine', exact: true })).toHaveCount(0);
 });
 
-test('real sign-up, caregiver role and sign-out workflow', async ({ page }) => {
+test('real sign-up, sign-in and sign-out workflow', async ({ page }) => {
   await page.goto('/signup');
   await page.getByLabel(/your name/i).fill('Week Ten Tester');
   await page.getByLabel('Email address').fill('week10-flow@example.com');
   await page.getByLabel('Password', { exact: false }).first().fill('demo-password');
   await page.getByLabel(/confirm password/i).fill('demo-password');
   await page.getByRole('button', { name: /create account|sign up/i }).click();
-  await page.getByRole('button', { name: /I am the Caregiver/i }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Sign out of CareConnect' }).click();
   await expect(page).toHaveURL('/');
@@ -163,7 +162,8 @@ test('real sign-up, caregiver role and sign-out workflow', async ({ page }) => {
   await page.getByLabel('Email address').fill('week10-flow@example.com');
   await page.getByLabel('Password', { exact: false }).fill('demo-password');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page).toHaveURL('/role');
+  await expect(page).toHaveURL('/app');
+  await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
 });
 
 test('PWA manifest, offline direct routes, local demo data and safe cache boundaries', async ({ page, context }) => {
@@ -287,10 +287,10 @@ test('responsive drawer closes safely when resized to desktop', async ({ page })
   await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
 });
 
-test('patient routes retain accessible navigation after the shared shell changes', async ({ page }) => {
+test('app routes retain accessible navigation after the shared shell changes', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await seed(page, 'patient');
-  for (const route of ['/app', '/app/schedule', '/app/medications', '/app/appointments']) {
+  await seed(page);
+  for (const route of ['/app', '/app/manage-medications', '/app/manage-appointments', '/app/activity']) {
     await page.goto(route);
     await expect(page.getByRole('main')).toHaveCount(1);
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
@@ -317,4 +317,26 @@ test('PWA installability in a dedicated non-private browser profile', async () =
     }, null, 2));
     expect(diagnostics.installabilityErrors).toEqual([]);
   } finally { await context.close(); }
+});
+
+test('caregiver marks a medication taken, checks in, and the activity log records both', async ({ page }) => {
+  await seed(page);
+  await page.goto('/app');
+  await expect(page.getByRole('heading', { name: "Today's medications" })).toBeVisible();
+  const mark = page.getByRole('button', { name: /^Mark as taken: / }).first();
+  const label = (await mark.getAttribute('aria-label')) ?? '';
+  const medName = label.replace(/^Mark as taken: /, '');
+  await mark.click();
+  await expect(page.getByRole('button', { name: `Undo: unmark ${medName} as taken` })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: `${medName} marked as taken` })).toHaveCount(1);
+  await page.getByRole('button', { name: "Check in now: record Margaret's check-in" }).click();
+  await expect(page.getByRole('button', { name: "Check in now: record Margaret's check-in" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('button', { name: `Undo: unmark ${medName} as taken` })).toBeVisible();
+  await page.goto('/app/activity');
+  await expect(page.getByText(`${medName} marked as taken`)).toBeVisible();
+  await expect(page.getByText('Margaret checked in')).toBeVisible();
+  await page.goto('/app');
+  await page.getByRole('button', { name: `Undo: unmark ${medName} as taken` }).click();
+  await expect(page.getByRole('button', { name: `Mark as taken: ${medName}` })).toBeVisible();
 });
