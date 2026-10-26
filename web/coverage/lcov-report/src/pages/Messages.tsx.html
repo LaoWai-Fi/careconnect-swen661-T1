@@ -1,0 +1,364 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/pages/Messages.tsx</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/pages</a> Messages.tsx</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">80.45% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>70/87</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">84% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>63/75</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">63.63% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>21/33</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">91.07% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>51/56</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">150x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
+import Field from '../components/Field';
+import Modal from '../components/Modal';
+import { addMessage, getMessages, removeMessage, updateMessage } from '../data/messagesStore';
+&nbsp;
+const empty = { to: '', cc: '', bcc: '', subject: '', body: '' };
+export default function Messages() {
+  const { id } = useParams();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const compose = id === 'compose';
+  const folder = params.get('folder') === 'archive' ? 'archive' : 'inbox';
+  const reply = params.get('reply');
+  const draftKey = `careconnect_message_draft:${reply || 'new'}`;
+  const [messages, setMessages] = useState(getMessages);
+  const [message, setMessage] = useState('');
+  const [draft, setDraft] = useState(empty);
+  const [files, setFiles] = useState&lt;string[]&gt;([]);
+  const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const summary = useRef&lt;HTMLParagraphElement&gt;(null);
+  const selected = messages.find(item =&gt; item.id === id);
+  useEffect(() =&gt; {
+    const refresh = () =&gt; setMessages(getMessages());
+    window.addEventListener('careconnect:messages', refresh);
+    window.addEventListener('storage', refresh);
+    return () =&gt; { window.removeEventListener('careconnect:messages', refresh); window.removeEventListener('storage', refresh); };
+  }, []);
+  useEffect(() =&gt; {
+    setError(''); setFiles([]);
+    if (!compose) return;
+    setMessage('');
+    const original = getMessages().find(item =&gt; item.id === reply);
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(draftKey) || 'null'); } catch { /* Start a clean draft if corrupted. */ }
+    setDraft(saved &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >Object.keys(empty).every(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; <span class="cstat-no" title="statement not covered" >typeof saved[key] === 'string')</span> </span>? <span class="branch-0 cbranch-no" title="branch not covered" >saved </span>: original
+      ? { ...empty, to: original.from, subject: `Re: ${original.subject}`, body: `\n\nPrevious message:\n${original.body}` } : empty);
+  }, [compose, reply, draftKey]);
+  useEffect(() =&gt; {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (selected &amp;&amp; !selected.read) <span class="cstat-no" title="statement not covered" >updateMessage(selected.id, { read: true });</span>
+  }, [selected]);
+  function change(field: keyof typeof empty, value: string) {
+    const next = { ...draft, [field]: value }; setDraft(next);
+    try { localStorage.setItem(draftKey, JSON.stringify(next)); } catch { <span class="cstat-no" title="statement not covered" >setError('Draft storage is unavailable. Keep this page open until you save the message.'); </span>}
+  }
+  function save(event: FormEvent) {
+    event.preventDefault();
+    if (!draft.to.trim() || !draft.subject.trim() || !draft.body.trim()) {
+      setError('Enter a recipient, subject and message before saving.');
+      requestAnimationFrame(() =&gt; summary.current?.focus()); return;
+    }
+    try {
+      addMessage({ ...draft, from: user?.name || <span class="branch-1 cbranch-no" title="branch not covered" >'Demo caregiver',</span> attachments: files });
+      localStorage.removeItem(draftKey);
+      navigate('/app/messages');
+      setMessage('Demo message saved locally. Nothing was sent to a server.');
+    } catch { <span class="cstat-no" title="statement not covered" >setError('Message could not be saved. Your draft is still on this page.'); </span>}
+  }
+  return &lt;div className="space-y-5 max-w-6xl mx-auto"&gt;
+    &lt;div className="page-action-row flex flex-wrap gap-3 items-center justify-between"&gt;
+      &lt;h1&gt;{compose ? 'Compose message' : selected ? selected.subject : id ? 'Message not found' : folder === 'archive' ? 'Archived messages' : 'Messages'}&lt;/h1&gt;
+      {!compose &amp;&amp; &lt;Link className="btn-primary no-underline" to="/app/messages/compose"&gt;New message&lt;/Link&gt;}
+    &lt;/div&gt;
+    &lt;p className="text-sm"&gt;Local demo inbox. No real messages are sent, and no server synchronization is provided.&lt;/p&gt;
+    &lt;p role="status"&gt;{message}&lt;/p&gt;
+    {compose ? &lt;form className="card space-y-4" onSubmit={save} noValidate&gt;
+      {error &amp;&amp; &lt;p ref={summary} tabIndex={-1} role="alert"&gt;{error}&lt;/p&gt;}
+      &lt;Field label="To" required value={draft.to} onChange={event =&gt; change('to', event.target.value)} hint="Enter a fictional name or address." /&gt;
+      &lt;details&gt;&lt;summary&gt;Additional recipients&lt;/summary&gt;&lt;div className="space-y-3"&gt;&lt;Field label="Cc" value={draft.cc} onChange={<span class="fstat-no" title="function not covered" >ev</span>ent =&gt; <span class="cstat-no" title="statement not covered" >change('cc', event.target.value)}</span> /&gt;&lt;Field label="Bcc" value={draft.bcc} onChange={<span class="fstat-no" title="function not covered" >ev</span>ent =&gt; <span class="cstat-no" title="statement not covered" >change('bcc', event.target.value)}</span> /&gt;&lt;/div&gt;&lt;/details&gt;
+      &lt;Field label="Subject" required value={draft.subject} onChange={event =&gt; change('subject', event.target.value)} /&gt;
+      &lt;Field label="Message" required multiline rows={7} value={draft.body} onChange={event =&gt; change('body', event.target.value)} /&gt;
+      &lt;label className="settings-field"&gt;Attachment names only&lt;input type="file" multiple onChange={<span class="fstat-no" title="function not covered" >ev</span>ent =&gt; <span class="cstat-no" title="statement not covered" >setFiles(Array.from(event.target.files || []).map(<span class="fstat-no" title="function not covered" >fi</span>le =&gt; <span class="cstat-no" title="statement not covered" >file.name)</span>)}</span> aria-describedby="attachment-help" /&gt;&lt;/label&gt;
+      &lt;p id="attachment-help" className="text-sm"&gt;Only filenames are saved in this demo. File contents are not uploaded or available for download.&lt;/p&gt;
+      {files.map(<span class="fstat-no" title="function not covered" >(n</span>ame, index) =&gt; <span class="cstat-no" title="statement not covered" >&lt;p key={`${name}-${index}`}&gt;{name} &lt;button type="button" className="web-icon-button" aria-label={`Remove attachment ${name}`} onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setFiles(files.filter(<span class="fstat-no" title="function not covered" >(_</span>, item) =&gt; <span class="cstat-no" title="statement not covered" >item !== index)</span>)}</span>&gt;Remove&lt;/button&gt;&lt;/p&gt;)</span>}
+      &lt;div className="flex flex-wrap gap-3"&gt;&lt;button type="submit" className="btn-primary"&gt;Save demo message&lt;/button&gt;&lt;Link className="btn-secondary no-underline" to="/app/messages"&gt;Back to messages&lt;/Link&gt;&lt;/div&gt;
+      &lt;p className="text-sm"&gt;Text drafts are saved while you type when browser storage is available.&lt;/p&gt;
+    &lt;/form&gt; : selected ? &lt;&gt;
+      &lt;Link to="/app/messages"&gt;Back to messages&lt;/Link&gt;
+      &lt;article className="card space-y-4" aria-label="Message detail"&gt;&lt;dl&gt;&lt;dt&gt;From&lt;/dt&gt;&lt;dd&gt;{selected.from}&lt;/dd&gt;&lt;dt&gt;To&lt;/dt&gt;&lt;dd&gt;{selected.to}&lt;/dd&gt;{selected.cc &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >&lt;&gt;&lt;dt&gt;Cc&lt;/dt&gt;&lt;dd&gt;{selected.cc}&lt;/dd&gt;&lt;/&gt;}</span>{selected.bcc &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >&lt;&gt;&lt;dt&gt;Bcc&lt;/dt&gt;&lt;dd&gt;{selected.bcc}&lt;/dd&gt;&lt;/&gt;}</span>&lt;dt&gt;Date&lt;/dt&gt;&lt;dd&gt;&lt;time dateTime={selected.timestamp}&gt;{new Date(selected.timestamp).toLocaleString()}&lt;/time&gt;&lt;/dd&gt;&lt;/dl&gt;&lt;p className="whitespace-pre-wrap"&gt;{selected.body}&lt;/p&gt;{selected.attachments?.map(<span class="fstat-no" title="function not covered" >(n</span>ame, index) =&gt; <span class="cstat-no" title="statement not covered" >&lt;p key={index}&gt;Attachment filename: {name} (content not stored)&lt;/p&gt;)</span>}&lt;/article&gt;
+      &lt;div className="flex flex-wrap gap-3"&gt;&lt;Link to={`/app/messages/compose?reply=${encodeURIComponent(selected.id)}`} className="btn-primary no-underline"&gt;Reply&lt;/Link&gt;&lt;button type="button" className="btn-secondary" onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; { <span class="cstat-no" title="statement not covered" >updateMessage(selected.id, { archived: !selected.archived }); <span class="cstat-no" title="statement not covered" ></span>navigate(`/app/messages?folder=${selected.archived ? 'inbox' : 'archive'}`); </span>}}&gt; {selected.archived ? <span class="branch-0 cbranch-no" title="branch not covered" >'Unarchive' </span>: 'Archive'}&lt;/button&gt;&lt;button type="button" className="btn-secondary" onClick={() =&gt; setDeleting(true)}&gt;Delete message&lt;/button&gt;&lt;/div&gt;
+      &lt;Modal open={deleting} title="Delete message" description="This removes the local demo message. It cannot be undone." onClose={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setDeleting(false)}</span>&gt;&lt;div className="web-dialog-actions"&gt;&lt;button type="button" data-autofocus className="btn-secondary" onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setDeleting(false)}</span>&gt;Cancel&lt;/button&gt;&lt;button type="button" className="btn-primary web-danger" onClick={() =&gt; { try { removeMessage(selected.id); setDeleting(false); navigate('/app/messages'); } catch { <span class="cstat-no" title="statement not covered" >setError('Message could not be deleted.'); </span>} }}&gt;Confirm delete&lt;/button&gt;&lt;/div&gt;{error &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >&lt;p role="alert"&gt;{error}&lt;/p&gt;}</span>&lt;/Modal&gt;
+    &lt;/&gt; : id ? &lt;p&gt;This message may have been deleted. &lt;Link to="/app/messages"&gt;Return to messages&lt;/Link&gt;&lt;/p&gt; : &lt;&gt;
+      &lt;nav aria-label="Message folders" className="flex gap-4"&gt;&lt;Link to="/app/messages" aria-current={folder === 'inbox' ? 'page' : undefined}&gt;Inbox&lt;/Link&gt;&lt;Link to="/app/messages?folder=archive" aria-current={folder === 'archive' ? 'page' : undefined}&gt;Archive&lt;/Link&gt;&lt;/nav&gt;
+      &lt;ul className="message-grid" aria-label={folder === 'archive' ? 'Archived messages' : 'Inbox messages'}&gt;
+        {messages.filter(item =&gt; item.archived === (folder === 'archive')).map(item =&gt; &lt;li key={item.id} className="card space-y-3"&gt;&lt;p className="text-sm"&gt;{item.read ? 'Read' : 'Unread'} · {item.from}&lt;/p&gt;&lt;h2 className="text-lg"&gt;&lt;Link to={`/app/messages/${encodeURIComponent(item.id)}`}&gt;{item.subject}&lt;/Link&gt;&lt;/h2&gt;&lt;p&gt;{item.body.slice(0, 120)}&lt;/p&gt;&lt;div className="flex flex-wrap gap-2"&gt;&lt;button className="web-icon-button" type="button" aria-label={`Mark as ${item.read ? 'unread' : 'read'}: ${item.subject}`} onClick={() =&gt; updateMessage(item.id, { read: !item.read })}&gt;Mark as {item.read ? 'unread' : 'read'}&lt;/button&gt;&lt;button className="web-icon-button" type="button" aria-label={`${item.archived ? 'Unarchive' : 'Archive'} ${item.subject}`} onClick={() =&gt; { updateMessage(item.id, { archived: !item.archived }); setMessage(item.archived ? 'Message restored to inbox.' : 'Message archived.'); }}&gt;{item.archived ? 'Unarchive' : 'Archive'}&lt;/button&gt;&lt;/div&gt;&lt;/li&gt;)}
+      &lt;/ul&gt;
+      {messages.filter(item =&gt; item.archived === (folder === 'archive')).length === 0 &amp;&amp; &lt;p&gt;No messages in this folder.&lt;/p&gt;}
+    &lt;/&gt;}
+  &lt;/div&gt;;
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-10-26T12:09:32.502Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

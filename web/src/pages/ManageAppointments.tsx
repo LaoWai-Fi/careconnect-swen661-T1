@@ -1,4 +1,5 @@
 import { useState, useRef, useId, type FormEvent } from 'react';
+import { localDay } from '../data/localDay';
 import {
   CalendarDays,
   PlusCircle,
@@ -39,7 +40,7 @@ function formatFullDate(dateStr: string): string {
 }
 
 function todayStr(): string {
-  return new Date().toISOString().split('T')[0];
+  return localDay();
 }
 
 // ── Location icon map ──────────────────────────────────────────────────────────
@@ -560,7 +561,7 @@ export default function ManageAppointments() {
             aria-label="Add new appointment"
           >
             <PlusCircle className="w-5 h-5" aria-hidden="true" />
-            Add appointment
+            Add new appointment
           </button>
         )}
       </div>

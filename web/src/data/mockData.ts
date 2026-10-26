@@ -1,10 +1,11 @@
+import { localDay } from './localDay';
 import type {
   Medication,
   Contact,
   CaregiverNote,
 } from '../types';
 
-const TODAY = new Date().toISOString().split('T')[0];
+const TODAY = localDay();
 
 // ── Medications ────────────────────────────────────────────────────────────
 

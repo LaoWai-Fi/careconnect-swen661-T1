@@ -5,6 +5,9 @@ import { ProtectedRoute, AuthRoute } from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import RouteAccessibility, { SkipLink } from './components/RouteAccessibility';
 import PwaStatus from './components/PwaStatus';
+import { PreferencesProvider } from './context/PreferencesContext';
+import Settings from './pages/Settings';
+import Messages from './pages/Messages';
 
 // Public pages (do not modify)
 import Landing     from './pages/Landing';
@@ -34,6 +37,9 @@ function AppShell() {
           <Route path="activity"              element={<ActivityLog />} />
           <Route path="manage-medications"    element={<ManageMedications />} />
           <Route path="manage-appointments"   element={<ManageAppointments />} />
+          <Route path="settings"              element={<Settings />} />
+          <Route path="messages"              element={<Messages />} />
+          <Route path="messages/:id"          element={<Messages />} />
           <Route path="*"                     element={<Navigate to="/app" replace />} />
         </Routes>
       </Layout>
@@ -69,6 +75,7 @@ const ROUTER_BASENAME = import.meta.env.BASE_URL.replace(/\/$/, '');
 export default function App() {
   return (
     <BrowserRouter basename={ROUTER_BASENAME}>
+      <PreferencesProvider>
       <SkipLink />
       <PwaStatus />
       <AuthProvider>
@@ -77,6 +84,7 @@ export default function App() {
           <AppRoutes />
         </AppProvider>
       </AuthProvider>
+      </PreferencesProvider>
     </BrowserRouter>
   );
 }

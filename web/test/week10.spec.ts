@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const evidence = path.resolve('..', 'docs', 'week10', 'evidence');
+const evidence = path.resolve('..', 'docs', 'week11', 'evidence');
 const user = { id: 'week10-demo', name: 'Wiliss Demo', email: 'week10@example.com' };
 
 test('upgrade retains legacy activity on dashboard and timeline', async ({ page }) => {
@@ -60,7 +60,7 @@ async function scan(page: Page, name: string) {
   expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(({ target }) => target) }))).toEqual([]);
 }
 
-for (const width of [320, 390, 767, 768, 1023, 1024, 1440]) {
+for (const width of [320, 375, 390, 767, 768, 1023, 1024, 1440]) {
   for (const [name, route, heading] of [
     ['signin', '/signin', 'Welcome back'],
     ['dashboard', '/app', 'Dashboard'],
@@ -74,7 +74,7 @@ for (const width of [320, 390, 767, 768, 1023, 1024, 1440]) {
       await expect(page.getByRole('main')).toHaveCount(1);
       await noOverflow(page);
       await scan(page, `${name}-${width}`);
-      if ([320, 768, 1440].includes(width)) {
+      if ([320, 375, 768, 1440].includes(width)) {
         await page.screenshot({ path: path.join(evidence, `${name}-${width}.png`), fullPage: true });
       }
     });
@@ -333,7 +333,7 @@ test('app routes retain accessible navigation after the shared shell changes', a
 
 test('PWA installability in a dedicated non-private browser profile', async () => {
   const context = await chromium.launchPersistentContext(path.resolve('test-results/installability-profile'), {
-    channel: process.env.PLAYWRIGHT_CHANNEL || 'msedge', headless: true,
+    channel: process.env.PLAYWRIGHT_CHANNEL || (process.platform === 'win32' ? 'msedge' : 'chromium'), headless: true,
     baseURL: 'http://127.0.0.1:4173',
   });
   try {

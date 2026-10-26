@@ -1,0 +1,173 @@
+{
+  "timestamp": "2026-10-26T12:09:51.530Z",
+  "testEngine": {
+    "name": "axe-core",
+    "version": "4.14.0"
+  },
+  "testEnvironment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0",
+    "windowWidth": 768,
+    "windowHeight": 1000,
+    "orientationAngle": 0,
+    "orientationType": "landscape-primary"
+  },
+  "violations": [],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "12.7pt (16.875px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div class=\"inline-flex items-center gap-2 bg-white/15 rounded-pill px-4 py-1.5 mb-6 text-sm font-semibold text-calm-100\">",
+                  "target": [
+                    ".bg-white\\/15"
+                  ]
+                },
+                {
+                  "html": "<section aria-labelledby=\"hero-heading\" class=\"bg-gradient-to-b from-calm-700 to-calm-600 text-white\">",
+                  "target": [
+                    ".bg-gradient-to-b"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div class=\"inline-flex items-center gap-2 bg-white/15 rounded-pill px-4 py-1.5 mb-6 text-sm font-semibold text-calm-100\">",
+          "target": [
+            ".bg-white\\/15"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "30.4pt (40.5px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section aria-labelledby=\"hero-heading\" class=\"bg-gradient-to-b from-calm-700 to-calm-600 text-white\">",
+                  "target": [
+                    ".bg-gradient-to-b"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h1 id=\"hero-heading\" class=\"text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4\" style=\"line-height: 1.15;\">Your daily companion for calm, confident care.</h1>",
+          "target": [
+            "#hero-heading"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "20.3pt (27px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section aria-labelledby=\"hero-heading\" class=\"bg-gradient-to-b from-calm-700 to-calm-600 text-white\">",
+                  "target": [
+                    ".bg-gradient-to-b"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p class=\"text-lg md:text-xl text-calm-100 leading-relaxed mb-8 max-w-xl\">For caregivers looking after someone who needs a little help remembering.</p>",
+          "target": [
+            ".md\\:text-xl"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "16.9pt (22.5px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section aria-labelledby=\"hero-heading\" class=\"bg-gradient-to-b from-calm-700 to-calm-600 text-white\">",
+                  "target": [
+                    ".bg-gradient-to-b"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"inline-flex items-center justify-center gap-2 font-semibold rounded-lg px-7 py-4 min-h-[3rem] text-lg bg-transparent text-white border-2 border-white/60 hover:border-white hover:bg-white/10 transition-colors no-underline\" href=\"/signin\" data-discover=\"true\">I already have an account</a>",
+          "target": [
+            ".bg-transparent"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        }
+      ]
+    }
+  ],
+  "url": "http://127.0.0.1:4173/"
+}
