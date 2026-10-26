@@ -11,15 +11,26 @@ import {
 } from '../../data/caregiverStore';
 import { saveAppointments } from '../../data/apptStore';
 import type { Appointment } from '../../data/appointmentsData';
+import { localDay } from '../../data/localDay';
 
 const isoDay = (offsetDays: number) =>
-  new Date(Date.now() + offsetDays * 86_400_000).toISOString().split('T')[0];
+  localDay(new Date(Date.now() + offsetDays * 86_400_000));
 
 function appointment(id: string, date: string, time: string): Appointment {
   return { id, title: `Appointment ${id}`, date, time, location: { name: 'Clinic', type: 'clinic' }, isInMyDay: false };
 }
 
 describe('activity log', () => {
+  it('normalizes legacy kinds and preserves unknown activity safely', () => {
+    const event = { id: 'legacy', label: 'Previous activity', timestamp: new Date().toISOString() };
+    localStorage.setItem('careconnect_activity_log', JSON.stringify([
+      { ...event, kind: 'med_skipped' }, { ...event, kind: 'schedule_done' },
+      { ...event, kind: 'future_kind' }, null, { kind: 'broken' },
+    ]));
+    expect(getActivityLog().map(item => item.kind)).toEqual(['med_unmarked', 'task_completed', 'other']);
+    localStorage.setItem('careconnect_activity_log', JSON.stringify({ wrong: 'shape' }));
+    expect(getActivityLog()).toEqual([]);
+  });
   it('starts empty and tolerates corrupt data', () => {
     expect(getActivityLog()).toEqual([]);
     localStorage.setItem('careconnect_activity_log', '{bad');
@@ -88,6 +99,22 @@ describe('medication tracking', () => {
 });
 
 describe('check-in', () => {
+  it('starts a new local day without reimporting the store or reloading the app', () => {
+    jest.useFakeTimers().setSystemTime(new Date(2031, 0, 12, 23, 59));
+    try {
+      const med = getTodayMedications()[0];
+      setMedicationTaken(med.id, true);
+      recordCheckIn();
+      jest.setSystemTime(new Date(2031, 0, 13, 0, 1));
+      expect(getTodayMedications().find(item => item.id === med.id)?.taken).toBe(false);
+      expect(getCheckInStatus().checkedIn).toBe(false);
+      setMedicationTaken(med.id, true);
+      recordCheckIn();
+      expect(JSON.parse(localStorage.getItem('careconnect_meds_taken')!).date).toBe('2031-01-13');
+      expect(JSON.parse(localStorage.getItem('careconnect_checkin')!).date).toBe('2031-01-13');
+      expect(getActivityLog().filter(item => item.kind === 'check_in')).toHaveLength(2);
+    } finally { jest.useRealTimers(); }
+  });
   it('records the check-in once and logs it', () => {
     expect(getCheckInStatus()).toEqual({ checkedIn: false, time: '' });
     recordCheckIn();

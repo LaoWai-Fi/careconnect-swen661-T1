@@ -11,8 +11,7 @@
 
 import { getMedications } from './medsStore';
 import { getAppointments } from './apptStore';
-
-const TODAY = new Date().toISOString().split('T')[0];
+import { localDay, localDayOffset } from './localDay';
 
 // ── Activity log ───────────────────────────────────────────────────────────────
 
@@ -20,7 +19,8 @@ export type ActivityEventKind =
   | 'med_taken'
   | 'med_unmarked'
   | 'task_completed'
-  | 'check_in';
+  | 'check_in'
+  | 'other';
 
 export interface ActivityEvent {
   id: string;
@@ -34,7 +34,20 @@ const LS_ACTIVITY_KEY = 'careconnect_activity_log';
 export function getActivityLog(): ActivityEvent[] {
   try {
     const raw = localStorage.getItem(LS_ACTIVITY_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const records: unknown = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(records)) return [];
+    return records.flatMap((record): ActivityEvent[] => {
+      if (!record || typeof record !== 'object') return [];
+      const event = record as Record<string, unknown>;
+      if (typeof event.id !== 'string' || typeof event.label !== 'string' ||
+        typeof event.timestamp !== 'string' || !Number.isFinite(Date.parse(event.timestamp))) return [];
+      const legacy = { med_skipped: 'med_unmarked', schedule_done: 'task_completed' } as const;
+      const kinds: ActivityEventKind[] = ['med_taken', 'med_unmarked', 'task_completed', 'check_in', 'other'];
+      const kind = typeof event.kind === 'string' && Object.prototype.hasOwnProperty.call(legacy, event.kind)
+        ? legacy[event.kind as keyof typeof legacy]
+        : kinds.includes(event.kind as ActivityEventKind) ? event.kind as ActivityEventKind : 'other';
+      return [{ id: event.id, label: event.label, timestamp: event.timestamp, kind }];
+    });
   } catch {
     return [];
   }
@@ -61,7 +74,7 @@ function readTakenToday(): Record<string, boolean> {
   try {
     const raw = localStorage.getItem(LS_MEDS_TAKEN_KEY);
     const stored: { date: string; taken: Record<string, boolean> } | null = raw ? JSON.parse(raw) : null;
-    return stored?.date === TODAY ? stored.taken : {};
+    return stored?.date === localDay() && stored.taken && typeof stored.taken === 'object' ? stored.taken : {};
   } catch {
     return {};
   }
@@ -79,6 +92,7 @@ export interface TodayMedication {
 /** Every medication with today's taken state. */
 export function getTodayMedications(): TodayMedication[] {
   const storedTaken = readTakenToday();
+  const today = localDay();
   return getMedications().map((med) => ({
     id: med.id,
     name: med.name,
@@ -86,7 +100,7 @@ export function getTodayMedications(): TodayMedication[] {
     times: med.times,
     instructions: med.instructions,
     // Recorded value wins; otherwise fall back to the seed value.
-    taken: storedTaken[med.id] ?? (med.taken[TODAY] ?? false),
+    taken: storedTaken[med.id] ?? (med.taken[today] ?? false),
   }));
 }
 
@@ -96,7 +110,7 @@ export function setMedicationTaken(medId: string, taken: boolean): void {
   if (!med) return;
   localStorage.setItem(
     LS_MEDS_TAKEN_KEY,
-    JSON.stringify({ date: TODAY, taken: { ...readTakenToday(), [medId]: taken } }),
+    JSON.stringify({ date: localDay(), taken: { ...readTakenToday(), [medId]: taken } }),
   );
   appendActivityEvent({
     kind: taken ? 'med_taken' : 'med_unmarked',
@@ -147,7 +161,7 @@ export function getCheckInStatus(): CheckInStatus {
   try {
     const raw = localStorage.getItem('careconnect_checkin');
     const stored: { date: string; time: string } = raw ? JSON.parse(raw) : null;
-    if (stored?.date === TODAY) return { checkedIn: true, time: stored.time };
+    if (stored?.date === localDay() && typeof stored.time === 'string') return { checkedIn: true, time: stored.time };
   } catch { /* empty */ }
   return { checkedIn: false, time: '' };
 }
@@ -157,7 +171,7 @@ export function recordCheckIn(): void {
   if (getCheckInStatus().checkedIn) return;
   const now = new Date();
   const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-  localStorage.setItem('careconnect_checkin', JSON.stringify({ date: TODAY, time }));
+  localStorage.setItem('careconnect_checkin', JSON.stringify({ date: localDay(now), time }));
   appendActivityEvent({ kind: 'check_in', label: 'Margaret checked in', timestamp: now.toISOString() });
 }
 
@@ -172,7 +186,7 @@ export interface NextAppointment {
 
 export function getNextAppointment(): NextAppointment | null {
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = localDay(now);
   const nowMin = now.getHours() * 60 + now.getMinutes();
 
   const future = getAppointments()
@@ -210,8 +224,8 @@ export interface UpcomingAlert {
 
 export function getUpcomingAlerts(): UpcomingAlert[] {
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const tomorrowStr = new Date(now.getTime() + 86_400_000).toISOString().split('T')[0];
+  const todayStr = localDay(now);
+  const tomorrowStr = localDayOffset(1, now);
 
   return getAppointments()
     .filter((a) => a.date === todayStr || a.date === tomorrowStr)

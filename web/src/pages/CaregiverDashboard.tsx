@@ -13,6 +13,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Button, Card } from '../components';
+import { localDay, localDayOffset } from '../data/localDay';
 import {
   getMedAdherence,
   getTodayMedications,
@@ -43,8 +44,8 @@ function formatFullDate(dateStr: string): string {
 }
 
 function relativeDate(dateStr: string): string {
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().split('T')[0];
+  const today = localDay();
+  const tomorrow = localDayOffset(1);
   if (dateStr === today) return 'Today';
   if (dateStr === tomorrow) return 'Tomorrow';
   return formatFullDate(dateStr);
@@ -221,6 +222,7 @@ const EVENT_CONFIG: Record<
   ActivityEvent['kind'],
   { label: string; iconClass: string; rowClass: string }
 > = {
+  other: { label: 'Activity recorded', iconClass: 'text-neutral-600', rowClass: 'border-neutral-300' },
   med_taken: {
     label: 'Medication taken',
     iconClass: 'text-success-600',
@@ -244,6 +246,7 @@ const EVENT_CONFIG: Record<
 };
 
 const EVENT_ICON: Record<ActivityEvent['kind'], React.ReactNode> = {
+  other: <Activity className="w-4 h-4" />,
   med_taken:     <Pill className="w-4 h-4" />,
   med_unmarked:   <AlertCircle className="w-4 h-4" />,
   task_completed: <CheckCircle2 className="w-4 h-4" />,
@@ -251,7 +254,7 @@ const EVENT_ICON: Record<ActivityEvent['kind'], React.ReactNode> = {
 };
 
 function ActivityRow({ event }: { event: ActivityEvent }) {
-  const cfg = EVENT_CONFIG[event.kind];
+  const cfg = EVENT_CONFIG[event.kind] ?? EVENT_CONFIG.other;
   return (
     <li
       className={`flex items-start gap-3 py-3 border-l-4 pl-4 ${cfg.rowClass}`}

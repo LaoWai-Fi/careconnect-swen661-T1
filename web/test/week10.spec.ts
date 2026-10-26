@@ -5,6 +5,39 @@ import path from 'node:path';
 
 const evidence = path.resolve('..', 'docs', 'week10', 'evidence');
 const user = { id: 'week10-demo', name: 'Wiliss Demo', email: 'week10@example.com' };
+
+test('upgrade retains legacy activity on dashboard and timeline', async ({ page }) => {
+  await seed(page);
+  await page.addInitScript(() => localStorage.setItem('careconnect_activity_log', JSON.stringify(
+    ['med_skipped', 'schedule_done', 'future_kind'].map((kind, index) => ({
+      id: `legacy-${index}`, kind, label: `Legacy activity ${index}`, timestamp: new Date().toISOString(),
+    })),
+  )));
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  for (const route of ['/app', '/app/activity']) {
+    await page.goto(route);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByText('Legacy activity 0')).toBeVisible();
+    await expect(page.getByText('Legacy activity 2')).toBeVisible();
+  }
+  expect(errors).toEqual([]);
+});
+
+test('daily tracking rolls over at local midnight while the app stays open', async ({ page }) => {
+  await page.clock.install({ time: new Date(2031, 0, 12, 23, 59) });
+  await seed(page);
+  await page.goto('/app');
+  const mark = page.getByRole('button', { name: /^Mark as taken: / }).first();
+  const name = (await mark.getAttribute('aria-label'))!.replace('Mark as taken: ', '');
+  await mark.click();
+  await page.getByRole('button', { name: "Check in now: record Margaret's check-in" }).click();
+  await page.clock.setSystemTime(new Date(2031, 0, 13, 0, 1));
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect(page.getByRole('button', { name: `Mark as taken: ${name}`, exact: true })).toBeVisible();
+  await page.getByRole('button', { name: "Check in now: record Margaret's check-in" }).click();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('careconnect_checkin')!).date)).toBe('2031-01-13');
+});
 async function seed(page: Page) {
   await page.addInitScript(({ user }) => {
     if (!localStorage.getItem('careconnect_session')) localStorage.setItem('careconnect_session', JSON.stringify({ user }));

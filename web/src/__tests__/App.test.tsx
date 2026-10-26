@@ -53,6 +53,16 @@ describe('sign-up and sign-in', () => {
 describe('signed-in routes', () => {
   beforeEach(() => persistSession({ user }));
 
+  it.each(['/app', '/app/activity'])('renders legacy and unknown persisted events on %s', async (route) => {
+    localStorage.setItem('careconnect_activity_log', JSON.stringify(['med_skipped', 'schedule_done', 'future_kind'].map((kind, index) => ({
+      id: `legacy-${index}`, kind, label: `Previous event ${index}`, timestamp: new Date().toISOString(),
+    }))));
+    renderAt(route);
+    expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
+    expect(screen.getByText('Previous event 0')).toBeInTheDocument();
+    expect(screen.getByText('Previous event 2')).toBeInTheDocument();
+  });
+
   it.each([
     ['/app', 'Dashboard'],
     ['/app/manage-medications', 'Manage medications'],

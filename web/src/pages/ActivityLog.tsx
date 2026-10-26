@@ -17,6 +17,7 @@ const KIND_CFG: Record<
   ActivityEventKind,
   { label: string; Icon: React.FC<{ className?: string }>; dot: string; border: string }
 > = {
+  other: { label: 'Activity recorded', Icon: Activity, dot: 'bg-neutral-500', border: 'border-neutral-300' },
   med_taken: {
     label: 'Medication taken',
     Icon: Pill,
@@ -79,7 +80,7 @@ function groupByDay(events: ActivityEvent[]): [string, ActivityEvent[]][] {
 // ── Event row ──────────────────────────────────────────────────────────────────
 
 function EventRow({ event }: { event: ActivityEvent }) {
-  const { label, Icon, dot, border } = KIND_CFG[event.kind];
+  const { label, Icon, dot, border } = KIND_CFG[event.kind] ?? KIND_CFG.other;
   return (
     <li
       className={`flex items-start gap-4 py-4 border-b border-neutral-100 last:border-b-0`}
