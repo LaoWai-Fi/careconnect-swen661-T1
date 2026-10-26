@@ -1,3 +1,4 @@
+import { localDay } from './localDay';
 // ── Type ──────────────────────────────────────────────────────────────────────
 
 export type AppointmentLocationType = 'clinic' | 'hospital' | 'telephone' | 'home';
@@ -31,7 +32,7 @@ export interface Appointment {
 function daysFromNow(n: number): string {
   const d = new Date();
   d.setDate(d.getDate() + n);
-  return d.toISOString().split('T')[0];
+  return localDay(d);
 }
 
 // ── Mock data ──────────────────────────────────────────────────────────────────

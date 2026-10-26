@@ -17,7 +17,13 @@ The web app is a caregiver-only experience and follows the WebUIBuild-Revised de
 - **Deployment.** The build supports serving from a sub-path (`VITE_BASE`) for GitHub Pages. Use `import.meta.env.BASE_URL` and router-relative links instead of hard-coded absolute asset paths. See the GitHub Pages section below.
 - **Remaining design features** (messages, hand mode, dashboard widgets, theme and font size) are to be ported from WebUIBuild-Revised into this structure, not rebuilt as separate views.
 
-## Week 10: Parts 2 and 4
+## Week 11 current implementation
+
+See the [Part 1 implementation report](../docs/week11/PART1_IMPLEMENTATION.md), [responsive screenshots](../docs/week11/PART1_SCREENSHOTS.md) and [verified results](../docs/week11/TEST_RESULTS.md). Messages, saved themes/text size/one-handed controls, keyboard dashboard customization and page search/help are implemented. This supersedes the earlier remaining-design note above. Messages are local demonstrations, not real delivery. The complete generated Jest report is [coverage/lcov-report/index.html](coverage/lcov-report/index.html).
+
+Run `npm ci`, `npm run lint`, `npm run test:coverage -- --runInBand`, `npm run build` and `npm run test:e2e`. To view locally, use `npm run preview` after building. Tests start their own preview and require port 4173 free. Non-Windows hosts need `npx playwright install chromium`; Windows defaults to installed Edge. `PLAYWRIGHT_CHANNEL` overrides that selection. Sign-up now opens the caregiver dashboard directly without a role chooser. The PR checks workflow saves test evidence as an artifact. Word preparation was deferred; the report and native screenshots are provided for the team to embed in its final document.
+
+## Week 10 historical contribution
 
 Current deliverables: [web accessibility documentation](../docs/week10/PART2_WEB_ACCESSIBILITY.md), [implementation summary](../docs/week10/PART4_IMPLEMENTATION.md), [PWA behavior and deployment](../docs/week10/PWA_IMPLEMENTATION.md), and [actual test results](../docs/week10/TEST_RESULTS.md).
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { localDay } from '../data/localDay';
 import { ShieldCheck, AlertCircle, AlertTriangle, Info, PlusCircle, type LucideIcon } from 'lucide-react';
 import { caregiverNotes as initialNotes } from '../data/mockData';
 import type { CaregiverNote, Priority } from '../types';
@@ -43,7 +44,7 @@ export default function Caregiver() {
     if (!draft.trim()) return;
     const newNote: CaregiverNote = {
       id: `n${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
+      date: localDay(),
       author: 'Joyce Adeyemi',
       note: draft.trim(),
       priority: draftPriority,

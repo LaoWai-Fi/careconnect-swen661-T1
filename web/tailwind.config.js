@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     // Mobile-first with three explicit breakpoints
@@ -133,3 +133,10 @@ export default {
   },
   plugins: [],
 };
+
+// Preserve the established palette in light mode while giving every semantic ramp a dark equivalent.
+for (const [name, ramp] of Object.entries(config.theme.extend.colors)) {
+  if (typeof ramp !== 'object') continue;
+  for (const [shade, fallback] of Object.entries(ramp)) ramp[shade] = `var(--cc-${name}-${shade}, ${fallback})`;
+}
+export default config;

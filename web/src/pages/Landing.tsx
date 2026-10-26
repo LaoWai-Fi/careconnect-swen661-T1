@@ -48,7 +48,7 @@ export default function Landing() {
 
         {/* ══ Header ══════════════════════════════════════════════════════════ */}
         <header className="bg-white border-b border-neutral-200 sticky top-0 z-40" role="banner">
-          <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 min-h-16 py-3 flex flex-wrap gap-3 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2.5">
               <span
@@ -121,7 +121,6 @@ export default function Landing() {
                   <Link
                     to="/signup"
                     className="inline-flex items-center justify-center gap-2 font-bold rounded-lg px-7 py-4 min-h-[3rem] text-lg bg-white text-calm-700 border-2 border-white hover:bg-calm-50 transition-colors no-underline"
-                    aria-label="Sign up for CareConnect"
                   >
                     Get started — it's free
                     <ArrowRight className="w-5 h-5" aria-hidden="true" />
@@ -129,7 +128,6 @@ export default function Landing() {
                   <Link
                     to="/signin"
                     className="inline-flex items-center justify-center gap-2 font-semibold rounded-lg px-7 py-4 min-h-[3rem] text-lg bg-transparent text-white border-2 border-white/60 hover:border-white hover:bg-white/10 transition-colors no-underline"
-                    aria-label="Sign in to CareConnect"
                   >
                     I already have an account
                   </Link>

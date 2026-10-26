@@ -1,0 +1,66 @@
+{
+  "revision": "Week 11 Part 1 working tree after merged PR15 fixes",
+  "timestamp": "2026-10-26T13:23:22.734Z",
+  "subpath": {
+    "initialDeepLinkHTTPStatus": 404,
+    "renderedDespiteStatic404": true,
+    "manifest": "http://127.0.0.1:4185/careconnect-swen661-T1/manifest.webmanifest",
+    "startURL": "http://127.0.0.1:4185/careconnect-swen661-T1/app",
+    "worker": "http://127.0.0.1:4185/careconnect-swen661-T1/sw.js",
+    "cacheNames": [
+      "careconnect-web-03d2ebb965534125"
+    ],
+    "iconStatuses": [
+      {
+        "src": "http://127.0.0.1:4185/careconnect-swen661-T1/icons/icon.svg",
+        "status": 200
+      },
+      {
+        "src": "http://127.0.0.1:4185/careconnect-swen661-T1/icons/icon-192.png",
+        "status": 200
+      },
+      {
+        "src": "http://127.0.0.1:4185/careconnect-swen661-T1/icons/icon-512.png",
+        "status": 200
+      },
+      {
+        "src": "http://127.0.0.1:4185/careconnect-swen661-T1/icons/maskable-192.png",
+        "status": 200
+      },
+      {
+        "src": "http://127.0.0.1:4185/careconnect-swen661-T1/icons/maskable-512.png",
+        "status": 200
+      }
+    ],
+    "offlineNestedRoute": "passed"
+  },
+  "legacyActivity": [
+    {
+      "route": "app",
+      "h1Count": 1,
+      "rootText": "Skip to main content\nCareConnect\nCaregiver\nSign out\n\nGood evening, Review\n\nViewing Margaret's care plan\n\nMonday 26 October\nFind a page\nGo\nDashboard\nMedications\nAppointments\nActivity\nMessages\nNotes\nSettings\nDashboard\n\nMargaret's care overview — Monday 26 October\n\n2/5 tasks done\nCustomize dashboard\n\nMargaret's status today\nMEDICATIONS\n\n2 of 4\n\ntaken today\n\nCHECK-IN\n\nNot yet\n\nAwaiting check-in\n\nCheck in now\nNEXT APPOINTMENT\n\nBlood test — fasting needed\n\nTomorrow — 8:45 am\n\nGreenfield Surgery\n\nToday's medications\n\nAmlodipine\n\n5 mg — 1 tablet · 8:30 am\n\nTake with food.\n\nTaken\nUndo\n\nAtorvastatin\n\n20 mg — 1 tablet · 8:00 pm\n\nTake in the evening.\n\nMark as taken\n\nSertraline\n\n50 mg — 1 tablet · 8:30 am\n\nTake with or without food.\n\nTaken\nUndo\n\nVitamin D3\n\n1000 IU — 1 capsule · 8:30 am\n\nTake with breakfast.\n\nMark as taken\nAlerts\n4\n\nVitamin D3 — overdue\n\n1000 IU — 1 capsule was due at 8:30 am and has not been taken\n\nAppointment today\n\nBlood pressure check — Dr. Sharma at 10:30 am\n\nAppointment today\n\nHeart checkup — Dr. Lee at 2:30 pm\n\nAppointment tomorrow\n\nBlood test — fasting needed at 8:45 am\n\nRecent activity\nView all\n\nPrevious-release dose skipped\n\nMEDICATION UNMARKED\n\njust now\nQuick links\n\nManage medications\n\n2/4 taken today\n\nManage appointments\n\n3 in the next 24 h\n\nCaregiver notes\n\nDaily observations log\n\nFull activity log\n\n1 events recorded\n\nNext appointment\n\nBlood test — fasting needed on 2026-10-27 at 08:45\n\nOpen appointments\nUnread messages\n\n2 unread messages in this local demo inbox.\n\nOpen messages\n\nData refreshes when you return to this tab. Last seen adherence reflects Margaret's most recent actions.\n\nCareConnect · Course prototype · Demo data stays on this device.\n\nCaregiver and support contacts\nInstall on your device",
+      "errors": []
+    },
+    {
+      "route": "app/activity",
+      "h1Count": 1,
+      "rootText": "Skip to main content\nCareConnect\nCaregiver\nSign out\n\nGood evening, Review\n\nViewing Margaret's care plan\n\nMonday 26 October\nFind a page\nGo\nDashboard\nMedications\nAppointments\nActivity\nMessages\nNotes\nSettings\nActivity log\n\nMargaret's recent actions — medications taken, check-ins, and tasks\n\nRefresh\nActivity recorded\nMedication taken\nMedication unmarked\nTask completed\nChecked in\nTODAY— 1 event\n\nPrevious-release dose skipped\n\nMEDICATION UNMARKED\n\n6:53 PM\n\nCareConnect · Course prototype · Demo data stays on this device.\n\nCaregiver and support contacts\nInstall on your device",
+      "errors": []
+    }
+  ],
+  "dailyRollover": {
+    "localDay": "2026-10-27",
+    "storedMedication": {
+      "date": "2026-10-26",
+      "taken": {
+        "m2": true
+      }
+    },
+    "storedCheckIn": {
+      "date": "2026-10-26",
+      "time": "11:59 PM"
+    },
+    "priorDayMedicationStillTaken": false,
+    "newDayCheckInOffered": true
+  }
+}

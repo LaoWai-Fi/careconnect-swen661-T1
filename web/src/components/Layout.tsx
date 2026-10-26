@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { CalendarDays, Pill, ShieldCheck, Heart, LogOut, LayoutDashboard, Activity,
-  Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+  Menu, PanelLeftClose, PanelLeftOpen, Settings, Mail, HelpCircle, Search } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { useApp } from '../context/AppContext';
@@ -13,7 +13,9 @@ const caregiverNav: NavItem[] = [
   { to: '/app/manage-medications', label: 'Medications', Icon: Pill },
   { to: '/app/manage-appointments', label: 'Appointments', Icon: CalendarDays },
   { to: '/app/activity', label: 'Activity', Icon: Activity },
+  { to: '/app/messages', label: 'Messages', Icon: Mail },
   { to: '/app/caregiver', label: 'Notes', Icon: ShieldCheck },
+  { to: '/app/settings', label: 'Settings', Icon: Settings },
 ];
 
 function Navigation({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
@@ -41,6 +43,9 @@ export default function Layout({ children, onSignOut }: {
   const { user } = useAuth();
   const { patient } = useApp();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [now, setNow] = useState(() => new Date());
@@ -81,6 +86,8 @@ export default function Layout({ children, onSignOut }: {
           </Link>
           <span className="web-role">Caregiver</span>
           <div className="web-account-actions">
+            <Link to="/app/settings" className="web-icon-button" aria-label="Settings"><Settings size={20} aria-hidden="true" /></Link>
+            <button type="button" className="web-icon-button" aria-label="Help and keyboard shortcuts" onClick={() => setHelpOpen(true)}><HelpCircle size={20} aria-hidden="true" /></button>
             <button className="web-icon-button" type="button" onClick={onSignOut} aria-label="Sign out of CareConnect">
               <LogOut size={20} aria-hidden="true" /><span className="web-control-label">Sign out</span>
             </button>
@@ -96,12 +103,20 @@ export default function Layout({ children, onSignOut }: {
           </time>
         </div>
       </header>
+      <form role="search" className="web-search" onSubmit={event => { event.preventDefault(); const match = caregiverNav.find(item => item.label.toLowerCase().includes(search.trim().toLowerCase())); if (search.trim() && match) { navigate(match.to); setSearch(''); } }}>
+        <label htmlFor="page-search"><Search size={18} aria-hidden="true" />Find a page</label>
+        <input id="page-search" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Medications, messages, settings…" list="page-destinations" />
+        <datalist id="page-destinations">{caregiverNav.map(item => <option key={item.to} value={item.label} />)}</datalist>
+        <button type="submit" className="web-icon-button">Go</button>
+        {search.trim() && !caregiverNav.some(item => item.label.toLowerCase().includes(search.trim().toLowerCase())) && <p role="status">No matching page. Try a navigation label.</p>}
+      </form>
       <div className="web-workspace">
         <aside id="web-sidebar" className="web-sidebar" data-collapsed={!expanded} aria-label="Care plan navigation">
           <Navigation items={items} />
         </aside>
         <main id="main-content" tabIndex={-1} className="web-main" aria-label="Main content">{children}</main>
       </div>
+      <nav className="web-quick-nav" aria-label="Quick navigation"><Link to="/app">Home</Link><Link to="/app/manage-medications">Medications</Link><Link to="/app/messages">Messages</Link><button type="button" onClick={() => setHelpOpen(true)}>Help</button></nav>
       <footer className="web-footer">
         <p>CareConnect · Course prototype · Demo data stays on this device.</p>
         <Link to="/app/contacts">Caregiver and support contacts</Link>
@@ -112,6 +127,9 @@ export default function Layout({ children, onSignOut }: {
       <Modal id="mobile-navigation" open={drawerOpen} title="CareConnect navigation"
         onClose={() => setDrawerOpen(false)} className="web-nav-dialog">
         <Navigation items={items} onNavigate={() => setDrawerOpen(false)} />
+      </Modal>
+      <Modal open={helpOpen} title="Help and keyboard shortcuts" onClose={() => setHelpOpen(false)}>
+        <div className="space-y-3"><p>Use Tab and Shift+Tab to move, Enter to follow links, and Enter or Space to activate buttons. Escape closes dialogs. Focus stays inside an open modal and returns to its opener when closed.</p><p>Use the first Skip to main content link to bypass navigation. Find a page searches navigation destinations, not private care data. Settings controls theme, text size, stronger focus and one-handed reach. Customize dashboard changes widget visibility and order using Up and Down buttons.</p><p>This app uses fictional local data only. It does not provide real authentication, clinical advice, message delivery or cloud synchronization.</p><Link to="/app/contacts" onClick={() => setHelpOpen(false)}>Caregiver and support contacts</Link></div>
       </Modal>
     </div>
   );

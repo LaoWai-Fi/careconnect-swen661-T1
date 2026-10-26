@@ -13,6 +13,8 @@ import {
   Info,
 } from 'lucide-react';
 import { Button, Card } from '../components';
+import DashboardWidgets from '../components/DashboardWidgets';
+import DashboardExtras from '../components/DashboardExtras';
 import { localDay, localDayOffset } from '../data/localDay';
 import {
   getMedAdherence,
@@ -364,18 +366,19 @@ export default function CaregiverDashboard() {
       </div>
 
       {/* ── Status summary ────────────────────────────────────────────────── */}
-      <StatusSummaryCard
+      <DashboardWidgets>
+      <div data-widget="status"><StatusSummaryCard
         medAdherence={medAdherence}
         checkIn={checkIn}
         nextAppt={nextAppt}
         onCheckIn={handleCheckIn}
-      />
+      /></div>
 
       {/* Announces medication and check-in changes to screen readers */}
       <p role="status" className="sr-only">{announcement}</p>
 
       {/* ── TODAY'S MEDICATIONS ──────────────────────────────────────────── */}
-      <section aria-labelledby="todays-meds-heading">
+      <section data-widget="medications" aria-labelledby="todays-meds-heading">
         <h2 id="todays-meds-heading" className="text-xl font-semibold text-neutral-800 flex items-center gap-2 mb-4">
           <Pill className="w-5 h-5 text-calm-600" aria-hidden="true" />
           Today's medications
@@ -425,6 +428,7 @@ export default function CaregiverDashboard() {
 
       {/* ── ALERTS ───────────────────────────────────────────────────────── */}
       <section
+        data-widget="alerts"
         role="region"
         aria-label="Alerts"
         aria-live="polite"
@@ -482,7 +486,7 @@ export default function CaregiverDashboard() {
       </section>
 
       {/* ── Two-column: Activity + Quick links ───────────────────────────── */}
-      <div className="web-dashboard-grid gap-6">
+      <div data-widget="activity" className="web-dashboard-grid gap-6">
 
         {/* Activity timeline — takes 2/3 of width on desktop */}
         <section
@@ -628,6 +632,9 @@ export default function CaregiverDashboard() {
 
       </div>
 
+      <div data-widget="next"><DashboardExtras kind="next" /></div>
+      <div data-widget="messages"><DashboardExtras kind="messages" /></div>
+      </DashboardWidgets>
       <p className="text-xs text-neutral-400 text-center pb-2">
         Data refreshes when you return to this tab. Last seen adherence reflects Margaret's most recent actions.
       </p>
