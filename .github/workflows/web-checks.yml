@@ -23,7 +23,7 @@ jobs:
       - run: npm run lint
       - run: npm run test:coverage -- --runInBand
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
         env:
           PLAYWRIGHT_CHANNEL: chromium
@@ -34,4 +34,5 @@ jobs:
           path: |
             web/coverage
             web/playwright-report
+            web/test-results
             docs/week11/evidence

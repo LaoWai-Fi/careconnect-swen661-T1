@@ -338,3 +338,6 @@ input[type="checkbox"] { accent-color: var(--cc-calm-600, #146488); }
 [data-theme="dark"] :is(.bg-neutral-700, .bg-neutral-800) { background-color: #243d4b; }
 /* Explicit element selector wins over Tailwind's @apply-expanded anchor color rules. */
 [data-theme="dark"] a.btn-primary { color: #ffffff; }
+
+/* Let buttons wrap on narrow screens so large text and wider fallback fonts never cause horizontal scrolling. */
+@media (max-width: 767px) { .btn { white-space: normal; max-width: 100%; text-align: center; } }

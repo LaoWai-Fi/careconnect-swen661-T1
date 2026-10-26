@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "screenshots": "tsx scripts/screenshots.ts",
     "test:e2e": "playwright test",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:evidence": "node scripts/e2e-evidence.mjs",
     "verify:responsive": "playwright test --grep responsive",
     "verify:pwa": "playwright test --grep PWA",
     "test": "jest",
