@@ -1,6 +1,6 @@
 /**
  * Shared medication store backed by localStorage.
- * Caregiver management screens write here; patient Medications screen reads from here.
+ * Caregiver management screens write here; the dashboard reads from here.
  */
 import { medications as defaultMeds } from './mockData';
 import type { Medication } from '../types';

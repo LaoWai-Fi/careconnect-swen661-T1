@@ -17,19 +17,20 @@ const KIND_CFG: Record<
   ActivityEventKind,
   { label: string; Icon: React.FC<{ className?: string }>; dot: string; border: string }
 > = {
+  other: { label: 'Activity recorded', Icon: Activity, dot: 'bg-neutral-500', border: 'border-neutral-300' },
   med_taken: {
     label: 'Medication taken',
     Icon: Pill,
     dot:    'bg-success-500',
     border: 'border-success-200',
   },
-  med_skipped: {
+  med_unmarked: {
     label: 'Medication unmarked',
     Icon: AlertCircle,
     dot:    'bg-warm-500',
     border: 'border-warm-200',
   },
-  schedule_done: {
+  task_completed: {
     label: 'Task completed',
     Icon: CheckCircle2,
     dot:    'bg-calm-500',
@@ -79,7 +80,7 @@ function groupByDay(events: ActivityEvent[]): [string, ActivityEvent[]][] {
 // ── Event row ──────────────────────────────────────────────────────────────────
 
 function EventRow({ event }: { event: ActivityEvent }) {
-  const { label, Icon, dot, border } = KIND_CFG[event.kind];
+  const { label, Icon, dot, border } = KIND_CFG[event.kind] ?? KIND_CFG.other;
   return (
     <li
       className={`flex items-start gap-4 py-4 border-b border-neutral-100 last:border-b-0`}
@@ -188,7 +189,7 @@ export default function ActivityLog() {
           <Info className="w-10 h-10 text-neutral-300 mx-auto mb-4" aria-hidden="true" />
           <p className="text-xl font-semibold text-neutral-700">No activity yet</p>
           <p className="text-neutral-500 mt-2 text-base">
-            Events will appear here when Margaret takes medications, completes tasks, or checks in.
+            Events will appear here when you mark medications as taken, add medications, or record Margaret's check-in.
           </p>
         </div>
       ) : (

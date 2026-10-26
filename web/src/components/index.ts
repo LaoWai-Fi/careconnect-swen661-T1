@@ -2,12 +2,6 @@
 // Import from here rather than individual files:
 //   import { Button, Card, Field } from '../components';
 
-export { default as Banner }        from './Banner';
-export type { BannerProps, BannerVariant } from './Banner';
-
-export { default as BigActionTile } from './BigActionTile';
-export type { BigActionTileProps }  from './BigActionTile';
-
 export { default as Button }        from './Button';
 export type { ButtonProps, ButtonVariant } from './Button';
 

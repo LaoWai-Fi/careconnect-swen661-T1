@@ -22,48 +22,28 @@ function LoadingScreen() {
 // ── Route guards ───────────────────────────────────────────────────────────────
 
 /**
- * Protects app routes that require both authentication and a chosen role.
+ * Protects app routes that require authentication.
  * - No user → redirect to landing "/"
- * - User but no role → redirect to "/role"
- * - User + role → render children
+ * - User → render children
  */
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { user, role, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
   if (!user)   return <Navigate to="/" replace />;
-  if (!role)   return <Navigate to="/role" replace />;
-
-  return <>{children}</>;
-}
-
-/**
- * Protects the role-chooser route: needs auth but no role yet.
- * - No user → redirect to landing "/"
- * - Already has a role → redirect into the app "/app"
- */
-export function RoleRoute({ children }: { children: ReactNode }) {
-  const { user, role, loading } = useAuth();
-
-  if (loading) return <LoadingScreen />;
-  if (!user)   return <Navigate to="/" replace />;
-  if (role)    return <Navigate to="/app" replace />;
 
   return <>{children}</>;
 }
 
 /**
  * Wraps public auth screens (sign in / sign up).
- * If the user is already authenticated, skip straight to the next step.
- * - Has user + role → go to app
- * - Has user, no role → go to role chooser
+ * If the user is already authenticated, skip straight to the app.
  */
 export function AuthRoute({ children }: { children: ReactNode }) {
-  const { user, role, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
-  if (user && role)  return <Navigate to="/app" replace />;
-  if (user && !role) return <Navigate to="/role" replace />;
+  if (user)    return <Navigate to="/app" replace />;
 
   return <>{children}</>;
 }

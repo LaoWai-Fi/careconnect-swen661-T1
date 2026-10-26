@@ -363,7 +363,7 @@ function ApptForm({
             <Field
               label="Address"
               placeholder="e.g. 12 Greenfield Road, Westfield"
-              hint="Optional — used for the 'Get directions' button on the patient screen."
+              hint="Optional — where the appointment takes place or how to get there."
               value={form.locationAddress}
               onChange={setField('locationAddress')}
             />
@@ -381,10 +381,10 @@ function ApptForm({
           />
 
           <Field
-            label="Patient notes"
+            label="Appointment notes"
             multiline
             placeholder="Instructions or reassurance for Margaret, e.g. 'No need to fast beforehand.'"
-            hint="Optional — shown in plain language on the patient appointments screen."
+            hint="Optional — a plain-language note about this appointment."
             value={form.notes}
             onChange={setField('notes')}
           />

@@ -1,26 +1,26 @@
 /**
- * Caregiver-side read utilities for patient-written localStorage data.
+ * Caregiver-side read utilities for care-plan data stored in localStorage.
  *
- * Keys written by patient screens:
- *   careconnect_meds_taken    — Record<medId, boolean> for today
- *   careconnect_schedule_done — { date: string; ids: string[] }
+ * The caregiver records medications taken and check-ins from the dashboard.
+ *
+ * Keys:
+ *   careconnect_meds_taken    — { date: string; taken: Record<medId, boolean> }
  *   careconnect_checkin       — { date: string; time: string }
  *   careconnect_activity_log  — ActivityEvent[]
  */
 
-import { scheduleItems } from './mockData';
 import { getMedications } from './medsStore';
 import { getAppointments } from './apptStore';
-
-const TODAY = new Date().toISOString().split('T')[0];
+import { localDay, localDayOffset } from './localDay';
 
 // ── Activity log ───────────────────────────────────────────────────────────────
 
 export type ActivityEventKind =
   | 'med_taken'
-  | 'med_skipped'
-  | 'schedule_done'
-  | 'check_in';
+  | 'med_unmarked'
+  | 'task_completed'
+  | 'check_in'
+  | 'other';
 
 export interface ActivityEvent {
   id: string;
@@ -34,7 +34,20 @@ const LS_ACTIVITY_KEY = 'careconnect_activity_log';
 export function getActivityLog(): ActivityEvent[] {
   try {
     const raw = localStorage.getItem(LS_ACTIVITY_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const records: unknown = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(records)) return [];
+    return records.flatMap((record): ActivityEvent[] => {
+      if (!record || typeof record !== 'object') return [];
+      const event = record as Record<string, unknown>;
+      if (typeof event.id !== 'string' || typeof event.label !== 'string' ||
+        typeof event.timestamp !== 'string' || !Number.isFinite(Date.parse(event.timestamp))) return [];
+      const legacy = { med_skipped: 'med_unmarked', schedule_done: 'task_completed' } as const;
+      const kinds: ActivityEventKind[] = ['med_taken', 'med_unmarked', 'task_completed', 'check_in', 'other'];
+      const kind = typeof event.kind === 'string' && Object.prototype.hasOwnProperty.call(legacy, event.kind)
+        ? legacy[event.kind as keyof typeof legacy]
+        : kinds.includes(event.kind as ActivityEventKind) ? event.kind as ActivityEventKind : 'other';
+      return [{ id: event.id, label: event.label, timestamp: event.timestamp, kind }];
+    });
   } catch {
     return [];
   }
@@ -54,24 +67,66 @@ export interface MedAdherence {
   missedMeds: { id: string; name: string; dosage: string; scheduledTime: string }[];
 }
 
-export function getMedAdherence(): MedAdherence {
-  let storedTaken: Record<string, boolean> = {};
-  try {
-    const raw = localStorage.getItem('careconnect_meds_taken');
-    if (raw) storedTaken = JSON.parse(raw);
-  } catch { /* empty */ }
+const LS_MEDS_TAKEN_KEY = 'careconnect_meds_taken';
 
-  const medications = getMedications();
+/** Taken flags the caregiver has recorded today, keyed by medication id. */
+function readTakenToday(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem(LS_MEDS_TAKEN_KEY);
+    const stored: { date: string; taken: Record<string, boolean> } | null = raw ? JSON.parse(raw) : null;
+    return stored?.date === localDay() && stored.taken && typeof stored.taken === 'object' ? stored.taken : {};
+  } catch {
+    return {};
+  }
+}
+
+export interface TodayMedication {
+  id: string;
+  name: string;
+  dosage: string;
+  times: string[];
+  instructions?: string;
+  taken: boolean;
+}
+
+/** Every medication with today's taken state. */
+export function getTodayMedications(): TodayMedication[] {
+  const storedTaken = readTakenToday();
+  const today = localDay();
+  return getMedications().map((med) => ({
+    id: med.id,
+    name: med.name,
+    dosage: med.dosage,
+    times: med.times,
+    instructions: med.instructions,
+    // Recorded value wins; otherwise fall back to the seed value.
+    taken: storedTaken[med.id] ?? (med.taken[today] ?? false),
+  }));
+}
+
+/** Marks a medication taken (or unmarks it) for today and logs the activity. */
+export function setMedicationTaken(medId: string, taken: boolean): void {
+  const med = getMedications().find((m) => m.id === medId);
+  if (!med) return;
+  localStorage.setItem(
+    LS_MEDS_TAKEN_KEY,
+    JSON.stringify({ date: localDay(), taken: { ...readTakenToday(), [medId]: taken } }),
+  );
+  appendActivityEvent({
+    kind: taken ? 'med_taken' : 'med_unmarked',
+    label: `${med.name} ${taken ? 'marked as taken' : 'unmarked'}`,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function getMedAdherence(): MedAdherence {
+  const medications = getTodayMedications();
   const totalCount = medications.length;
   let takenCount = 0;
   const missedMeds: MedAdherence['missedMeds'] = [];
 
   for (const med of medications) {
-    // Use localStorage value if present, else fall back to static mock value
-    const taken =
-      storedTaken[med.id] !== undefined ? storedTaken[med.id] : (med.taken[TODAY] ?? false);
-
-    if (taken) {
+    if (med.taken) {
       takenCount++;
     } else {
       // Only flag as missed if the scheduled time has passed
@@ -95,29 +150,6 @@ export function getMedAdherence(): MedAdherence {
   return { takenCount, totalCount, missedMeds };
 }
 
-// ── Schedule adherence ─────────────────────────────────────────────────────────
-
-export interface ScheduleAdherence {
-  doneCount: number;
-  totalCount: number;
-}
-
-export function getScheduleAdherence(): ScheduleAdherence {
-  let localDoneIds: string[] = [];
-  try {
-    const raw = localStorage.getItem('careconnect_schedule_done');
-    const stored: { date: string; ids: string[] } = raw ? JSON.parse(raw) : null;
-    if (stored?.date === TODAY) localDoneIds = stored.ids;
-  } catch { /* empty */ }
-
-  const totalCount = scheduleItems.length;
-  const doneCount = scheduleItems.filter(
-    (i) => i.done || localDoneIds.includes(i.id),
-  ).length;
-
-  return { doneCount, totalCount };
-}
-
 // ── Check-in ───────────────────────────────────────────────────────────────────
 
 export interface CheckInStatus {
@@ -129,9 +161,18 @@ export function getCheckInStatus(): CheckInStatus {
   try {
     const raw = localStorage.getItem('careconnect_checkin');
     const stored: { date: string; time: string } = raw ? JSON.parse(raw) : null;
-    if (stored?.date === TODAY) return { checkedIn: true, time: stored.time };
+    if (stored?.date === localDay() && typeof stored.time === 'string') return { checkedIn: true, time: stored.time };
   } catch { /* empty */ }
   return { checkedIn: false, time: '' };
+}
+
+/** Records today's check-in (once) and logs the activity. */
+export function recordCheckIn(): void {
+  if (getCheckInStatus().checkedIn) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  localStorage.setItem('careconnect_checkin', JSON.stringify({ date: localDay(now), time }));
+  appendActivityEvent({ kind: 'check_in', label: 'Margaret checked in', timestamp: now.toISOString() });
 }
 
 // ── Next appointment ────────────────────────────────────────────────────────────
@@ -145,7 +186,7 @@ export interface NextAppointment {
 
 export function getNextAppointment(): NextAppointment | null {
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = localDay(now);
   const nowMin = now.getHours() * 60 + now.getMinutes();
 
   const future = getAppointments()
@@ -183,8 +224,8 @@ export interface UpcomingAlert {
 
 export function getUpcomingAlerts(): UpcomingAlert[] {
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const tomorrowStr = new Date(now.getTime() + 86_400_000).toISOString().split('T')[0];
+  const todayStr = localDay(now);
+  const tomorrowStr = localDayOffset(1, now);
 
   return getAppointments()
     .filter((a) => a.date === todayStr || a.date === tomorrowStr)
