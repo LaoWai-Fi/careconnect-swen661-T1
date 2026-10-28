@@ -7,6 +7,20 @@ CareConnect
 ![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)
 A responsive course-prototype web application for caregivers. Built with React, Vite and React Router, with a PWA foundation and accessibility patterns targeting WCAG 2.1 AA.
 
+### Cross-browser testing
+
+`npm run test:e2e` runs the Playwright suite in Chromium, Firefox and WebKit (install them once with
+`npx playwright install chromium firefox webkit`). Use `npm run test:e2e:chromium` for a quick run.
+Results and evidence files go to `test-results/`, which is git-ignored. Run `npm run test:e2e:evidence`
+only when you intend to refresh the committed evidence in `docs/week11/evidence`.
+
+- PWA install and offline-cache tests run in Chromium only, because installability is defined there.
+- Seven tests are skipped in WebKit, each with its reason shown in the test report. Playwright's WebKit on
+  macOS does not Tab to links and buttons by default, does not report some focus restoration, and cannot
+  navigate offline through a service worker. These behaviours pass in Chromium and Firefox. Spot-check them
+  in Safari by hand: skip link, drawer and dialog focus containment, Escape returning focus to the opener,
+  and offline reload of a direct route.
+
 ## Project conventions
 
 The web app is a caregiver-only experience and follows the WebUIBuild-Revised design build. Some code in this folder came from the original generated starter and no longer matches that design, so it has been removed to keep the app consistent. Please keep these decisions in place when adding features:

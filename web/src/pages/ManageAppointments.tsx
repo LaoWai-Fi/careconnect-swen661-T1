@@ -290,7 +290,7 @@ function ApptForm({
           label="Appointment title (required)"
           required
           placeholder="e.g. Blood pressure check — Dr. Sharma"
-          hint="Use plain language Margaret will recognise."
+          hint="Use plain language that is easy to recognise."
           value={form.title}
           onChange={setField('title')}
           error={errors.title}
@@ -376,7 +376,7 @@ function ApptForm({
           <Field
             label="Assigned caregiver"
             placeholder="e.g. Joyce Adeyemi"
-            hint="Optional — shown to Margaret as 'Joyce is taking you to this appointment'."
+            hint="Optional. The caregiver taking Margaret to this appointment."
             value={form.caregiver}
             onChange={setField('caregiver')}
           />
@@ -384,7 +384,7 @@ function ApptForm({
           <Field
             label="Appointment notes"
             multiline
-            placeholder="Instructions or reassurance for Margaret, e.g. 'No need to fast beforehand.'"
+            placeholder="Instructions or reminders, e.g. 'No need to fast beforehand.'"
             hint="Optional — a plain-language note about this appointment."
             value={form.notes}
             onChange={setField('notes')}

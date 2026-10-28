@@ -130,7 +130,7 @@ export default function SignUp() {
                 onChange={(e) => setName((e.target as HTMLInputElement).value)}
                 error={errors.name}
                 required
-                placeholder="e.g. Dorothy Smith"
+                placeholder="e.g. Joyce Adeyemi"
                 hint="This is how CareConnect will greet you."
               />
 
