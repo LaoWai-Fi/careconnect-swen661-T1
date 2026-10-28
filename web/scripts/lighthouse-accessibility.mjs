@@ -53,7 +53,7 @@ try {
       const target = new URL(route, base).href;
       const outputPath = path.join(outDir, `lighthouse-${name}-${mode}`);
       const args = ['--yes', 'lighthouse@12', target, `--port=${port}`, '--only-categories=accessibility',
-        '--disable-storage-reset', '--quiet', '--output=json', '--output=html', `--output-path=${outputPath}`];
+        '--disable-storage-reset', '--no-enable-error-reporting', '--quiet', '--output=json', '--output=html', `--output-path=${outputPath}`];
       if (mode === 'desktop') args.push('--preset=desktop');
       const run = spawnSync('npx', args, { stdio: ['ignore', 'inherit', 'inherit'], shell: process.platform === 'win32' });
       if (run.status !== 0) { rows.push({ name, mode, score: 'ERROR', failed: [] }); continue; }
