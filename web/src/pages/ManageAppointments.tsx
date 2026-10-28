@@ -186,7 +186,7 @@ function SelectField({
         aria-describedby={error ? errorId : undefined}
         className={[
           'block w-full rounded-lg border-2 px-4 py-3 text-base text-neutral-800',
-          'min-h-[2.75rem] focus:outline-none transition-colors bg-white',
+          'min-h-[2.75rem] transition-colors bg-white',
           error
             ? 'border-alert-500 focus:border-alert-600'
             : 'border-neutral-300 hover:border-neutral-400 focus:border-calm-600',

@@ -238,7 +238,7 @@ function MedForm({
                   aria-describedby={errors.times ? timesErrorId : undefined}
                   className={[
                     'rounded-lg border-2 px-4 py-3 text-base text-neutral-800 min-h-[2.75rem]',
-                    'focus:outline-none transition-colors',
+                    'transition-colors',
                     errors.times
                       ? 'border-alert-500 focus:border-alert-600'
                       : 'border-neutral-300 hover:border-neutral-400 focus:border-calm-600',

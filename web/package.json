@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "screenshots": "tsx scripts/screenshots.ts",
+    "lighthouse:accessibility": "node scripts/lighthouse-accessibility.mjs",
     "test:e2e": "playwright test",
     "test:e2e:chromium": "playwright test --project=chromium",
     "test:e2e:evidence": "node scripts/e2e-evidence.mjs",
