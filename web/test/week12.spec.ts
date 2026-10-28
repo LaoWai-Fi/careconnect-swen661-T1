@@ -167,3 +167,49 @@ test('chat assistant keyboard flow keeps focus and labels each speaker', async (
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: /open assistant/i })).toBeFocused();
 });
+
+// 6. One-handed mode moves the header buttons to the chosen side, and Tab order matches the visual order.
+for (const hand of ['off', 'left', 'right'] as const) {
+  test(`one-handed ${hand}: header buttons sit on the chosen side and Tab follows the visual order`, async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', WEBKIT_TAB);
+    await seed(page);
+    await page.addInitScript((h) => localStorage.setItem('careconnect_web_preferences', JSON.stringify({ handMode: h })), hand);
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto('/app');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const x = async (name: string | RegExp, role: 'link' | 'button') => {
+      const box = await page.locator('.web-utility').getByRole(role, { name }).boundingBox();
+      return box!.x + box!.width / 2;
+    };
+    const menu = await x('Open navigation', 'button');
+    const brand = await x('CareConnect home', 'link');
+    const settings = await x('Settings', 'link');
+    const signOut = await x(/Sign out/, 'button');
+    if (hand === 'left') {
+      expect(settings).toBeLessThan(menu);
+      expect(signOut).toBeLessThan(menu);
+      expect(menu).toBeLessThan(brand);
+    } else if (hand === 'right') {
+      expect(brand).toBeLessThan(settings);
+      expect(signOut).toBeLessThan(menu);
+      expect(menu).toBeGreaterThan(settings);
+    } else {
+      expect(menu).toBeLessThan(brand);
+      expect(settings).toBeGreaterThan(brand);
+    }
+    // keyboard order of the header buttons equals their left-to-right order
+    const order: number[] = [];
+    await page.locator('body').click({ position: { x: 1, y: 1 } });
+    for (let i = 0; i < 12 && order.length < 5; i++) {
+      await page.keyboard.press('Tab');
+      const info = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement;
+        const inHeader = Boolean(el?.closest('.web-utility'));
+        return { inHeader, x: el ? el.getBoundingClientRect().x : -1 };
+      });
+      if (info.inHeader) order.push(info.x);
+    }
+    expect(order.length).toBeGreaterThanOrEqual(4);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+  });
+}

@@ -292,6 +292,9 @@
 [data-hand="left"] .web-quick-nav { justify-content: flex-start; }
 [data-hand="right"] .web-quick-nav { justify-content: flex-end; }
 [data-hand="right"] .web-nav-dialog { margin-inline: auto .75rem; }
+/* One-handed header: Left puts Settings, Help and Sign out at the start, Right keeps them at the end next to the menu button. */
+[data-hand="left"] .web-account-actions { margin-inline-start: 0; }
+[data-hand="right"] .web-role + .web-account-actions { margin-inline-start: auto; }
 .settings-field { display: grid; gap: .4rem; font-weight: 600; }
 .settings-field select, .settings-field input { max-width: 100%; min-width: 0; padding: .5rem; border: 2px solid var(--cc-neutral-400, #60697a); border-radius: .5rem; color: var(--cc-neutral-800, #1e2631); background: var(--cc-white, #fff); }
 input[type="checkbox"] { accent-color: var(--cc-calm-600, #146488); }
