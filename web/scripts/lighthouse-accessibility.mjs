@@ -1,19 +1,22 @@
 // Lighthouse accessibility audit for every route, in mobile and desktop modes.
 //
-// Usage:
-//   npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort   (terminal 1)
-//   npm run lighthouse:accessibility                                                          (terminal 2)
+// Usage (two terminals, from the web folder):
+//   Terminal 1: npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort
+//   Terminal 2: npm run lighthouse:accessibility
 //
-// Audit the deployed site instead:
+// Audit the deployed site instead (no preview server needed):
 //   BASE_URL=https://<owner>.github.io/<repo>/ npm run lighthouse:accessibility
 //
-// The app uses a local demo session, so Playwright launches Chromium, stores that session on the site
-// origin, and Lighthouse attaches to the same browser (--port) without clearing storage. Lighthouse itself
-// runs through npx, so it is not added to package.json. Reports go to test-results/lighthouse by default;
-// set EVIDENCE_DIR to write them elsewhere. Exit code 1 if any score is below MIN_SCORE (default 90).
+// Optional: LH_ONLY=landing,dashboard limits the routes, LH_MODES=desktop limits the modes,
+// MIN_SCORE changes the pass mark (default 90), EVIDENCE_DIR changes where reports are written.
+//
+// The app uses a local demo session, so this script starts Chromium with a debugging port, stores the
+// session on the site origin through that browser, and lets Lighthouse attach to the same browser
+// (--port) without clearing storage. Lighthouse runs through npx, so it is not added to package.json.
+// Reports go to test-results/lighthouse by default. Exit code 1 if any score is below MIN_SCORE.
 import { chromium } from '@playwright/test';
-import { spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
+import { spawn, spawnSync } from 'node:child_process';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -22,39 +25,62 @@ const minScore = Number(process.env.MIN_SCORE || 90);
 const port = Number(process.env.CDP_PORT || 9333);
 const outDir = path.resolve(process.env.EVIDENCE_DIR || 'test-results', 'lighthouse');
 const modes = (process.env.LH_MODES || 'mobile,desktop').split(',');
-const routes = [
+const only = process.env.LH_ONLY ? process.env.LH_ONLY.split(',') : null;
+const allRoutes = [
   ['landing', ''], ['signin', 'signin'], ['signup', 'signup'],
   ['dashboard', 'app'], ['medications', 'app/manage-medications'], ['appointments', 'app/manage-appointments'],
   ['activity', 'app/activity'], ['messages', 'app/messages'], ['compose', 'app/messages/compose'],
   ['notes', 'app/caregiver'], ['contacts', 'app/contacts'], ['settings', 'app/settings'],
 ];
+const routes = only ? allRoutes.filter(([name]) => only.includes(name)) : allRoutes;
+const session = JSON.stringify({ user: { id: 'lighthouse', name: 'Dom Demo', email: 'lighthouse@example.com' } });
 
 await mkdir(outDir, { recursive: true });
 const profile = await mkdtemp(path.join(os.tmpdir(), 'careconnect-lighthouse-'));
-const context = await chromium.launchPersistentContext(profile, {
-  headless: true,
-  args: [`--remote-debugging-port=${port}`],
-});
+const chromeArgs = ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
+  '--no-first-run', '--no-default-browser-check', '--disable-gpu', 'about:blank'];
+if (process.getuid?.() === 0) chromeArgs.unshift('--no-sandbox');
+const chrome = spawn(process.env.CHROME_PATH || chromium.executablePath(), chromeArgs, { stdio: 'ignore' });
+
+async function waitForChrome() {
+  for (let i = 0; i < 60; i++) {
+    try { if ((await fetch(`http://127.0.0.1:${port}/json/version`)).ok) return; } catch { /* not up yet */ }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error(`Chromium did not open debugging port ${port}. Is something else using it? Set CDP_PORT to change it.`);
+}
+
+// Playwright is connected only while the session is written, then disconnected. Staying connected while
+// Lighthouse runs would leave the new Lighthouse tab paused waiting for this script (spawnSync blocks it).
+async function setSession(signedIn) {
+  const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`);
+  try {
+    const context = browser.contexts()[0];
+    const page = context.pages()[0] || await context.newPage();
+    if (!page.url().startsWith(base.origin)) await page.goto(base.href);
+    await page.evaluate(([value]) => {
+      if (value) localStorage.setItem('careconnect_session', value); else localStorage.removeItem('careconnect_session');
+    }, [signedIn ? session : null]);
+  } finally {
+    await browser.close(); // disconnects only; the Chromium process keeps running
+  }
+}
+
 const rows = [];
 try {
-  const page = context.pages()[0] || await context.newPage();
-  await page.goto(base.href);
-  await page.evaluate(() => localStorage.setItem('careconnect_session', JSON.stringify({
-    user: { id: 'lighthouse', name: 'Dom Demo', email: 'lighthouse@example.com' },
-  })));
-  // Signed-in users are redirected away from /signin and /signup, so audit those two signed out.
+  await waitForChrome();
   for (const mode of modes) {
     for (const [name, route] of routes) {
+      // Signed-in users are redirected away from the public pages, so audit those signed out.
       const signedOut = ['', 'signin', 'signup'].includes(route);
-      await page.evaluate((out) => {
-        if (out) localStorage.removeItem('careconnect_session');
-        else localStorage.setItem('careconnect_session', JSON.stringify({ user: { id: 'lighthouse', name: 'Dom Demo', email: 'lighthouse@example.com' } }));
-      }, signedOut);
+      await setSession(!signedOut);
       const target = new URL(route, base).href;
       const outputPath = path.join(outDir, `lighthouse-${name}-${mode}`);
       const args = ['--yes', 'lighthouse@12', target, `--port=${port}`, '--only-categories=accessibility',
-        '--disable-storage-reset', '--no-enable-error-reporting', '--quiet', '--output=json', '--output=html', `--output-path=${outputPath}`];
+        '--disable-storage-reset', '--no-enable-error-reporting', '--quiet',
+        '--output=json', '--output=html', `--output-path=${outputPath}`];
       if (mode === 'desktop') args.push('--preset=desktop');
+      console.log(`Auditing ${name} (${mode})...`);
       const run = spawnSync('npx', args, { stdio: ['ignore', 'inherit', 'inherit'], shell: process.platform === 'win32' });
       if (run.status !== 0) { rows.push({ name, mode, score: 'ERROR', failed: [] }); continue; }
       const report = JSON.parse(await readFile(`${outputPath}.report.json`, 'utf8'));
@@ -63,7 +89,8 @@ try {
     }
   }
 } finally {
-  await context.close();
+  chrome.kill();
+  await rm(profile, { recursive: true, force: true }).catch(() => {});
 }
 
 console.log('\nLighthouse accessibility scores (minimum ' + minScore + ')');
