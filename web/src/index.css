@@ -346,6 +346,8 @@ input[type="checkbox"] { accent-color: var(--cc-calm-600, #146488); }
 [data-theme="dark"] a[class~="bg-calm-600"][class~="text-white"]:not(.web-brand):not(.web-nav-link) { color: #ffffff; } /* same :not() list as the generic dark link rule, so it outranks it */
 [data-theme="dark"] :is(.bg-calm-500, .bg-success-600, .bg-warm-600)[class~="text-white"] { color: #0f1e25; }
 [data-theme="dark"] .text-neutral-200 { color: #dbe7ed; }
+/* Required-field asterisk and other alert-red text: #a81830 on the dark surface is only 2.1:1, so use the light alert tone (found with HTML_CodeSniffer). */
+[data-theme="dark"] .text-alert-600 { color: #ffb3be; }
 
 /* Let buttons wrap on narrow screens so large text and wider fallback fonts never cause horizontal scrolling. */
 @media (max-width: 767px) { .btn { white-space: normal; max-width: 100%; text-align: center; } }

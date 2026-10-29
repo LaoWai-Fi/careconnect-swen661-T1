@@ -213,3 +213,30 @@ for (const hand of ['off', 'left', 'right'] as const) {
     expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 }
+
+// 7. Required-field asterisks are visible text, so they need 3:1 or better on the dark surface too
+//    (aria-hidden text is skipped by axe, so this is checked directly from computed colors).
+test('required field markers keep readable contrast in dark theme', async ({ page }) => {
+  await open(page, '/signin', false, 'dark');
+  const worst = await page.evaluate(() => {
+    const parse = (c: string) => (c.match(/[\d.]+/g) || []).slice(0, 4).map(Number);
+    const lum = ([r, g, b]: number[]) => {
+      const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const bgOf = (el: Element | null): number[] => {
+      for (let e = el; e; e = e.parentElement) {
+        const c = parse(getComputedStyle(e).backgroundColor);
+        if (c.length === 4 ? c[3] > 0.99 : c.length === 3) return c;
+      }
+      return [255, 255, 255];
+    };
+    const ratios = Array.from(document.querySelectorAll('.text-alert-600')).map((el) => {
+      const a = lum(parse(getComputedStyle(el).color)); const b = lum(bgOf(el));
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+    return { count: ratios.length, min: Math.min(...ratios) };
+  });
+  expect(worst.count).toBeGreaterThan(0);
+  expect(worst.min).toBeGreaterThanOrEqual(4.5);
+});
