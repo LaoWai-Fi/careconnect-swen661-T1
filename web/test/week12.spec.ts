@@ -199,8 +199,8 @@ for (const hand of ['off', 'left', 'right'] as const) {
     }
     // keyboard order of the header buttons equals their left-to-right order
     const order: number[] = [];
-    await page.locator('body').click({ position: { x: 1, y: 1 } });
-    for (let i = 0; i < 12 && order.length < 5; i++) {
+    // start from a fresh page with no focus so every browser begins at the top of the document
+    for (let i = 0; i < 16 && order.length < 5; i++) {
       await page.keyboard.press('Tab');
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement;
