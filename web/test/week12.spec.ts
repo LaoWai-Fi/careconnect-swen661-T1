@@ -240,3 +240,28 @@ test('required field markers keep readable contrast in dark theme', async ({ pag
   expect(worst.count).toBeGreaterThan(0);
   expect(worst.min).toBeGreaterThanOrEqual(4.5);
 });
+
+// 8. Text on the landing hero gradient: axe cannot resolve gradients and only lists them as "needs review",
+//    so the worst case against both ends of the gradient is calculated here, in both themes.
+for (const theme of [undefined, 'dark'] as const) {
+  test(`landing hero text contrast against its gradient, ${theme ?? 'light'} theme`, async ({ page }) => {
+    await open(page, '/', false, theme);
+    const worst = await page.evaluate(() => {
+      const parse = (c: string) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      const lum = ([r, g, b]: number[]) => {
+        const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      const ratio = (a: number[], b: number[]) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+      const hero = document.querySelector('[aria-labelledby="hero-heading"]') as HTMLElement;
+      const stops = (getComputedStyle(hero).backgroundImage.match(/rgb\([^)]*\)/g) || []).map(parse);
+      const texts = Array.from(hero.querySelectorAll<HTMLElement>('#hero-heading, p, .rounded-pill'))
+        .filter((e) => Array.from(e.childNodes).some((n) => n.nodeType === 3 && (n.textContent || '').trim()));
+      const results = texts.map((e) => ({ text: (e.textContent || '').trim().slice(0, 30), min: Math.min(...stops.map((s) => ratio(parse(getComputedStyle(e).color), s))) }));
+      return { stops: stops.length, results };
+    });
+    expect(worst.stops).toBeGreaterThanOrEqual(2);
+    expect(worst.results.length).toBeGreaterThanOrEqual(3);
+    for (const r of worst.results) expect(r.min, r.text).toBeGreaterThanOrEqual(4.5);
+  });
+}

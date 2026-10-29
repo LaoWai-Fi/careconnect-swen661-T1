@@ -348,6 +348,8 @@ input[type="checkbox"] { accent-color: var(--cc-calm-600, #146488); }
 [data-theme="dark"] .text-neutral-200 { color: #dbe7ed; }
 /* Required-field asterisk and other alert-red text: #a81830 on the dark surface is only 2.1:1, so use the light alert tone (found with HTML_CodeSniffer). */
 [data-theme="dark"] .text-alert-600 { color: #ffb3be; }
+/* Landing hero text: the dark theme turns the calm-100 tint into a dark color (#193a4b), but the hero stays a blue gradient, so the subtitle and badge fell to 1.37:1. Keep them light. axe only reports gradient backgrounds as "needs review". */
+[data-theme="dark"] .text-calm-100 { color: #e3f5fa; }
 
 /* Let buttons wrap on narrow screens so large text and wider fallback fonts never cause horizontal scrolling. */
 @media (max-width: 767px) { .btn { white-space: normal; max-width: 100%; text-align: center; } }
