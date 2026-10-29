@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Button, Field, Card } from '../components';
+import { useAnnouncement } from '../hooks/useAnnouncement';
 import { getAppointments, saveAppointments } from '../data/apptStore';
 import type { Appointment, AppointmentLocationType } from '../data/appointmentsData';
 
@@ -508,7 +509,7 @@ type Mode = 'list' | 'add' | { edit: string };
 export default function ManageAppointments() {
   const [appts, setAppts] = useState<Appointment[]>(getAppointments);
   const [mode, setMode] = useState<Mode>('list');
-  const [message, setMessage] = useState('');
+  const [message, announce] = useAnnouncement();
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
   function persist(updated: Appointment[]) {
@@ -519,10 +520,10 @@ export default function ManageAppointments() {
   function handleSave(appt: Appointment) {
     if (mode === 'add') {
       persist([...appts, appt]);
-      setMessage(`${appt.title} added to this device's demo appointments.`);
+      announce(`${appt.title} added to this device's demo appointments.`);
     } else if (typeof mode === 'object') {
       persist(appts.map((a) => (a.id === mode.edit ? appt : a)));
-      setMessage(`${appt.title} saved.`);
+      announce(`${appt.title} saved.`);
     }
     setMode('list');
     requestAnimationFrame(() => addButtonRef.current?.focus());
@@ -531,7 +532,7 @@ export default function ManageAppointments() {
   function handleDelete(id: string) {
     const removed = appts.find((a) => a.id === id);
     persist(appts.filter((a) => a.id !== id));
-    setMessage(`${removed?.title || 'Appointment'} deleted.`);
+    announce(`${removed?.title || 'Appointment'} deleted.`);
   }
 
   const editingAppt =

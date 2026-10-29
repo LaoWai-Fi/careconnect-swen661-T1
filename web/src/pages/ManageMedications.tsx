@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button, Field, Card } from '../components';
+import { useAnnouncement } from '../hooks/useAnnouncement';
 import { getMedications, saveMedications, pickColour } from '../data/medsStore';
 import { appendActivityEvent } from '../data/caregiverStore';
 import type { Medication } from '../types';
@@ -366,7 +367,7 @@ type Mode = 'list' | 'add' | { edit: string };
 export default function ManageMedications() {
   const [meds, setMeds] = useState<Medication[]>(getMedications);
   const [mode, setMode] = useState<Mode>('list');
-  const [message, setMessage] = useState('');
+  const [message, announce] = useAnnouncement();
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
   function persist(updated: Medication[]) {
@@ -375,7 +376,7 @@ export default function ManageMedications() {
   }
 
   function handleSave(med: Medication) {
-    setMessage(`${med.name} saved to this device's demo care plan.`);
+    announce(`${med.name} saved to this device's demo care plan.`);
     if (mode === 'add') {
       persist([...meds, med]);
       appendActivityEvent({
@@ -392,7 +393,7 @@ export default function ManageMedications() {
 
   function handleDelete(id: string) {
     const removed = meds.find((med) => med.id === id);
-    setMessage(`${removed?.name || 'Medication'} removed from this device's demo care plan.`);
+    announce(`${removed?.name || 'Medication'} removed from this device's demo care plan.`);
     persist(meds.filter((m) => m.id !== id));
   }
 
