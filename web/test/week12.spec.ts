@@ -186,9 +186,9 @@ for (const hand of ['off', 'left', 'right'] as const) {
     const settings = await x('Settings', 'link');
     const signOut = await x(/Sign out/, 'button');
     if (hand === 'left') {
-      expect(settings).toBeLessThan(menu);
-      expect(signOut).toBeLessThan(menu);
-      expect(menu).toBeLessThan(brand);
+      expect(menu).toBeLessThan(settings);
+      expect(signOut).toBeLessThan(brand);
+      expect(settings).toBeLessThan(brand);
     } else if (hand === 'right') {
       expect(brand).toBeLessThan(settings);
       expect(signOut).toBeLessThan(menu);

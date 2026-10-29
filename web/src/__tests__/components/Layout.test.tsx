@@ -18,7 +18,7 @@ describe('Layout one-handed header', () => {
 
   it.each([
     ['off', 'menu, brand, then account buttons'],
-    ['left', 'account buttons first, in page order as seen'],
+    ['left', 'menu first, then account buttons, then brand'],
     ['right', 'brand first, account buttons then menu last'],
   ] as const)('orders the header for %s hand mode (%s) so Tab order matches what is seen', async (hand, _why) => {
     void _why;
@@ -28,8 +28,8 @@ describe('Layout one-handed header', () => {
     const brand = screen.getByRole('link', { name: 'CareConnect home' });
     const menu = screen.getByRole('button', { name: 'Open navigation', hidden: true });
     if (hand === 'left') {
-      expect(precedes(settings, menu)).toBe(true);
-      expect(precedes(menu, brand)).toBe(true);
+      expect(precedes(menu, settings)).toBe(true);
+      expect(precedes(settings, brand)).toBe(true);
     } else if (hand === 'right') {
       expect(precedes(brand, settings)).toBe(true);
       expect(precedes(settings, menu)).toBe(true);

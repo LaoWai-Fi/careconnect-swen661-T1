@@ -25,7 +25,7 @@ export default function Settings() {
           <option value="off">Off</option><option value="left">Left hand</option><option value="right">Right hand</option>
         </select>
       </div>
-      <p id="hand-help">The header buttons (Settings, Help and Sign out) and the menu move to your chosen side, quick navigation on small screens is grouped on that side, and the drawer opens from it. Reading and keyboard order always match what you see.</p>
+      <p id="hand-help">The menu and the header buttons (Settings, Help and Sign out) move to your chosen side, quick navigation on small screens is grouped on that side, and the drawer opens from it. Reading and keyboard order always match what you see.</p>
       <label className="flex items-center gap-3"><input type="checkbox" checked={preferences.highContrast} onChange={event => { update({ highContrast: event.target.checked }); saved(); }} />Stronger borders and focus</label>
     </section>
     <button type="button" className="btn-secondary" onClick={() => { reset(); setMessage('Default settings restored, including dashboard widgets.'); }}>Restore default settings</button>

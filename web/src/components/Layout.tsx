@@ -74,13 +74,6 @@ export default function Layout({ children, onSignOut }: {
         <div className="web-utility" data-hand={preferences.handMode}>
           {/* One-handed mode: the order in the page is the visual order, so reading and Tab order always match what is seen. */}
           {preferences.handMode === 'left' ? <>
-          <div className="web-account-actions">
-            <Link to="/app/settings" className="web-icon-button" aria-label="Settings"><Settings size={20} aria-hidden="true" /></Link>
-            <button type="button" className="web-icon-button" aria-label="Help and keyboard shortcuts" onClick={() => setHelpOpen(true)}><HelpCircle size={20} aria-hidden="true" /></button>
-            <button className="web-icon-button" type="button" onClick={onSignOut} aria-label="Sign out of CareConnect">
-              <LogOut size={20} aria-hidden="true" /><span className="web-control-label">Sign out</span>
-            </button>
-          </div>
           <button className="web-icon-button web-mobile-menu" type="button"
             aria-label="Open navigation" aria-expanded={drawerOpen} aria-haspopup="dialog"
             aria-controls={drawerOpen ? 'mobile-navigation' : undefined} onClick={() => setDrawerOpen(true)}>
@@ -91,6 +84,13 @@ export default function Layout({ children, onSignOut }: {
             aria-controls="web-sidebar" onClick={() => setExpanded(!expanded)}>
             {expanded ? <PanelLeftClose aria-hidden="true" /> : <PanelLeftOpen aria-hidden="true" />}
           </button>
+          <div className="web-account-actions">
+            <Link to="/app/settings" className="web-icon-button" aria-label="Settings"><Settings size={20} aria-hidden="true" /></Link>
+            <button type="button" className="web-icon-button" aria-label="Help and keyboard shortcuts" onClick={() => setHelpOpen(true)}><HelpCircle size={20} aria-hidden="true" /></button>
+            <button className="web-icon-button" type="button" onClick={onSignOut} aria-label="Sign out of CareConnect">
+              <LogOut size={20} aria-hidden="true" /><span className="web-control-label">Sign out</span>
+            </button>
+          </div>
           <Link to="/app" className="web-brand" aria-label="CareConnect home">
             <span className="web-brandmark"><Heart size={22} aria-hidden="true" /></span>
             <span className="web-brand-name">CareConnect</span>
