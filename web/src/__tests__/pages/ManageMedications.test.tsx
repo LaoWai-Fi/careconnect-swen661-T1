@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ManageMedications from '../../pages/ManageMedications';
 import { getMedications } from '../../data/medsStore';
@@ -40,7 +40,7 @@ describe('ManageMedications', () => {
     const card = await screen.findByRole('article', { name: 'Lisinopril prescription' });
     expect(within(card).getByText('9:30 am')).toBeInTheDocument();
     expect(within(card).getByText('Take with water')).toBeInTheDocument();
-    expect(screen.getByRole('status', { name: 'Medication updates' })).toHaveTextContent('Lisinopril saved');
+    await waitFor(() => expect(screen.getByRole('status', { name: 'Medication updates' })).toHaveTextContent('Lisinopril saved'));
     expect(getMedications().some((m) => m.name === 'Lisinopril')).toBe(true);
     expect(getActivityLog()[0].label).toBe("Added Lisinopril to Margaret's medications");
   });

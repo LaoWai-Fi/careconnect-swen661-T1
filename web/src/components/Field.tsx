@@ -46,8 +46,7 @@ const inputBase =
   'block w-full rounded-lg border-2 bg-white px-4 py-3 ' +
   'text-base text-neutral-800 placeholder:text-neutral-500 ' +
   'min-h-[2.75rem] ' + // 44px touch target
-  'transition-colors duration-200 ' +
-  'focus:outline-none '; // outline handled globally via *:focus-visible
+  'transition-colors duration-200 '; // the keyboard focus ring comes from the global *:focus-visible rule; do not suppress the outline here
 
 const inputNormal =
   inputBase +

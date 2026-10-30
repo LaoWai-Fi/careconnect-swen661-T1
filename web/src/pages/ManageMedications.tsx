@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button, Field, Card } from '../components';
+import { useAnnouncement } from '../hooks/useAnnouncement';
 import { getMedications, saveMedications, pickColour } from '../data/medsStore';
 import { appendActivityEvent } from '../data/caregiverStore';
 import type { Medication } from '../types';
@@ -238,7 +239,7 @@ function MedForm({
                   aria-describedby={errors.times ? timesErrorId : undefined}
                   className={[
                     'rounded-lg border-2 px-4 py-3 text-base text-neutral-800 min-h-[2.75rem]',
-                    'focus:outline-none transition-colors',
+                    'transition-colors',
                     errors.times
                       ? 'border-alert-500 focus:border-alert-600'
                       : 'border-neutral-300 hover:border-neutral-400 focus:border-calm-600',
@@ -366,7 +367,7 @@ type Mode = 'list' | 'add' | { edit: string };
 export default function ManageMedications() {
   const [meds, setMeds] = useState<Medication[]>(getMedications);
   const [mode, setMode] = useState<Mode>('list');
-  const [message, setMessage] = useState('');
+  const [message, announce] = useAnnouncement();
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
   function persist(updated: Medication[]) {
@@ -375,7 +376,7 @@ export default function ManageMedications() {
   }
 
   function handleSave(med: Medication) {
-    setMessage(`${med.name} saved to this device's demo care plan.`);
+    announce(`${med.name} saved to this device's demo care plan.`);
     if (mode === 'add') {
       persist([...meds, med]);
       appendActivityEvent({
@@ -392,7 +393,7 @@ export default function ManageMedications() {
 
   function handleDelete(id: string) {
     const removed = meds.find((med) => med.id === id);
-    setMessage(`${removed?.name || 'Medication'} removed from this device's demo care plan.`);
+    announce(`${removed?.name || 'Medication'} removed from this device's demo care plan.`);
     persist(meds.filter((m) => m.id !== id));
   }
 

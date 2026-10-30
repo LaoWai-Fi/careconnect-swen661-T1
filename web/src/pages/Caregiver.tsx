@@ -117,7 +117,7 @@ export default function Caregiver() {
             <textarea
               id="note-text"
               rows={4}
-              className="w-full rounded-lg border-2 border-neutral-300 px-4 py-3 text-base text-neutral-800 placeholder:text-neutral-400 focus:border-calm-600 focus:outline-none transition-colors resize-none"
+              className="w-full rounded-lg border-2 border-neutral-300 px-4 py-3 text-base text-neutral-800 placeholder:text-neutral-400 focus:border-calm-600 transition-colors resize-none"
               placeholder="Describe any observations, concerns, or updates…"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
@@ -166,7 +166,7 @@ export default function Caregiver() {
                         <div className="flex items-center justify-between gap-3 flex-wrap">
                           <div className="flex items-center gap-2">
                             <span
-                              className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-700 flex-shrink-0"
+                              className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-300 flex items-center justify-center text-xs font-bold text-neutral-700 flex-shrink-0"
                               aria-hidden="true"
                             >
                               {note.author

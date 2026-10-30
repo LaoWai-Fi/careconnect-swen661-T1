@@ -292,6 +292,9 @@
 [data-hand="left"] .web-quick-nav { justify-content: flex-start; }
 [data-hand="right"] .web-quick-nav { justify-content: flex-end; }
 [data-hand="right"] .web-nav-dialog { margin-inline: auto .75rem; }
+/* One-handed header: Left puts the menu first, then Settings, Help and Sign out; Right keeps them at the end next to the menu button. */
+[data-hand="left"] .web-account-actions { margin-inline-start: 0; }
+[data-hand="right"] .web-role + .web-account-actions { margin-inline-start: auto; }
 .settings-field { display: grid; gap: .4rem; font-weight: 600; }
 .settings-field select, .settings-field input { max-width: 100%; min-width: 0; padding: .5rem; border: 2px solid var(--cc-neutral-400, #60697a); border-radius: .5rem; color: var(--cc-neutral-800, #1e2631); background: var(--cc-white, #fff); }
 input[type="checkbox"] { accent-color: var(--cc-calm-600, #146488); }
@@ -338,6 +341,15 @@ input[type="checkbox"] { accent-color: var(--cc-calm-600, #146488); }
 [data-theme="dark"] :is(.bg-neutral-700, .bg-neutral-800) { background-color: #243d4b; }
 /* Explicit element selector wins over Tailwind's @apply-expanded anchor color rules. */
 [data-theme="dark"] a.btn-primary { color: #ffffff; }
+/* Dark theme contrast fixes found in Week 12: Landing filled links, avatar initials and Landing footer text.
+   Attribute selectors are used on purpose: Tailwind copies any rule that names a class used in @apply (bg-calm-600, text-white) onto other selectors. */
+[data-theme="dark"] a[class~="bg-calm-600"][class~="text-white"]:not(.web-brand):not(.web-nav-link) { color: #ffffff; } /* same :not() list as the generic dark link rule, so it outranks it */
+[data-theme="dark"] :is(.bg-calm-500, .bg-success-600, .bg-warm-600)[class~="text-white"] { color: #0f1e25; }
+[data-theme="dark"] .text-neutral-200 { color: #dbe7ed; }
+/* Required-field asterisk and other alert-red text: #a81830 on the dark surface is only 2.1:1, so use the light alert tone (found with HTML_CodeSniffer). */
+[data-theme="dark"] .text-alert-600 { color: #ffb3be; }
+/* Landing hero text: the dark theme turns the calm-100 tint into a dark color (#193a4b), but the hero stays a blue gradient, so the subtitle and badge fell to 1.37:1. Keep them light. axe only reports gradient backgrounds as "needs review". */
+[data-theme="dark"] .text-calm-100 { color: #e3f5fa; }
 
 /* Let buttons wrap on narrow screens so large text and wider fallback fonts never cause horizontal scrolling. */
 @media (max-width: 767px) { .btn { white-space: normal; max-width: 100%; text-align: center; } }

@@ -9,6 +9,37 @@ function renderApp(path = '/app') {
   return render(<App />);
 }
 
+function precedes(a: HTMLElement, b: HTMLElement) {
+  return Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+}
+
+describe('Layout one-handed header', () => {
+  afterEach(() => localStorage.removeItem('careconnect_web_preferences'));
+
+  it.each([
+    ['off', 'menu, brand, then account buttons'],
+    ['left', 'menu first, then account buttons, then brand'],
+    ['right', 'brand first, account buttons then menu last'],
+  ] as const)('orders the header for %s hand mode (%s) so Tab order matches what is seen', async (hand, _why) => {
+    void _why;
+    localStorage.setItem('careconnect_web_preferences', JSON.stringify({ handMode: hand }));
+    renderApp();
+    const settings = await screen.findByRole('link', { name: 'Settings', description: '' });
+    const brand = screen.getByRole('link', { name: 'CareConnect home' });
+    const menu = screen.getByRole('button', { name: 'Open navigation', hidden: true });
+    if (hand === 'left') {
+      expect(precedes(menu, settings)).toBe(true);
+      expect(precedes(settings, brand)).toBe(true);
+    } else if (hand === 'right') {
+      expect(precedes(brand, settings)).toBe(true);
+      expect(precedes(settings, menu)).toBe(true);
+    } else {
+      expect(precedes(menu, brand)).toBe(true);
+      expect(precedes(brand, settings)).toBe(true);
+    }
+  });
+});
+
 describe('Layout shell', () => {
   it('greets the caregiver by first name and names the care plan being viewed', async () => {
     renderApp();

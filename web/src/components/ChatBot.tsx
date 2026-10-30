@@ -125,7 +125,6 @@ export default function ChatBot() {
   const previouslyOpen = useRef(false);
 
   const panelLabelId   = useId();
-  const messageLiveId  = useId();
 
   // Focus input when panel opens; return focus to launcher on close
   useEffect(() => {
@@ -160,6 +159,8 @@ export default function ChatBot() {
     if (!text || sending) return;
 
     setInput('');
+    // Keep keyboard focus in the field while the reply is pending (a disabled control would drop it).
+    inputRef.current?.focus();
 
     const userMsg: ChatMessage = {
       id: `u_${Date.now()}`,
@@ -267,22 +268,12 @@ export default function ChatBot() {
           </div>
 
           {/* Message list */}
+          {/* role="log" is a polite live region, so each new message is announced once */}
           <div
             className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
+            role="log"
             aria-label="Conversation"
           >
-            {/* Live region: new messages announced to screen readers */}
-            <div
-              id={messageLiveId}
-              aria-live="polite"
-              aria-atomic="false"
-              aria-relevant="additions"
-              className="sr-only"
-            >
-              {messages.length > 0 && messages[messages.length - 1].role === 'assistant'
-                ? messages[messages.length - 1].content
-                : ''}
-            </div>
 
             {messages.map((msg) => (
               <div
@@ -311,6 +302,7 @@ export default function ChatBot() {
                       : 'bg-calm-600 text-white rounded-tr-none',
                   ].join(' ')}
                 >
+                  <span className="sr-only">{msg.role === 'assistant' ? 'Assistant: ' : 'You: '}</span>
                   {msg.content}
                 </div>
               </div>
@@ -340,7 +332,7 @@ export default function ChatBot() {
           {/* Input row */}
           <div className="flex-shrink-0 border-t border-neutral-200 px-3 py-3 flex items-center gap-2">
             <label htmlFor="chat-input" className="sr-only">
-              Type your question
+              Type your question, then press Enter to send
             </label>
             <input
               ref={inputRef}
@@ -351,9 +343,8 @@ export default function ChatBot() {
               onKeyDown={handleKeyDown}
               placeholder="Ask a question…"
               autoComplete="off"
-              disabled={sending}
-              aria-label="Type your question and press Enter to send"
-              className="flex-1 min-h-[2.75rem] rounded-lg border-2 border-neutral-200 px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-calm-600 focus:outline-none transition-colors disabled:opacity-50"
+              aria-busy={sending}
+              className="flex-1 min-h-[2.75rem] rounded-lg border-2 border-neutral-300 px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-500 focus:border-calm-600 transition-colors"
             />
             <button
               onClick={sendMessage}

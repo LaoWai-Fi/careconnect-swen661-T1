@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ManageAppointments from '../../pages/ManageAppointments';
 import { getAppointments } from '../../data/apptStore';
@@ -63,5 +63,7 @@ describe('ManageAppointments', () => {
     await userEvent.click(screen.getByRole('button', { name: `Delete: ${appt.title}` }));
     await userEvent.click(await screen.findByRole('button', { name: 'Yes, delete' }));
     expect(screen.queryByRole('button', { name: `Edit: ${appt.title}` })).not.toBeInTheDocument();
+    // a polite status message tells screen reader users the delete happened
+    await waitFor(() => expect(screen.getByRole('status', { name: 'Appointment updates' })).toHaveTextContent(`${appt.title} deleted.`));
   });
 });

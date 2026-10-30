@@ -19,4 +19,27 @@ Run `npm run build`, then `npm run test:e2e`. The suite starts its own productio
 
 [TEST_RESULTS.md](../docs/week10/TEST_RESULTS.md) is the record of the actual test scope. The three core pages are checked at 320, 390, 767, 768, 1023, 1024 and 1440 CSS pixels, with additional form, keyboard and PWA states. Remaining `incomplete` axe items are kept for human inspection.
 
-No new NVDA/VoiceOver session or full WCAG conformance certification is claimed. For manual testing, check headings, landmarks, field names/errors, current-page state, live status and modal focus using the checklist in the Part 2 report.
+Full WCAG conformance certification is not claimed. The Week 12 work below adds one manual VoiceOver session. NVDA and JAWS were not tested.
+
+## Week 12 manual screen reader session (VoiceOver)
+
+| Item | Detail |
+| --- | --- |
+| Tester | Dom Puller (Team 1) |
+| Date | October 28, 2026 |
+| Screen reader and browser | VoiceOver with Safari 26.6.2 (21624.5.1.11.3) |
+| Operating system | macOS 26.6.2 (25G83), MacBook Pro 13 inch with Touch Bar |
+| Site tested | https://laowai-fi.github.io/careconnect-swen661-T1 |
+
+Tasks covered: landmarks and headings, sign in and form errors, navigation, the Contacts page, appointment add, edit and delete, medication add and remove, Settings (theme, text size, one-handed mode), and the CareConnect Assistant chat dialog.
+
+Results and fixes from the session:
+
+| Finding | Result | Fix |
+| --- | --- | --- |
+| Chat assistant: speaker not announced, focus lost while waiting, duplicate input name | Fixed and passed on retest | Messages start with "You:" or "Assistant:", focus stays in the field while waiting (`aria-busy`), one accessible name |
+| One-handed mode did not move the header buttons | Fixed and passed on retest | `Layout.tsx` renders the menu button first in left mode and last in right mode, with settings, help and sign out on the chosen side |
+| Appointment delete gave no spoken result | Partly fixed, known limitation | The result is shown on the page and exposed as a polite status region (`role="status"`), set through `useAnnouncement` (`src/hooks/useAnnouncement.ts`) after a 600 ms delay. VoiceOver with Safari still does not speak it after the dialog closes, although it announces the focused delete control and the item is removed. Accepted as a limitation of live region support in that browser and screen reader pair |
+| Dark mode text contrast (avatars, landing page hero, required asterisk) | Fixed, verified by axe, HTML_CodeSniffer and Playwright | Dark theme overrides in `src/index.css` |
+
+Known limits: the Emergency contact call button is not part of the web version because a browser cannot place a call, so it was not tested. Status messages for appointments and medications rely on `aria-live` timing, which differs between screen readers and was not spoken by VoiceOver with Safari after a delete. Other screen readers were not tested. WAVE and axe DevTools browser extensions are run manually by the team and recorded in the Week 12 document.
