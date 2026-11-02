@@ -26,18 +26,18 @@ name: React Native compose a caregiver message
 - takeScreenshot: rn-messages-before-compose
 # The button label starts with an emoji; match the text part only.
 - tapOn: ".*New Message"
-# Fill the multi-line Message field first: Enter adds a newline there instead
-# of closing the keyboard. The single-line fields below it then close the
-# keyboard with Enter, so Send is never hidden behind it.
-- tapOn: Write your update…
-- inputText: Margaret is doing well today.
-# Parentheses are regex groups in Maestro, so they are escaped here.
+# Fill top-to-bottom so the keyboard never scrolls the recipient out of view.
 - tapOn: 'e\.g\. Sarah \(daughter\)'
 - inputText: Sarah
 - pressKey: Enter
 - tapOn: e.g. Margaret's visit summary
 - inputText: Visit update
 - pressKey: Enter
+- tapOn: Write your update…
+- inputText: Margaret is doing well today.
+# This Back follows a focused multiline field with its keyboard open. Unlike
+# the single-line fields above, Enter here would add a newline.
+- pressKey: Back
 - tapOn: Send
 # New messages are added to the top of the inbox.
 - assertVisible: ".*Visit update.*"

@@ -7,7 +7,6 @@ on:
       - mobile-flutter/**
       - mobile-rn/**
       - '!mobile-rn/__tests__/**'
-      - maestro/**
   workflow_dispatch:
 permissions:
   contents: read
@@ -119,7 +118,7 @@ jobs:
             adb install artifacts/builds/Week12-Flutter/CareConnect-Flutter-Week12.apk
             adb install artifacts/builds/Week12-ReactNative/CareConnect-ReactNative-Week12.apk
             mkdir -p artifacts/android-e2e
-            maestro test --format junit --output artifacts/android-e2e/results.xml --debug-output artifacts/android-e2e/debug maestro/
+            maestro test --format junit --output artifacts/android-e2e/results.xml --test-output-dir artifacts/android-e2e/debug --debug-output artifacts/android-e2e/debug maestro/
             cp *.png artifacts/android-e2e/ 2>/dev/null || true
       - uses: actions/upload-artifact@v4
         if: always()
