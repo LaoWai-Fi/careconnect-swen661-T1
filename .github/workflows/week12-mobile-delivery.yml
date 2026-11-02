@@ -1,5 +1,12 @@
 name: Week 12 mobile final verification and APKs
 on:
+  push:
+    branches: [feat/wiliss-wk12-integration-delivery]
+    paths:
+      - .github/workflows/week12-mobile-delivery.yml
+      - mobile-flutter/**
+      - mobile-rn/**
+      - maestro/**
   workflow_dispatch:
 permissions:
   contents: read
