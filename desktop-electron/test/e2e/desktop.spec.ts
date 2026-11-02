@@ -147,7 +147,7 @@ test('autosave writes care-data.json to the user data folder', async () => {
   await signIn(page)
   await clickMenuItem(app, 'Medications')
   await expect(page.getByRole('heading', { name: /Manage medications/ })).toBeVisible()
-  await page.getByRole('button', { name: /: mark as taken$/ }).first().click()
+  await page.getByRole('button', { name: /Activate to mark as taken$/ }).first().click()
 
   const file = path.join(userData, 'care-data.json')
   await expect
@@ -159,7 +159,7 @@ test('window bounds and care plan persist across relaunch', async () => {
   const first = await launch(userData)
   await signIn(first.page)
   await clickMenuItem(first.app, 'Medications')
-  await first.page.getByRole('button', { name: /: mark as taken$/ }).first().click()
+  await first.page.getByRole('button', { name: /Activate to mark as taken$/ }).first().click()
   const file = path.join(userData, 'care-data.json')
   await expect.poll(() => fs.existsSync(file) && fs.readFileSync(file, 'utf8')).toMatch(/"taken":\s*true/)
 
@@ -189,5 +189,5 @@ test('window bounds and care plan persist across relaunch', async () => {
 
   await signIn(second.page)
   await clickMenuItem(app, 'Medications')
-  await expect(second.page.getByRole('button', { name: /: mark as not taken$/ }).first()).toBeVisible()
+  await expect(second.page.getByRole('button', { name: /Activate to mark as not taken$/ }).first()).toBeVisible()
 })

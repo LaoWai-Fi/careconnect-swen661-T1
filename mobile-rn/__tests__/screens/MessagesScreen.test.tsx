@@ -15,6 +15,30 @@ function renderMessages() {
 }
 
 describe('MessagesScreen', () => {
+  test('compose validates required fields and saves the completed local message', async () => {
+    await renderMessages();
+    await fireEvent.press(screen.getByText('✉️ New Message'));
+    await fireEvent.press(screen.getByRole('button', { name: 'Send' }));
+    expect(await screen.findByText('Enter who should receive this.')).toBeTruthy();
+    expect(screen.getByText('Enter a subject.')).toBeTruthy();
+    expect(screen.getByText('Write a short message first.')).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('To'), 'Demo family member');
+    await fireEvent.changeText(screen.getByLabelText('Subject'), 'Final integration check');
+    await fireEvent.changeText(screen.getByLabelText('Message'), 'This is fictional local test data.');
+    await fireEvent.press(screen.getByRole('button', { name: 'Send' }));
+    await waitFor(() => expect(screen.queryByText('New message')).toBeNull());
+    expect(screen.getByText('Final integration check')).toBeTruthy();
+  });
+
+  test('cancelling compose leaves the inbox unchanged', async () => {
+    await renderMessages();
+    await fireEvent.press(screen.getByText('✉️ New Message'));
+    await fireEvent.changeText(screen.getByLabelText('Subject'), 'Discard this draft');
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByText('New message')).toBeNull());
+    expect(screen.queryByText('Discard this draft')).toBeNull();
+    expect(screen.getByText('2 unread')).toBeTruthy();
+  });
   test('renders active (non-archived) messages with unread count', async () => {
     await renderMessages();
     expect(screen.getByText('Dr. Sharma')).toBeTruthy();

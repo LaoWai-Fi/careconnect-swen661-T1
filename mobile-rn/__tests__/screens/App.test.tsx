@@ -21,6 +21,32 @@ function mountApp(initialState = seededInitialState()) {
 }
 
 describe('App routing', () => {
+  test('medication detail updates the shared care plan and returns to the list', async () => {
+    const state = seededInitialState();
+    state.userName = 'Wiliss Demo';
+    state.medications[0].taken = false;
+    await mountApp(state);
+    await fireEvent.press(screen.getByLabelText('Meds'));
+    await fireEvent.press(await screen.findByText('Amlodipine'));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Mark as taken' }));
+    expect(await screen.findByText('✓ Taken today')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: '← Back' }));
+    expect(await screen.findByText('2 of 3 taken today')).toBeTruthy();
+  });
+
+  test('message detail and archive screens return through the real navigator', async () => {
+    const state = seededInitialState();
+    state.userName = 'Wiliss Demo';
+    await mountApp(state);
+    await fireEvent.press(screen.getByLabelText('Messages'));
+    await fireEvent.press(await screen.findByLabelText("Unread message from Dr. Sharma: Margaret's blood pressure results"));
+    expect(await screen.findByText('From')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: '← Back' }));
+    await fireEvent.press(await screen.findByText('🗄 Archive'));
+    expect(await screen.findByText('Archived messages')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: '← Back to messages' }));
+    expect(await screen.findByText('1 unread')).toBeTruthy();
+  });
   test('starts on the landing screen', async () => {
     await mountApp();
     expect(screen.getByText('CareConnect')).toBeTruthy();

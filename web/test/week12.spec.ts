@@ -120,7 +120,7 @@ async function focusIndicator(page: Page) {
     const outlineVisible = style.outlineStyle !== 'none' && outlineWidth >= 2 && style.outlineColor !== 'rgba(0, 0, 0, 0)';
     const box = el.getBoundingClientRect();
     const label = `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''} "${(el.getAttribute('aria-label') || el.textContent || el.getAttribute('name') || '').trim().slice(0, 40)}" @${Math.round(box.x)},${Math.round(box.y + window.scrollY)}`;
-    return { label, outlineVisible, outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}` };
+    return { id: el.getAttribute('data-keyboard-test-id'), label, outlineVisible, outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}` };
   });
 }
 
@@ -130,21 +130,27 @@ for (const [name, route, isProtected] of routes) {
     await open(page, route, isProtected);
     const expected = await page.evaluate(() => Array.from(document.querySelectorAll<HTMLElement>(
       'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex="0"]',
-    )).filter((el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden'
-      && !el.closest('[inert], dialog:not([open]), details:not([open]) > :not(summary)')).length);
-    expect(expected).toBeGreaterThan(0);
+    )).filter((el) => el.tabIndex >= 0 && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden'
+      && !el.closest('[inert], dialog:not([open]), details:not([open]) > :not(summary)'))
+      .map((el, index) => {
+        const id = `keyboard-control-${index}`;
+        el.setAttribute('data-keyboard-test-id', id);
+        return id;
+      }));
+    expect(expected.length).toBeGreaterThan(0);
     const reached = new Set<string>();
     const missingIndicator: string[] = [];
-    for (let step = 0; step < expected + 6; step++) {
+    for (let step = 0; step < expected.length * 2 + 6; step++) {
       await page.keyboard.press('Tab');
       const info = await focusIndicator(page);
       if (!info) continue;
-      if (reached.has(info.label)) { if (info.label === [...reached][0]) break; continue; }
-      reached.add(info.label);
+      if (!info.id) continue;
+      if (reached.has(info.id)) { if (info.id === [...reached][0]) break; continue; }
+      reached.add(info.id);
       if (!info.outlineVisible) missingIndicator.push(`${info.label} -> ${info.outline}`);
     }
     expect(missingIndicator, 'every focus stop needs an outline of at least 2px').toEqual([]);
-    expect(reached.size, 'Tab order must reach the page controls (no keyboard trap)').toBeGreaterThanOrEqual(Math.min(expected, 3));
+    expect(expected.filter(id => !reached.has(id)), 'every expected control must be reached by Tab').toEqual([]);
   });
 }
 

@@ -1,0 +1,32 @@
+name: Week 12 integration checks
+on:
+  push:
+    branches: [feat/wiliss-wk12-integration-delivery]
+    paths: [mobile-rn/__tests__/**, .github/workflows/week12-integration-checks.yml]
+  pull_request:
+    paths: [mobile-rn/**, .github/workflows/week12-integration-checks.yml]
+permissions:
+  contents: read
+jobs:
+  react-native-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: mobile-rn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile-rn/package-lock.json
+      - run: npm ci
+      - run: npm run coverage -- --runInBand --coverageReporters=json-summary --coverageReporters=lcov --coverageReporters=text-summary --json --outputFile=week12-jest.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Week12-ReactNative-Final-Tests
+          path: |
+            mobile-rn/coverage
+            mobile-rn/week12-jest.json

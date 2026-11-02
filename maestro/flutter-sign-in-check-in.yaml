@@ -41,6 +41,7 @@ name: Flutter sign in and daily check in
     direction: DOWN
 - tapOn:
     id: dashboard-checkin
-# Feedback banner clears itself after ~3 s, so assert and capture right away.
-- assertVisible: "✓ Check-in recorded!"
+# Verify the durable state, rather than the three-second feedback banner.
+# Semantics merges the card's label, value and supporting text with newlines.
+- assertVisible: "(?s).*Check-in.*Done.*Completed.*"
 - takeScreenshot: flutter-check-in-recorded
