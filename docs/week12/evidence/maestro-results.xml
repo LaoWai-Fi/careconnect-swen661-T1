@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="test" tests="6" failures="0" time="301.849" timestamp="2026-11-02T06:01:41">
+    <testcase id="Flutter sign in and daily check in" name="Flutter sign in and daily check in" classname="Flutter sign in and daily check in" file="maestro/flutter-sign-in-check-in.yaml" time="30.494" timestamp="2026-11-02T06:01:41" status="SUCCESS"/>
+    <testcase id="Flutter compose a caregiver message" name="Flutter compose a caregiver message" classname="Flutter compose a caregiver message" file="maestro/flutter-message-workflow.yaml" time="59.3" timestamp="2026-11-02T06:02:12" status="SUCCESS"/>
+    <testcase id="Flutter medication management" name="Flutter medication management" classname="Flutter medication management" file="maestro/flutter-medication-workflow.yaml" time="62.535" timestamp="2026-11-02T06:03:11" status="SUCCESS"/>
+    <testcase id="React Native sign in and daily check in" name="React Native sign in and daily check in" classname="React Native sign in and daily check in" file="maestro/rn-sign-in-check-in.yaml" time="29.027" timestamp="2026-11-02T06:04:14" status="SUCCESS"/>
+    <testcase id="React Native compose a caregiver message" name="React Native compose a caregiver message" classname="React Native compose a caregiver message" file="maestro/rn-message-workflow.yaml" time="65.53" timestamp="2026-11-02T06:04:43" status="SUCCESS"/>
+    <testcase id="React Native medication management" name="React Native medication management" classname="React Native medication management" file="maestro/rn-medication-workflow.yaml" time="54.899" timestamp="2026-11-02T06:05:48" status="SUCCESS"/>
+  </testsuite>
+</testsuites>

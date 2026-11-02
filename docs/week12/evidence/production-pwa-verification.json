@@ -1,0 +1,17 @@
+{
+  "time": "2026-11-02T06:11:38.416Z",
+  "url": "https://laowai-fi.github.io/careconnect-swen661-T1/",
+  "manifestErrors": [],
+  "installabilityErrors": [],
+  "worker": {
+    "controller": "https://laowai-fi.github.io/careconnect-swen661-T1/sw.js",
+    "scope": "https://laowai-fi.github.io/careconnect-swen661-T1/"
+  },
+  "offlineReload": true,
+  "screenshots": [
+    "production-dashboard-375.png",
+    "production-dashboard-768.png",
+    "production-dashboard-1440.png"
+  ],
+  "physicalInstallationPerformed": false
+}

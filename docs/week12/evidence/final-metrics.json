@@ -1,0 +1,126 @@
+{
+  "react-native": {
+    "tests": 135,
+    "suites": 15,
+    "coverage": {
+      "lines": {
+        "total": 603,
+        "covered": 518,
+        "skipped": 0,
+        "pct": 85.9
+      },
+      "statements": {
+        "total": 684,
+        "covered": 578,
+        "skipped": 0,
+        "pct": 84.5
+      },
+      "functions": {
+        "total": 284,
+        "covered": 214,
+        "skipped": 0,
+        "pct": 75.35
+      },
+      "branches": {
+        "total": 553,
+        "covered": 442,
+        "skipped": 0,
+        "pct": 79.92
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  "desktop": {
+    "tests": 224,
+    "suites": 20,
+    "coverage": {
+      "lines": {
+        "total": 1411,
+        "covered": 1389,
+        "skipped": 0,
+        "pct": 98.44
+      },
+      "statements": {
+        "total": 1653,
+        "covered": 1615,
+        "skipped": 0,
+        "pct": 97.7
+      },
+      "functions": {
+        "total": 591,
+        "covered": 575,
+        "skipped": 0,
+        "pct": 97.29
+      },
+      "branches": {
+        "total": 1190,
+        "covered": 1102,
+        "skipped": 0,
+        "pct": 92.6
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  "web": {
+    "tests": 135,
+    "suites": 20,
+    "coverage": {
+      "lines": {
+        "total": 975,
+        "covered": 922,
+        "skipped": 0,
+        "pct": 94.56
+      },
+      "statements": {
+        "total": 1178,
+        "covered": 1073,
+        "skipped": 0,
+        "pct": 91.08
+      },
+      "functions": {
+        "total": 388,
+        "covered": 346,
+        "skipped": 0,
+        "pct": 89.17
+      },
+      "branches": {
+        "total": 834,
+        "covered": 696,
+        "skipped": 0,
+        "pct": 83.45
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "browser": {
+      "startTime": "2026-11-02T05:43:37.527Z",
+      "duration": 134251.947,
+      "expected": 162,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "flutter": {
+    "tests": 129,
+    "lines": {
+      "pct": 93.89,
+      "covered": 2043,
+      "total": 2176
+    }
+  }
+}

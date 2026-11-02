@@ -39,6 +39,7 @@ local.properties
 coverage/
 # Keep the web Jest/RTL coverage report in the repo for grading (Assignment 11).
 !web/coverage/
+!docs/week12/coverage/
 
 # Generated submission PDFs and visual QA renders (source reports are in docs/).
 /output/

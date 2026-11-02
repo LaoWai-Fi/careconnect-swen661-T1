@@ -1,0 +1,11 @@
+{
+  "time": "2026-11-02T06:01:01.976Z",
+  "executable": "desktop-electron/release/win-unpacked/CareConnect.exe",
+  "packagedLaunch": true,
+  "signIn": true,
+  "medicationChange": true,
+  "filePersistence": true,
+  "keyboardTab": true,
+  "nativeAcceleratorsManuallyVerified": false,
+  "osInstallerExecuted": false
+}

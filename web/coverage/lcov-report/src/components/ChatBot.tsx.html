@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88% </span>
+                <span class="strong">87.67% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>66/75</span>
+                <span class='fraction'>64/73</span>
             </div>
         
             
@@ -425,16 +425,7 @@
 <a name='L360'></a><a href='#L360'>360</a>
 <a name='L361'></a><a href='#L361'>361</a>
 <a name='L362'></a><a href='#L362'>362</a>
-<a name='L363'></a><a href='#L363'>363</a>
-<a name='L364'></a><a href='#L364'>364</a>
-<a name='L365'></a><a href='#L365'>365</a>
-<a name='L366'></a><a href='#L366'>366</a>
-<a name='L367'></a><a href='#L367'>367</a>
-<a name='L368'></a><a href='#L368'>368</a>
-<a name='L369'></a><a href='#L369'>369</a>
-<a name='L370'></a><a href='#L370'>370</a>
-<a name='L371'></a><a href='#L371'>371</a>
-<a name='L372'></a><a href='#L372'>372</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L363'></a><a href='#L363'>363</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -561,7 +552,6 @@
 <span class="cline-any cline-yes">255x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">255x</span>
-<span class="cline-any cline-yes">255x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">255x</span>
@@ -593,6 +583,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
@@ -711,17 +703,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">272x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -784,7 +767,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">192x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -932,7 +914,6 @@ export default function ChatBot() {
   const previouslyOpen = useRef(false);
 &nbsp;
   const panelLabelId   = useId();
-  const messageLiveId  = useId();
 &nbsp;
   // Focus input when panel opens; return focus to launcher on close
   useEffect(() =&gt; {
@@ -967,6 +948,8 @@ export default function ChatBot() {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!text || sending) <span class="cstat-no" title="statement not covered" >return;</span>
 &nbsp;
     setInput('');
+    // Keep keyboard focus in the field while the reply is pending (a disabled control would drop it).
+    inputRef.current?.focus();
 &nbsp;
     const userMsg: ChatMessage = {
       id: `u_${Date.now()}`,
@@ -1074,22 +1057,12 @@ export default function ChatBot() {
           &lt;/div&gt;
 &nbsp;
           {/* Message list */}
+          {/* role="log" is a polite live region, so each new message is announced once */}
           &lt;div
             className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
+            role="log"
             aria-label="Conversation"
           &gt;
-            {/* Live region: new messages announced to screen readers */}
-            &lt;div
-              id={messageLiveId}
-              aria-live="polite"
-              aria-atomic="false"
-              aria-relevant="additions"
-              className="sr-only"
-            &gt;
-              {messages.length &gt; 0 &amp;&amp; messages[messages.length - 1].role === 'assistant'
-                ? messages[messages.length - 1].content
-                : ''}
-            &lt;/div&gt;
 &nbsp;
             {messages.map((msg) =&gt; (
               &lt;div
@@ -1118,6 +1091,7 @@ export default function ChatBot() {
                       : 'bg-calm-600 text-white rounded-tr-none',
                   ].join(' ')}
                 &gt;
+                  &lt;span className="sr-only"&gt;{msg.role === 'assistant' ? 'Assistant: ' : 'You: '}&lt;/span&gt;
                   {msg.content}
                 &lt;/div&gt;
               &lt;/div&gt;
@@ -1147,7 +1121,7 @@ export default function ChatBot() {
           {/* Input row */}
           &lt;div className="flex-shrink-0 border-t border-neutral-200 px-3 py-3 flex items-center gap-2"&gt;
             &lt;label htmlFor="chat-input" className="sr-only"&gt;
-              Type your question
+              Type your question, then press Enter to send
             &lt;/label&gt;
             &lt;input
               ref={inputRef}
@@ -1158,9 +1132,8 @@ export default function ChatBot() {
               onKeyDown={handleKeyDown}
               placeholder="Ask a question…"
               autoComplete="off"
-              disabled={sending}
-              aria-label="Type your question and press Enter to send"
-              className="flex-1 min-h-[2.75rem] rounded-lg border-2 border-neutral-200 px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-calm-600 focus:outline-none transition-colors disabled:opacity-50"
+              aria-busy={sending}
+              className="flex-1 min-h-[2.75rem] rounded-lg border-2 border-neutral-300 px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-500 focus:border-calm-600 transition-colors"
             /&gt;
             &lt;button
               onClick={sendMessage}
@@ -1183,7 +1156,7 @@ export default function ChatBot() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-10-26T22:19:27.807Z
+                at 2026-11-02T05:43:36.643Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
