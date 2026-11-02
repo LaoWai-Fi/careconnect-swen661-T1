@@ -6,6 +6,7 @@ on:
       - .github/workflows/week12-mobile-delivery.yml
       - mobile-flutter/**
       - mobile-rn/**
+      - '!mobile-rn/__tests__/**'
       - maestro/**
   workflow_dispatch:
 permissions:
