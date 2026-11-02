@@ -1,0 +1,122 @@
+name: Week 12 mobile final verification and APKs
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Test and build Flutter
+        working-directory: mobile-flutter
+        run: |
+          mkdir -p ../artifacts/flutter
+          flutter --version > ../artifacts/flutter/toolchain.txt
+          flutter pub get
+          flutter test --coverage --reporter expanded | tee ../artifacts/flutter/tests.txt
+          cp coverage/lcov.info ../artifacts/flutter/lcov.info
+          flutter build apk --release --build-number=${{ github.run_number }}
+          cp build/app/outputs/flutter-apk/app-release.apk ../artifacts/flutter/CareConnect-Flutter-Week12.apk
+          git rev-parse HEAD > ../artifacts/flutter/source-sha.txt
+          sha256sum ../artifacts/flutter/*.apk > ../artifacts/flutter/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Week12-Flutter
+          path: artifacts/flutter
+          if-no-files-found: error
+  react-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile-rn/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Test React Native
+        working-directory: mobile-rn
+        run: |
+          mkdir -p ../artifacts/react-native
+          npm ci
+          npm run coverage -- --runInBand --coverageReporters=json-summary --coverageReporters=lcov --coverageReporters=text-summary --json --outputFile=../artifacts/react-native/jest-results.json
+          cp -r coverage ../artifacts/react-native/
+      - name: Generate and build standalone release APK
+        working-directory: mobile-rn
+        env:
+          CI: '1'
+          NODE_ENV: production
+        run: |
+          npx expo prebuild --platform android --no-install
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,x86_64 --max-workers=2
+          cp app/build/outputs/apk/release/app-release.apk ../../artifacts/react-native/CareConnect-ReactNative-Week12.apk
+          git rev-parse HEAD > ../../artifacts/react-native/source-sha.txt
+          sha256sum ../../artifacts/react-native/*.apk > ../../artifacts/react-native/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Week12-ReactNative
+          path: artifacts/react-native
+          if-no-files-found: error
+  android-workflows:
+    needs: [flutter, react-native]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Week12-*
+          path: artifacts/builds
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install Maestro
+        run: |
+          curl -fsSL https://get.maestro.mobile.dev -o "$RUNNER_TEMP/install-maestro.sh"
+          bash "$RUNNER_TEMP/install-maestro.sh"
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install artifacts/builds/Week12-Flutter/CareConnect-Flutter-Week12.apk
+            adb install artifacts/builds/Week12-ReactNative/CareConnect-ReactNative-Week12.apk
+            mkdir -p artifacts/android-e2e
+            maestro test --format junit --output artifacts/android-e2e/results.xml --debug-output artifacts/android-e2e/debug maestro/
+            cp *.png artifacts/android-e2e/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Week12-Android-Workflows
+          path: |
+            artifacts/android-e2e
+            ~/.maestro/tests
