@@ -155,7 +155,7 @@ Current/reported historical test counts are not guarantees for a newly changed c
 - [User guide](USER_GUIDE.md)
 - [Week 12 submission index and remaining checks](README.md)
 - [Mobile VPAT](MOBILE_VPAT.md)
-- [Desktop VPAT](../week9/CARECONNECT_DESKTOP_VPAT.md)
+- [Desktop VPAT](DESKTOP_VPAT.md)
 - [Web VPAT](WEB_VPAT.md)
 - [Web accessibility implementation notes](../../web/ACCESSIBILITY.md)
 - [Desktop architecture and security notes](../week8/ARCHITECTURE.md)

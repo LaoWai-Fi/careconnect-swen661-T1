@@ -30,6 +30,9 @@ artifacts/
 !docs/week11/Team1_Week11_Part4_Performance_SEO_2026-11-01.docx
 !docs/week12/CareConnect_Mobile_WCAG21_AA_VPAT.docx
 !docs/week12/CareConnect_Web_WCAG21_AA_VPAT.docx
+!docs/week12/CareConnect_Week12_Mobile_VPAT.docx
+!docs/week12/CareConnect_Week12_Desktop_VPAT.docx
+!docs/week12/CareConnect_Week12_Web_VPAT.docx
 *.pdf
 !docs/week9/CARECONNECT_DESKTOP_VPAT.pdf
 *.xlsx

@@ -10,11 +10,13 @@
 |---|---|
 | User guide | [USER_GUIDE.md](USER_GUIDE.md) |
 | Developer guide | [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) |
-| Mobile VPAT — Flutter and React Native | [Markdown source](MOBILE_VPAT.md) · [Word document](CareConnect_Mobile_WCAG21_AA_VPAT.docx) |
-| Desktop VPAT — Electron | [Markdown source](../week9/CARECONNECT_DESKTOP_VPAT.md) · [Word document](../week9/CARECONNECT_DESKTOP_VPAT_Week9_With_Results.docx) · [PDF](../week9/CARECONNECT_DESKTOP_VPAT.pdf) |
-| Web VPAT — React | [Markdown source](WEB_VPAT.md) · [Word document](CareConnect_Web_WCAG21_AA_VPAT.docx) |
+| Mobile VPAT — Flutter and React Native | [Markdown source](MOBILE_VPAT.md) · [Week 12 Word document](CareConnect_Week12_Mobile_VPAT.docx) |
+| Desktop VPAT — Electron | [Markdown source](DESKTOP_VPAT.md) · [Week 12 Word document](CareConnect_Week12_Desktop_VPAT.docx) |
+| Web VPAT — React | [Markdown source](WEB_VPAT.md) · [Week 12 Word document](CareConnect_Week12_Web_VPAT.docx) |
 
-The desktop report is the existing Week 9 evaluation reused for this assignment. It covers all 50 WCAG 2.1 Level A and AA criteria and documents its evidence baseline and known gaps; it is not represented as a new Week 12 retest.
+All three reports are labeled for Week 12. The desktop report retains the historical Week 9 evaluation baseline and known gaps; references to Week 9 identify the testing evidence, not the current assignment. It is not represented as a new Week 12 retest.
+
+Regenerate the Week 12 desktop source and all three Word reports from the repository root with `python docs\week12\generate_vpats.py`.
 
 ## Evidence and scope notes
 

@@ -61,7 +61,7 @@ On the mobile and desktop prototypes, the SOS action presents a confirmation bef
 - **Focus and dialogs:** Web/Desktop keyboard tests document visible focus, Escape dismissal, and focus restoration for dialogs. Mobile screen-reader behavior must be verified on each final native build.
 - **Motion and gestures:** Key actions have labeled buttons; dashboard reorder has tap-based Move Up/Move Down alternatives in the mobile implementations.
 
-For criterion-by-criterion status and the exact evidence scope, see the [Mobile VPAT](MOBILE_VPAT.md), [Desktop VPAT](../week9/CARECONNECT_DESKTOP_VPAT.md), and [Web VPAT](WEB_VPAT.md).
+For criterion-by-criterion status and the exact evidence scope, see the [Mobile VPAT](MOBILE_VPAT.md), [Desktop VPAT](DESKTOP_VPAT.md), and [Web VPAT](WEB_VPAT.md).
 
 ## Screenshots
 

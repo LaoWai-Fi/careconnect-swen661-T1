@@ -1,4 +1,6 @@
-# CareConnect Mobile — WCAG 2.1 Level A and AA Conformance Report
+# Week 12 Part 3 — CareConnect Mobile VPAT
+
+**Assignment 12: Final Project — Complete Documentation**
 
 **Product:** CareConnect Mobile (Flutter and React Native / Expo)
 **Project:** SWEN 661 Team 1

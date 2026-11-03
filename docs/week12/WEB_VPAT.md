@@ -1,4 +1,6 @@
-# CareConnect Web — WCAG 2.1 Level A and AA Conformance Report
+# Week 12 Part 3 — CareConnect Web VPAT
+
+**Assignment 12: Final Project — Complete Documentation**
 
 **Product:** CareConnect Web (React/Vite)
 **Project:** SWEN 661 Team 1
