@@ -1,5 +1,7 @@
 # CareConnect — Developer Guide
 
+**Final Week 12 edition:** Use the updated [developer documentation in PART3_GUIDES.md](PART3_GUIDES.md#32-developer-documentation) or the [complete Word submission](CareConnect_Week12_Part3_Complete.docx). Those editions incorporate the team's final checkout, build, and coverage records. The text below is the earlier checkout baseline.
+
 This guide covers the four implementations in the monorepo. Each app has its own dependencies, test commands, release process, and maturity. No platform should be treated as a secure clinical product: authentication and data are demonstration/local implementations.
 
 ## Architecture overview

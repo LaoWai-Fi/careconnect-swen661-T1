@@ -6,6 +6,12 @@
 
 ## Submission files
 
+**Latest complete Part 3:** [Word document](CareConnect_Week12_Part3_Complete.docx), including the updated user/developer guides, five Week 12 application screenshots, a rendered architecture diagram, and all three 50-criterion VPATs.
+
+The authoritative updated guide text is [PART3_GUIDES.md](PART3_GUIDES.md). It incorporates the team's final build, installation, coverage, and production evidence on `main`. The individual guides and VPAT exports below remain the earlier documentation baseline; use the complete Word edition for the final assembled submission.
+
+Regenerate the complete edition with `python docs\week12\generate_submission_sections.py --complete`. Its screenshots and architecture image are retained in `submission-assets/`. The generator preserves historical conformance evidence, relabels historical CI references, and adds final evidence without claiming new assistive-technology testing.
+
 | Deliverable | Editable source / evidence |
 |---|---|
 | User guide | [USER_GUIDE.md](USER_GUIDE.md) |
@@ -23,16 +29,16 @@ Regenerate the Week 12 desktop source and all three Word reports from the reposi
 - The supplied `Team1_Week12_Submission_Items.docx` contains the team's web accessibility testing and fix evidence. Its WAVE and axe DevTools runs were on the local production build of the fix branch, not a post-merge scan of the live site. The Word submission still contains a placeholder asking for the post-merge live-site result; replace that text before submitting the full Week 12 package.
 - The team's web report records 455 Playwright passes, 23 documented WebKit skips, 135 Jest/RTL passes, keyboard-only testing, and VoiceOver/Safari testing. The known limitation is that VoiceOver did not speak the appointment-deletion status message.
 - Mobile evidence in this repository records TalkBack testing on an Android emulator and six successful Maestro workflows. It does not record iOS VoiceOver testing or a current final-build test on iOS.
-- The mobile user-guide section uses no fabricated screenshots. The repository currently has web and desktop screenshots, but no current Flutter/React Native screen captures. Capture and insert those before treating the mobile screenshot portion as complete.
-- A live Lighthouse report in `docs/week11/evidence/` is one homepage lab run; it is not full-site WCAG evidence and does not replace a manual assistive-technology evaluation.
+- The complete guide includes the team's actual Week 12 Flutter, React Native, packaged Windows, and production web screenshots. Web screenshots are cropped for readability; original downloads are retained. These images are not new screen-reader test evidence.
+- The team's [final integration and delivery records](https://github.com/LaoWai-Fi/careconnect-swen661-T1/blob/main/docs/week12/README.md) report final line coverage of Flutter 93.89%, React Native 85.90%, Electron 98.44%, and web 94.56%, six release-APK Maestro passes, and four production Landing/Dashboard Lighthouse accessibility scores of 100. These supplement historical evidence; they do not establish whole-site production WAVE/axe results or new screen-reader sessions.
 
 ## Final human verification checklist
 
 - [ ] Replace the stale post-merge placeholder in the supplied Week 12 Word submission. If claiming live WAVE/axe results, run those tools on the deployed version and save the actual reports/screenshots.
-- [ ] Capture current Flutter and React Native screenshots on a device/emulator and add them to the user guide or the final submission package.
+- [x] Include the team's Week 12 Flutter and React Native screenshots in the complete user guide.
 - [ ] If iOS is in the submission scope, build both apps and complete VoiceOver checks; the current evidence only establishes Android TalkBack testing.
 - [ ] Re-run the mobile and desktop manual checks against the exact final builds. Windows/NVDA and Windows contrast themes remain untested for desktop.
-- [ ] Confirm the instructor accepts Markdown plus linked Word VPATs as editable documentation; if a single combined Word submission is required, export the user and developer guides and combine them with the three VPATs.
+- [ ] Open the complete Word edition and check image readability, table layout, and page breaks before inserting it into the team submission. Generated XML/archive integrity is checked; Word's rendered pagination has not been verified.
 
 ## Related documentation
 

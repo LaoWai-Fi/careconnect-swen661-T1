@@ -1,5 +1,7 @@
 # CareConnect — User Guide
 
+**Final Week 12 edition:** Use the updated [user documentation in PART3_GUIDES.md](PART3_GUIDES.md#31-user-documentation) or the [complete Word submission](CareConnect_Week12_Part3_Complete.docx). Those editions include the final Android build instructions and actual Week 12 screenshots. The text below is the earlier guide baseline.
+
 CareConnect is an educational care-coordination prototype for care recipients and caregivers. It helps people view a daily routine, medication schedule, appointments, activity, and messages. The user interface is designed to reduce memory load through clear labels, predictable navigation, large controls, and visible status feedback.
 
 > **Important:** CareConnect is not a medical device or clinical service. It uses demonstration/sample data and does not provide medical advice, verify medication instructions, contact emergency services, or securely manage real patient records. Do not enter real health information or rely on it for care decisions.
